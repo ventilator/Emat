@@ -9,7 +9,7 @@ object Fstart: TFstart
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Verdana'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -22,12 +22,6 @@ object Fstart: TFstart
     Top = 176
     Width = 4
     Height = 13
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Verdana'
-    Font.Style = []
-    ParentFont = False
   end
   object i1: TImage
     Left = 0

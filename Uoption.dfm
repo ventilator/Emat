@@ -1,10 +1,11 @@
 object Fsettings: TFsettings
-  Left = 313
-  Top = 303
-  Width = 376
-  Height = 320
+  Left = 347
+  Top = 279
   Anchors = [akLeft, akTop, akRight, akBottom]
+  BorderStyle = bsDialog
   Caption = 'Einstellungen'
+  ClientHeight = 291
+  ClientWidth = 366
   Color = 15592941
   Ctl3D = False
   ParentFont = True
@@ -13,7 +14,7 @@ object Fsettings: TFsettings
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    368
+    366
     291)
   PixelsPerInch = 96
   TextHeight = 13
@@ -31,7 +32,7 @@ object Fsettings: TFsettings
     ParentFont = False
   end
   object Label1: TLabel
-    Left = 230
+    Left = 228
     Top = 275
     Width = 130
     Height = 13
@@ -53,10 +54,11 @@ object Fsettings: TFsettings
   object TB: TTabbedNotebook
     Left = 8
     Top = 4
-    Width = 351
+    Width = 349
     Height = 199
     Align = alCustom
     Anchors = [akLeft, akTop, akRight, akBottom]
+    PageIndex = 1
     TabFont.Charset = DEFAULT_CHARSET
     TabFont.Color = clBtnText
     TabFont.Height = -11
@@ -167,17 +169,125 @@ object Fsettings: TFsettings
     object TTabPage
       Left = 4
       Top = 24
-      Caption = 'Hotkeys'
+      Caption = 'globale Hotkeys'
       object Label2: TLabel
-        Left = 52
-        Top = 0
-        Width = 148
-        Height = 143
-        Caption = 
-          '...sind derzeit nicht ver'#228'nderbar'#13#10#13#10#8226' Strg+F9   zur'#252'ck'#13#10#8226' Strg+' +
-          'F11  pause/spielen'#13#10#8226' Strg+F12  vor'#13#10#13#10#8226' Strg+F1 25% Lautst'#228'rke'#13 +
-          #10#8226' Strg+F2 50% Lautst'#228'rke'#13#10#8226' Strg+F3 75% Lautst'#228'rke'#13#10#8226' Strg+F4 1' +
-          '00% Lautst'#228'rke'#13#10
+        Left = 18
+        Top = 10
+        Width = 70
+        Height = 13
+        Caption = 'vorheriger Titel'
+      end
+      object Label3: TLabel
+        Left = 18
+        Top = 32
+        Width = 30
+        Height = 13
+        Caption = 'Pause'
+      end
+      object Label4: TLabel
+        Left = 18
+        Top = 55
+        Width = 64
+        Height = 13
+        Caption = 'n'#228'chster Titel'
+      end
+      object Label5: TLabel
+        Left = 18
+        Top = 78
+        Width = 73
+        Height = 13
+        Caption = '25% Lautst'#228'rke'
+      end
+      object Label6: TLabel
+        Left = 18
+        Top = 100
+        Width = 73
+        Height = 13
+        Caption = '50% Lautst'#228'rke'
+      end
+      object Label7: TLabel
+        Left = 18
+        Top = 123
+        Width = 73
+        Height = 13
+        Caption = '75% Lautst'#228'rke'
+      end
+      object Label8: TLabel
+        Left = 18
+        Top = 146
+        Width = 79
+        Height = 13
+        Caption = '100% Lautst'#228'rke'
+      end
+      object E_GHK_vorher: TEdit
+        Left = 128
+        Top = 8
+        Width = 121
+        Height = 19
+        TabOrder = 0
+        Text = 'Strg+F9'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
+      end
+      object E_GHK_pause: TEdit
+        Left = 128
+        Top = 30
+        Width = 121
+        Height = 19
+        TabOrder = 1
+        Text = 'Strg+F11'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
+      end
+      object E_GHK_nachher: TEdit
+        Left = 128
+        Top = 53
+        Width = 121
+        Height = 19
+        TabOrder = 2
+        Text = 'Strg+F12'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
+      end
+      object E_GHK25: TEdit
+        Left = 128
+        Top = 76
+        Width = 121
+        Height = 19
+        TabOrder = 3
+        Text = 'Strg+F1'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
+      end
+      object E_GHK50: TEdit
+        Left = 128
+        Top = 98
+        Width = 121
+        Height = 19
+        TabOrder = 4
+        Text = 'Strg+F2'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
+      end
+      object E_GHK75: TEdit
+        Left = 128
+        Top = 121
+        Width = 121
+        Height = 19
+        TabOrder = 5
+        Text = 'Strg+F3'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
+      end
+      object E_GHK100: TEdit
+        Left = 128
+        Top = 144
+        Width = 121
+        Height = 19
+        TabOrder = 6
+        Text = 'Strg+F4'
+        OnKeyDown = E_GHK_vorherKeyDown
+        OnKeyPress = E_GHK_vorherKeyPress
       end
     end
     object TTabPage
@@ -196,6 +306,25 @@ object Fsettings: TFsettings
         Checked = True
         State = cbChecked
         TabOrder = 0
+      end
+    end
+    object TTabPage
+      Left = 4
+      Top = 24
+      Caption = 'Renderkern'
+      object RGRender: TRadioGroup
+        Left = 0
+        Top = 0
+        Width = 341
+        Height = 171
+        Align = alClient
+        Caption = 'Aktiver Renderkern'
+        ItemIndex = 1
+        Items.Strings = (
+          'DSPack'
+          'BASS')
+        TabOrder = 0
+        OnClick = RGRenderClick
       end
     end
   end

@@ -12,7 +12,10 @@ uses
   Ulaut in 'Ulaut.pas' {Flaut},
   Uvideo in 'Uvideo.pas' {Fvideo},
   Usave in 'Usave.pas',
-  ump3player in 'ump3player.pas' {FMp3Player};
+  ump3player in 'ump3player.pas' {FMp3Player},
+  U_BassPlayer in 'U_BassPlayer.pas',
+  spectrum_vis in 'spectrum_vis.pas',
+  CommonTypes in 'CommonTypes.pas';
 
 {$R *.res}
 

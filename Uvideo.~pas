@@ -54,8 +54,8 @@ end;
 
 procedure TFvideo.FormPaint(Sender: TObject);
 begin
-fmp3.MediaP.Display:=fvideo.panel1;
-fmp3.MediaP.DisplayRect:=Fvideo.Panel1.ClientRect;
+//fmp3.MediaP.Display:=fvideo.panel1;
+//fmp3.MediaP.DisplayRect:=Fvideo.Panel1.ClientRect;
 end;
 
 procedure TFvideo.FormClose(Sender: TObject; var Action: TCloseAction);

@@ -13,6 +13,7 @@ type
     ImageList1: TImageList;
     i1: TImage;
     i2: TImage;
+    Label1: TLabel;
 
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -31,7 +32,7 @@ implementation
 {$R *.dfm}
 
 procedure TFstart.FormCreate(Sender: TObject);
-var bild: Tbitmap;
+//var bild: Tbitmap;
 begin
 {geht net weil delphi beim hinzufügen von bildern der imagelist abstürzt grrr...
   randomize;

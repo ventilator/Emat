@@ -11,8 +11,9 @@ uses
   uwarte in 'uwarte.pas' {FWarte},
   Ulaut in 'Ulaut.pas' {Flaut},
   Uvideo in 'Uvideo.pas' {Fvideo},
-  ump3player in 'ukbin\ump3player.pas' {FMp3Player},
-  Usave in 'Usave.pas';
+  Usave in 'Usave.pas',
+  ump3player in 'ump3player.pas' {FMp3Player},
+  U_BassPlayer in 'U_BassPlayer.pas';
 
 {$R *.res}
 

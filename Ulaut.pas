@@ -36,7 +36,7 @@ end;
 
 procedure TFlaut.TBTrayVolumeChange(Sender: TObject);
 begin
-fmp3.TBVolume.Position:=1000-TBTrayVolume.Position;
+fmp3.TBVolume.Position:=maxVolume-TBTrayVolume.Position;
 end;
 
 procedure TFlaut.FormDeactivate(Sender: TObject);

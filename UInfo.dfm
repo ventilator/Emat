@@ -3601,9 +3601,17 @@ object FInfo: TFInfo
     Lines.Strings = (
       '...'
       ''
-      '- 0.5 beta 2.00'
+      #8226' 0.5 beta 2'
       '  '
-      '  v'#246'llig neuer Renderkern (DSPack)')
+      '  '#8226' neuer Renderkern (DSPack) anstatt Windows '
+      '    MediaPlayer 6.2 (f'#252'r zuk'#252'nftige, bessere '
+      'Videounterst'#252'tzung)'
+      ''
+      #8226' 0.5 beta 3'
+      ''
+      '   '#8226' zweiter Renderkern (BASS)'
+      '    (f'#252'r den Equalizer, aber ohne Video)'
+      '   '#8226' Equalizer')
     ParentCtl3D = False
     ParentFont = False
     ReadOnly = True
@@ -3627,7 +3635,9 @@ object FInfo: TFInfo
     Font.Name = 'Verdana'
     Font.Style = []
     Lines.Strings = (
-      #8226' Horologium-Unterst'#252'tzung  (Mp3-Wecker)'
+      #8226' stark verbesserte Videounterst'#252'tzung'
+      #8226' Horologium-Unterst'#252'tzung verbessern '
+      '(Mp3-Wecker ist NICHT einsatzbereit)'
       #8226' Playlistenkomprimierung'
       #8226' bessere Doppelte Mp3s Ausmistfunktion'
       #8226' mehrere Elemente der Liste markieren k'#246'nnen'
@@ -3657,6 +3667,15 @@ object FInfo: TFInfo
     Font.Height = -11
     Font.Name = 'Verdana'
     Font.Style = []
+    Lines.Strings = (
+      '[zu viele um sie hier alle aufzulisten]'
+      ';-)'
+      ''
+      '-Wiedergabe stockt auf einigen ausgelasteten '
+      'Systemen'
+      ''
+      '-Die Musikrichting Blues wird in den '
+      'Medieninformationen nicht angezeigt')
     ParentCtl3D = False
     ParentFont = False
     ReadOnly = True
@@ -3682,7 +3701,7 @@ object FInfo: TFInfo
     Lines.Strings = (
       'Dies ist Emat 0.5 beta'
       ''
-      'Einfaches Mp3 AusmistTool'
+      '"Einfaches Mp3 AusmistTool"'
       ''
       'Lead coding and Design:'
       '  Clemens Gr'#252'newald - Der_Ventilator'
@@ -3692,7 +3711,19 @@ object FInfo: TFInfo
       '  Daniel Hillenbrand - B@ngung'
       '  Michael Wei'#223'm'#252'ller - Army'
       ''
-      'Delphi.Source auf Anfrage.')
+      'Dieses Programm ist Freeware und darf'
+      'unkommerziell weitergegeben werden.'
+      ''
+      'Nutzung auf eigene Gefahr.'
+      ''
+      'Getestet unter Windows 2000 Sp4, XP Sp1 & XP Sp2'
+      'Unter Windows 9x, ME nur eingeschr'#228'nkt nutzbar'
+      ''
+      'Programmiert mit Delphi unter Verwendung'
+      'einiger Freewarekomponenten'
+      '(z.B. LMD-Pack, DSPack).'
+      ''
+      'Source auf Anfrage.')
     ParentCtl3D = False
     ParentFont = False
     ReadOnly = True
@@ -3745,7 +3776,8 @@ object FInfo: TFInfo
       #8226' Strg+F1 25% Lautst'#228'rke'
       #8226' Strg+F2 50% Lautst'#228'rke'
       #8226' Strg+F3 75% Lautst'#228'rke'
-      #8226' Strg+F4 100% Lautst'#228'rke')
+      #8226' Strg+F4 100% Lautst'#228'rke'
+      '(lineare Regelung)')
     ParentCtl3D = False
     ParentFont = False
     ReadOnly = True

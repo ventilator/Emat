@@ -21,7 +21,7 @@ object Flaut: TFlaut
     Width = 25
     Height = 83
     Align = alLeft
-    Max = 1000
+    Max = 10000
     Orientation = trVertical
     TabOrder = 0
     TickMarks = tmBoth

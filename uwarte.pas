@@ -10,6 +10,7 @@ type
   TFWarte = class(TForm)
     PBwarte: TXProgress;
     BAbbrechen: TButton;
+    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure BAbbrechenClick(Sender: TObject);
   private
@@ -36,8 +37,10 @@ end;
 
 procedure TFWarte.BAbbrechenClick(Sender: TObject); //uk
 begin
-if MessageDlg('Wollen Sie diesesn Vorgang wirklich abbrechen?',mtConfirmation,[mbYes,mbNo],0) = mrYes
- then PBwarte.Tag:=1  
+Fwarte.FormStyle:=fsNormal;
+if MessageDlg('Wollen Sie diesesn Vorgang wirklich abbrechen?'+#13+'Er kann später fortgesetzt werden.',mtConfirmation,[mbYes,mbNo],0) = mrYes
+ then PBwarte.Tag:=1;
+Fwarte.FormStyle:=fsStayOnTop;
 end;
 
 end.

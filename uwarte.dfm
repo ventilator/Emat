@@ -6,16 +6,17 @@ object FWarte: TFWarte
   BorderIcons = [biSystemMenu, biMinimize, biMaximize, biHelp]
   BorderStyle = bsNone
   Caption = 'Bitte warten...'
-  ClientHeight = 54
+  ClientHeight = 70
   ClientWidth = 312
   Color = clBtnFace
   ParentFont = True
+  FormStyle = fsStayOnTop
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   DesignSize = (
     312
-    54)
+    70)
   PixelsPerInch = 96
   TextHeight = 13
   object PBwarte: TXProgress
@@ -36,6 +37,13 @@ object FWarte: TFWarte
     Caption = 'Bitte warten...'
     CaptionType = ctCustom
     anchors = [akLeft, akTop, akRight]
+  end
+  object Label1: TLabel
+    Left = 32
+    Top = 56
+    Width = 252
+    Height = 13
+    Caption = '[falls Renderkern=BASS weiteres Mp3-h'#246'ren m'#246'glich]'
   end
   object BAbbrechen: TButton
     Left = 116

@@ -8,7 +8,7 @@ Grafische Stringlistenausgabe (also eine Listbox)
 Programmiert mit Delphi 7
 Das Design entspricht nicht modernen ergonomischen Gepflogenheiten, sondern meinem Geschmack
 
-(c) Clemens Grünewald
+© Clemens Grünewald
 0.1.0  01.07.2004 - 20.07.2004
 -initial Release
 

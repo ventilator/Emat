@@ -2,7 +2,7 @@ unit Usave;
 
 interface
 
-uses inifiles,dialogs,sysutils;
+uses inifiles,dialogs,sysutils, forms;
 
 type Tplayliste = record
        filename : string[255];
@@ -37,11 +37,11 @@ procedure TSave.S_Playlisten(playlisten:tplaylisten);
  var datei : file of tplayliste;
      i     : integer;
  begin
-  assign(datei,'playlisten.dat');
+  assign(datei,extractfilepath(application.ExeName)+'playlisten.epc');
   try
    rewrite(datei);
   except
-   messagedlg('"playlisten.dat" kann nicht gelesen werden.',mtwarning,[mbOK],0);
+   messagedlg('"playlisten.epc" kann nicht gelesen werden.',mtError,[mbOK],0);
    exit;
   end;
   Reset(Datei);
@@ -56,9 +56,9 @@ function TSave.L_Playlisten:tplaylisten;
      playlisten : tplaylisten;
      i     : integer;
 begin
-  if fileexists('playlisten.dat') then
+  if fileexists('playlisten.epc') then
   begin
-   AssignFile(Datei,'playlisten.dat');
+   AssignFile(Datei,extractfilepath(application.ExeName)+'playlisten.epc');
    Reset(Datei);
 
    for i:=0 to FileSize(Datei)-1 do

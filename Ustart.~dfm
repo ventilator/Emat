@@ -9,7 +9,7 @@ object Fstart: TFstart
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Verdana'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
@@ -22,12 +22,6 @@ object Fstart: TFstart
     Top = 176
     Width = 4
     Height = 13
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Verdana'
-    Font.Style = []
-    ParentFont = False
   end
   object i1: TImage
     Left = 0
@@ -18054,6 +18048,13 @@ object Fstart: TFstart
       7758}
     Visible = False
     OnClick = FormClick
+  end
+  object Label1: TLabel
+    Left = 161
+    Top = 15
+    Width = 197
+    Height = 13
+    Caption = 'Info siehe Dialog "Info" im ?-Men'#252
   end
   object Timer1: TTimer
     OnTimer = Timer1Timer

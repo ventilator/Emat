@@ -8,23 +8,76 @@ uses
   StdCtrls, ExtCtrls, ActnList, XPStyleActnCtrls, StdActns, UPathDialog,
   ImgList, ComCtrls, Grids, MPlayer, XProgress, Gauges, mmsystem, registry,
   CoolTrayIcon, Menus, shellapi, UId3tag, Buttons, CustomizeDlg, strutils,
-  LMDCustomComponent, LMDGlobalHotKey, dxCore, dxContainer, Exbar, usave, XPMan;
+  LMDCustomComponent, LMDGlobalHotKey, dxCore, dxContainer, Exbar, usave, XPMan,
+  DSPack, dsutil, u_bassplayer, commontypes, spectrum_vis, bass;
 
 
-const Version   = '0.5 [beta 1.07.2] ';
-      Neuigkeit = '';
+const Version   = '0.5 [beta 3-dev3.52] ';
+      Neuigkeit = '';   //braucht kein mensch... oder doch? ;-)
       Datenbankversion='2';
       RegHauptPfad='Software\G-Software\Emat\0.58\';
       RegPlaylistenPfad= RegHauptPfad+ 'Playlisten\' ;
       RegEinstellungenPfad= RegHauptPfad+ 'Einstellungen\' ;
       MP3Player_Einleitung='Audiodateien, die zum Transfer bereit sind: ';
+      maxVolume = 10000;
+type
+  ID3Genre = (
+    id3gBlues, id3gClassicRock, id3gCountry, id3gDance, id3gDisco,
+    id3gFunk, id3gGrunge, id3gHipHop, id3gJazz, id3gMetal, id3gNewAge,
+    id3gOldies, id3gOther, id3gPop, id3gRNB, id3gRap, id3gReggae,
+    id3gRock, id3gTechno, id3gIndustrial, id3gAlternative, id3gSka,
+    id3gDeathMetal, id3gPranks, id3gSoundtrack, id3gEuroTechno,
+    id3gAmbient, id3gTripHop, id3gVocal, id3gJazzFunk, id3gFusion,
+    id3gTrance, id3gClassical, id3gInstrumental, id3gAcid, id3gHouse,
+    id3gGame, id3gSoundClip, id3gGospel, id3gNoise, id3gAlternRock,
+    id3gBass, id3gSoul, id3gPunk, id3gSpace, id3gMeditative,
+    id3gInstrumentalPop, id3gInstrumentalRock, id3gEthnic, id3gGothic,
+    id3gDarkwave, id3gTechnoIndustrial, id3gElectronic, id3gPopFolk,
+    id3gEurodance, id3gDream, id3gSouthernRock, id3gComedy, id3gCult,
+    id3gGangsta, id3gTop40, id3gChristianRap, id3gPopFunk, id3gJungle,
+    id3gNativeAmerican, id3gCabaret, id3gNewWave, id3gPsychadelic,
+    id3gRave, id3gShowtunes, id3gTrailer, id3gLoFi, id3gTribal,
+    id3gAcidPunk, id3gAcidJazz, id3gPolka, id3gRetro, id3gMusical,
+    id3gRockNRoll, id3gHardRock, id3gFolk, id3gFolkRock,
+    id3gNationalFolk, id3gSwing, id3gFastFusion, id3gBebob, id3gLatin,
+    id3gRevival, id3gCeltic, id3gBluegrass, id3gAvantgarde,
+    id3gGothicRock, id3gProgressiveRock, id3gPsychedelicRock,
+    id3gSymphonicRock, id3gSlowRock, id3gBigBand, id3gChorus,
+    id3gEasyListening, id3gAcoustic, id3gHumour, id3gSpeech,
+    id3gChanson, id3gOpera, id3gChamberMusic, id3gSonata, id3gSymphony,
+    id3gBootyBass, id3gPrimus, id3gPornGroove, id3gSatire, id3gSlowJam,
+    id3gClub, id3gTango, id3gSamba, id3gFolklore, id3gBallad,
+    id3gPowerBallad, id3gRhythmicSoul, id3gFreestyle, id3gDuet,
+    id3gPunkRock, id3gDrumSolo, id3gAcapella, id3gEuroHouse,
+    id3gDanceHall
+  );
 
-      //uk [Lautstärke des MediaP]
-      MCI_SETAUDIO = $0873;
-      MCI_DGV_SETAUDIO_VOLUME = $4002;
-      MCI_DGV_SETAUDIO_ITEM = $00800000;
-      MCI_DGV_SETAUDIO_VALUE = $01000000;
-      MCI_DGV_STATUS_VOLUME = $4019;
+const        //Blues eigentlich an erster Stelle
+  ID3GenreName: array [0..125] of String = (
+    '', 'Classic Rock', 'Country', 'Dance', 'Disco', 'Funk', 'Grunge',
+    'Hip-Hop', 'Jazz', 'Metal', 'New Age', 'Oldies', 'Other', 'Pop', 'R&B',
+    'Rap', 'Reggae', 'Rock', 'Techno', 'Industrial', 'Alternative', 'Ska',
+    'Death Metal', 'Pranks', 'Soundtrack', 'Euro-Techno', 'Ambient',
+    'Trip-Hop', 'Vocal', 'Jazz+Funk', 'Fusion', 'Trance', 'Classical',
+    'Instrumental', 'Acid', 'House', 'Game', 'Sound Clip', 'Gospel',
+    'Noise', 'AlternRock', 'Bass', 'Soul', 'Punk', 'Space', 'Meditative',
+    'Instrumental Pop', 'Instrumental Rock', 'Ethnic', 'Gothic',
+    'Darkwave', 'Techno-Industrial', 'Electronic', 'Pop-Folk',
+    'Eurodance', 'Dream', 'Southern Rock', 'Comedy', 'Cult', 'Gangsta',
+    'Top 40', 'Christian Rap', 'Pop/Funk', 'Jungle', 'Native American',
+    'Cabaret', 'New Wave', 'Psychadelic', 'Rave', 'Showtunes', 'Trailer',
+    'Lo-Fi', 'Tribal', 'Acid Punk', 'Acid Jazz', 'Polka', 'Retro',
+    'Musical', 'Rock & Roll', 'Hard Rock', 'Folk', 'Folk-Rock',
+    'National Folk', 'Swing', 'Fast Fusion', 'Bebob', 'Latin', 'Revival',
+    'Celtic', 'Bluegrass', 'Avantgarde', 'Gothic Rock', 'Progressive Rock',
+    'Psychedelic Rock', 'Symphonic Rock', 'Slow Rock', 'Big Band',
+    'Chorus', 'Easy Listening', 'Acoustic', 'Humour', 'Speech', 'Chanson',
+    'Opera', 'Chamber Music', 'Sonata', 'Symphony', 'Booty Bass', 'Primus',
+    'Porn Groove', 'Satire', 'Slow Jam', 'Club', 'Tango', 'Samba',
+    'Folklore', 'Ballad', 'Power Ballad', 'Rhythmic Soul', 'Freestyle',
+    'Duet', 'Punk Rock', 'Drum Solo', 'Acapella', 'Euro-House', 'Dance Hall'
+    );
+
 
 Type
   TID3Tag = record
@@ -55,34 +108,6 @@ type TMp3Eintrag = record
 type TDatenbank=ARRAY OF TMp3Eintrag;
 
 type TueberDatenbank=ARRAY OF TDatenbank;
-     {
-type Tplayliste = record              //Auch in Save ändern
-       filename : string[255];
-       path     : string[255];
-       eintraege : integer;
-      end;
-
-type Tplaylisten = array of tplayliste;
-       }
-//uk [Lautstärke des MediaP]
-type
-  MCI_DGV_SETAUDIO_PARMS = record
-    dwCallback: DWORD;
-    dwItem: DWORD;
-    dwValue: DWORD;
-    dwOver: DWORD;
-    lpstrAlgorithm: PChar;
-    lpstrQuality: PChar;
-  end;
-
-//uk [Lautstärke des MediaP]
-type
-  MCI_STATUS_PARMS = record
-    dwCallback: DWORD;
-    dwReturn: DWORD;
-    dwItem: DWORD;
-    dwTrack: DWORD;
-  end;
 
 type
   TFmp3 = class(TForm)
@@ -92,8 +117,6 @@ type
     ATB: TActionToolBar;
     PathD: TPathDialog;
     ILSymbolleiste: TImageList;
-    MediaP: TMediaPlayer;
-    Timer: TTimer;
     GVolume: TGauge;
     TBVolume: TTrackBar;
     LTitel: TLabel;
@@ -169,9 +192,16 @@ type
     PMsidebar: TPopupMenu;
     AListeAusSidbarLoeschen: TAction;
     AListeAusSidbarLoeschen1: TMenuItem;
+    FilterGraph: TFilterGraph;
+    DSTrackBar: TDSTrackBar;
+    ID3Tagneuauslesen1: TMenuItem;
+    BassTimer: TTimer;
+    IEQ: TImage;
+    ILsidebar: TImageList;
+    PBSpectrum: TPaintBox;
+    TimerSpectrum: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure AddOrdnerExecute(Sender: TObject);
-    procedure TimerTimer(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure AnextExecute(Sender: TObject);
     procedure PBarMouseDown(Sender: TObject; Button: TMouseButton;
@@ -209,7 +239,6 @@ type
     procedure AumbennenClick(Sender: TObject);
     procedure ASortExecute(Sender: TObject);
     procedure ADauerAuslesenExecute(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
     procedure AFarbresretExecute(Sender: TObject);
     procedure GHK_pauseKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -246,6 +275,19 @@ type
     procedure AsuchfeldfocusExecute(Sender: TObject);
     procedure AhilfeExecute(Sender: TObject);
     procedure LTitelClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure DSTrackBarTimer(sender: TObject; CurrentPos,
+      StopPos: Cardinal);
+    procedure BassTimerTimer(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure IEQMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure IEQMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure IEQMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure TimerSpectrumTimer(Sender: TObject);
+    procedure PBSpectrumClick(Sender: TObject);
 
   private
     procedure ErschaffeGliste;
@@ -272,7 +314,6 @@ type
     procedure Gliste2DragOver(Sender, Source: Tobject; x, y: integer;
       State: TDragState; var accept: boolean);
     procedure Gliste2DragDrop(Sender, Source: Tobject; x, y: integer);
-    procedure SetMPVolume(MP: TMediaPlayer; Volume: Integer);
     procedure SammelPlaylistNamen(plsname: string);
     procedure ErstelleRegNeu;
     procedure Suche(Name: string;teilmengenseparator:integer);
@@ -288,8 +329,10 @@ type
     procedure Playlistenlisteausgeben;
     function filesizetostr(int: real): string;
     procedure FindeDoppelteMedien;
-
-
+    procedure LeseId3(dateiname: string;markiert:integer);
+    procedure ZeichneFortschritt(prozent: real; total: integer);
+    procedure EQInit;
+    procedure EQDraw;
     { Private-Deklarationen }
   public
     procedure Spiele(index: integer);
@@ -313,6 +356,9 @@ var
   ID3 :TID3;
   FExBar: TExBar;
   Save: TSave;
+  BassPlayer: TBassPlayer;
+  basshandle: HWND;
+  bassChannel    : DWORD;
 implementation
 
 uses UInfo, Ustart, Uoption, Ubug, Uwarte, Ulaut, ump3player, Uvideo;
@@ -320,16 +366,21 @@ uses UInfo, Ustart, Uoption, Ubug, Uwarte, Ulaut, ump3player, Uvideo;
 {$R *.dfm}
 var letzterTitel, aktuellerTitel, aktuellePlayliste, aktuellGeladeneListe,
     Weckton,Sidebarpfad,Suchpuffer0,Suchpuffer1 :string;
-    minimiert, shuffle : boolean;
+    minimiert, shuffle, EQtaste : boolean;
     defektIndex,aktiveListe,iconnummer :integer;
     listenaufteilung : real;
+    eqwert : array [1..10] of integer;
 
 procedure TFmp3.FormCreate(Sender: TObject);
 
 begin
   Application.ShowMainForm:=false;
-  trayicon.Icon:=Application.Icon;
 
+    //Bass
+  BassPlayer:=TBassplayer.Create(basshandle);
+  BassPlayer.initEQ;
+
+  trayicon.Icon:=Application.Icon;
   Save:=TSave.Create('Emat.ini');
   GListe:=@Gliste1;
   aktiveListe:=0;
@@ -340,6 +391,7 @@ begin
 
   caption:='Emat '+Version+'| Einfaches Mp3 Ausmist-Tool | '+Neuigkeit;
   Application.Title:=fmp3.Caption; //uk
+  trayicon.Hint:='Emat'; //uk
   Fmp3.DoubleBuffered:=true;
   PBar.Caption:='';
   Iconnummer:=25; //uk
@@ -381,14 +433,17 @@ begin
     PopupMenu := PMsidebar;
     OnMenuItemClick := ItemClick;
 
+
     ExGroups.Add('Playlisten').AddMenuItem('Liste laden... (Strg+O)','',0,22);
     ExGroups.Add('Metainformationen');
-    
+
+
     EndUpdate;
    end;
 
   playlisten:=save.L_Playlisten;
   Playlistenlisteausgeben;
+  EQtaste:=false;
 end;
 
 procedure TFmp3.Liste1Aktiv(Sender:TObject);
@@ -476,7 +531,7 @@ procedure TFmp3.GlisteKeyDown(Key:word;Shift:tshiftstate);
 begin
   case key of
   vk_delete: Loeschen;
-  vk_return : aspielenexecute(fmp3);
+  vk_return: aspielenexecute(fmp3);
   vk_space : ApauseExecute(fmp3);
   end;
 
@@ -518,6 +573,7 @@ begin
     Reg.DeleteKey('Software\G-Software\Emat\');
     Reg.OpenKey(reghauptpfad,true);
     Reg.CloseKey;
+    fsettings.EinstellungenSpeichern;
     ErstelleRegPlaylistenNeu;
 end;
 
@@ -575,7 +631,7 @@ var i    : integer;
 begin
   FExbar.BeginUpdate;
   Fexbar.ExGroups.Delete(0);
-  Fexbar.ExGroups.Add('Playlisten'(*, true*)).AddMenuItem('Liste laden... (Strg+O)','',0,22);
+  Fexbar.ExGroups.Add('Playlisten').AddMenuItem('Liste laden... (Strg+O)','',0,22);
   //Fexbar.ExGroups[1].GroupIconIndex := 10;
   Fexbar.ExGroups.Exchange(0,1);
 
@@ -612,26 +668,24 @@ begin
   fmp3player.Progress.BackgroundColor:=ClMap.Color;
   fmp3player.Progress.BarColor:=clblack;
   PBar.GradientColor:=ClMap.Color;
-  GVolume.ForeColor:=ClMap.SelectedColor;
-  
+  GVolume.ForeColor:=ClMap.Color;
+
   Gliste1.clscrollbar:=ClMap.Color;
   Gliste1.clmouseover:=ClMap.Color;
   Gliste1.clfortschritt:=ClMap.Color;
   Gliste1.clscrollbar2:=ClMap.Color;
   Gliste1.clfortschrittrahmen:=Clblack;
 
-  Gliste2.clscrollbar:=ClMap.Color;
-  Gliste2.clmouseover:=ClMap.Color;
-  Gliste2.clfortschritt:=ClMap.Color;
-  Gliste2.clscrollbar2:=ClMap.Color;
-  Gliste2.clfortschrittrahmen:=Clblack;
-
   Application.HintColor:=ClMap.Color;
 
+ spectrum.BkgColor:=ClMap.Color;
+ spectrum.PenColor:=Gliste.clhintergrund;
+ spectrum.PeakColor:=ClMap.FontColor;
 
   //Schriftfarbe ändern                 uk
  Fmp3.Font.Color:=ClMap.FontColor;
  Fsettings.Font.Color:=ClMap.FontColor;
+ Fsettings.TB.TabFont.Color:=ClMap.FontColor;
  Fbug.Font.Color:=ClMap.FontColor;
  Fstart.Font.Color:=ClMap.FontColor;
  Finfo.Font.Color:=ClMap.FontColor;
@@ -639,6 +693,8 @@ begin
  Fmp3player.Font.Color:=ClMap.FontColor;
  Gliste1.cltext:=ClMap.FontColor;
  Gliste2.cltext:=ClMap.FontColor;
+
+
 
 
 //Fensterfarbe ändern                  uk
@@ -660,11 +716,13 @@ begin
  Fwarte.Font.Name:=fsettings.LMDFontCombo.SelectedFont;
  Fmp3player.Font.Name:=fsettings.LMDFontCombo.SelectedFont;
  Fexbar.Font.Name:=fsettings.LMDFontCombo.SelectedFont;
+ Fsettings.TB.TabFont.Name:=fsettings.LMDFontCombo.SelectedFont;
 
  Gliste1.schriftart:=fsettings.LMDFontCombo.SelectedFont;
  Gliste2.schriftart:=fsettings.LMDFontCombo.SelectedFont;
  Fexbar.Font.Name:=fsettings.LMDFontCombo.SelectedFont;
-
+ Ltitel.Canvas.Font.Name:=fsettings.LMDFontCombo.SelectedFont;
+ Fsettings.TB.TabFont.Name:=fsettings.LMDFontCombo.SelectedFont;
  Sidebarskin;
 end;
 
@@ -673,6 +731,11 @@ procedure TFMp3.ArraySpeichern(Dateiname:string);
   var Datei: file of TMp3Eintrag;
       i:integer;
 begin
+  if Dateiname='' then
+  begin
+  PlsSpeichernExecute(fmp3);
+  exit;
+  end;
   Liste1Aktiv(fmp3);                                 //vielleicht später ändern
   AssignFile(Datei,Dateiname);
    try
@@ -805,9 +868,17 @@ end;
 
 procedure TFmp3.Spiele(index:integer);
   var medium, endung, TextNeu: string;
-      dauer,tempfortschritt: integer;
+       tempfortschritt: integer;
 begin
   index:=ListenIndexZuArrayIndex(index);
+
+ if mp3s[index].dauer='' then
+  begin
+    DauerAuslesen(index);
+    tempfortschritt:=gliste.fortschrittlichesElement;           //optimale Lösung?
+    ArrayZuListe;
+    gliste.fortschrittlichesElement:=tempfortschritt;
+  end;
 
  if Mp3s[index].dauer='defekt'
   then
@@ -827,68 +898,50 @@ begin
   begin
   defektIndex:=-1;
 
+  letzterTitel:=medium;                           //und am Anfang?
+
   medium:=Mp3s[index].path+Mp3s[index].filename;
 
   if fileexists(medium) then
   begin
 
-  if letzterTitel<>MediaP.FileName then
-    letzterTitel:=MediaP.Filename;
+  case Fsettings.RGRender.ItemIndex of
+  0:     //DSPack
+    begin
+      if not FilterGraph.Active then FilterGraph.Active := true;
+      FilterGraph.ClearGraph;
+      FilterGraph.RenderFile(medium);
+      Spule(0);                         ////wahhhhh wie schlecht
+      FilterGraph.Volume:=TBVolume.Position;
+      FilterGraph.Play;
+    end;
 
-  MediaP.FileName:=medium;
-  MediaP.Open;
-
-  SetMPVolume(MediaP, TBVolume.Position);
-
-  endung:=ExtractFileExt(medium);                //uk
-  if (endung='.mpg') or                          //uk
-     (endung='.mpeg') or                         //uk
-     (endung='.avi')                             //uk
-   then
-   begin
-    Fvideo.Caption:=MediaP.FileName;               //uk
-    MediaP.Display:=fvideo.panel1;                 //uk
-    MediaP.DisplayRect:=Fvideo.Panel1.ClientRect;  //uk
-    Fvideo.Caption:='Emat-Videofenster ['+extractrealfilename( extractfilename (medium) ) +']';
-    Fvideo.Show;
-   end                               //uk
-   else Fvideo.Hide;                             //uk
-
-  MediaP.Play;
-
-  Timer.Enabled:=true;
-
+  1:    //BASS
+    begin
+      Bassplayer.play(medium);
+      BassTimer.Enabled:=true;
+      TimerSpectrum.Enabled:=true;
+    end;
+  end;
+  
+  //Aktuellen Titelnamen ausgeben
   TextNeu:=Medium;
+
   while Ltitel.Canvas.TextWidth(TextNeu)>pbar.Left+pbar.Width-Ltitel.Canvas.TextWidth('...') do
     begin
     TextNeu:=copy(TextNeu,2,Length(textNeu));
-
     end;
-
   if length(medium)<>length(textneu)
   then LTitel.Caption:='...'+TextNeu
   else LTitel.Caption:=TextNeu;
-
-
   LTitel.Hint:=Medium+#13'Linksklick: Markieren'+#13+'Rechtsklick: Explorer am Speicherort öffnen';
+  Trayicon.Hint:='Emat ['+extractrealfilename( extractfilename (medium) ) +']';
+  Application.Title:=Trayicon.Hint;
 
   aktuellerTitel:=Medium;
 
-  Trayicon.Hint:='Emat ['+extractrealfilename( extractfilename (medium) ) +']'; //uk
-  Application.Title:=Trayicon.Hint;                                             //uk
-
   GListe.SetFortschrittlichesElement( ArrayIndexZuListenIndex (index) );
-
   ElementMarkieren(GListe.fortschrittlichesElement);
-
-  if mp3s[index].dauer='' then
-  begin
-    dauer:=MediaP.Length div 1000;
-    mp3s[index].dauer:= inttostr(dauer div 60)+':'+(format('%.2d',[dauer mod 60]));
-    tempfortschritt:=gliste.fortschrittlichesElement;           //optimale Lösung?
-    ArrayZuListe;
-    gliste.fortschrittlichesElement:=tempfortschritt;
-  end;
 
   end
   else begin
@@ -900,9 +953,19 @@ end;
 
 procedure TFMp3.Spule(prozent:real);
 begin
- MediaP.Position:=round(MediaP.Length*prozent);
- MediaP.Play;
- PBar.Position:=round(prozent*100);
+  case Fsettings.RGRender.ItemIndex of
+  0:     //DSPack
+    begin
+       dstrackbar.position:=round(prozent*dstrackbar.Max);
+       dstrackbar.MouseUp(mbleft,[],0,0);                   //war früher protected ;-)
+    end;
+  1:    //BASS
+    begin
+      Bassplayer.position:=round(prozent*bassplayer.length);
+    end;
+  end;
+   PBar.Position:=round(prozent*100);
+   
 end;
 
 procedure TFmp3.Weiterschalten;
@@ -921,30 +984,6 @@ end;
 function TFmp3.filesizetostr(int:real):string;
 begin
   result:=Format('%.0n', [int]);
-end;
-
-procedure TFmp3.TimerTimer(Sender: TObject);
-var fortschritt:real;
-    seklaenge:integer;
-begin
-   try
-
-   if MediaP.Error<>0 then Weiterschalten;
-
-   fortschritt:= MediaP.Position / MediaP.Length;
-   Gliste.SetFortschritt(fortschritt);
-
-   PBar.Position:=round(fortschritt*100);
-   seklaenge:=trunc(MediaP.Position/1000);
-   PBar.Caption:=inttostr(seklaenge div 60)+':'+(format('%.2d',[seklaenge mod 60]));
-
-   if MediaP.Position >= MediaP.Length
-   then Weiterschalten;
-
-   except
-   MediaP.Close;
-   Weiterschalten;
-   end;
 end;
 
 procedure TFmp3.FormResize(Sender: TObject);
@@ -971,10 +1010,8 @@ end;
 procedure TFmp3.PBarMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
- if Timer.Enabled then begin
  Spule(x/PBar.Width);
- end;
-
+ Gliste.fortschritt:=(x/PBar.Width);
 end;
 
 procedure TFmp3.ASpielenExecute(Sender: TObject);
@@ -984,24 +1021,44 @@ end;
 
 procedure TFmp3.APauseExecute(Sender: TObject);
 begin
-   MediaP.Pause;
+  case Fsettings.RGRender.ItemIndex of
+  0:     //DSPack
+    begin
+    FilterGraph.Pause;
+    end;
+  1:     //BASS
+    begin
+    Bassplayer.Pause;
+    end;
+  end;
+
+  trayicon.Hint:='Emat - Pause';
 end;
 
 
 procedure TFmp3.AStoppExecute(Sender: TObject);
 begin
- try
-   MediaP.Close;
- finally                                     //braucht man das wirklich?
+  case Fsettings.RGRender.ItemIndex of
+  0:     //DSPack
+    begin
+    FilterGraph.Stop;
+    FilterGraph.ClearGraph;
+    end;
+  1:     //BASS
+    begin
+    Bassplayer.stop;
+    BassTimer.Enabled:=false;
+    TimerSpectrum.Enabled:=false;
+    end;
+  end;
+
    GListe.SetFortschritt(0);
    GListe.fortschrittlichesElement:=-1;
-   Timer.Enabled:=false;
    PBar.Caption:='';         //uk
    LTitel.Caption:='';       //uk
    aktuellerTitel:='';
    Application.Title:=fmp3.Caption; //uk
- end;
-
+   trayicon.Hint:='Emat';
 
 end;
 
@@ -1032,24 +1089,6 @@ begin
    ArrayLaden(OpenD.FileName);
   end;
 end;
-
-
-//uk [für Latutstärke des MediaP]
-procedure TFmp3.SetMPVolume(MP: TMediaPlayer; Volume: Integer);
-  { Volume: 0 - 1000 }
-var 
-  p: MCI_DGV_SETAUDIO_PARMS; 
-begin 
-  { Volume: 0 - 1000 } 
-  p.dwCallback := 0;
-  p.dwItem := MCI_DGV_SETAUDIO_VOLUME; 
-  p.dwValue := Volume; 
-  p.dwOver := 0; 
-  p.lpstrAlgorithm := nil; 
-  p.lpstrQuality := nil; 
-  mciSendCommand(MP.DeviceID, MCI_SETAUDIO, 
-    MCI_DGV_SETAUDIO_VALUE or MCI_DGV_SETAUDIO_ITEM, Cardinal(@p)); 
-end; 
 
 
 function TFmp3.ListenIndexZuArrayIndex(Index:integer):integer;
@@ -1122,13 +1161,19 @@ end;
 
 procedure TFmp3.TBVolumeChange(Sender: TObject);
 begin
-//Quelle: http://www.swissdelphicenter.ch/de/showcode.php?id=618
+  case Fsettings.RGRender.ItemIndex of
+  0:     //DSPack
+    begin
+      FilterGraph.Volume:=tbvolume.Position;
+    end;   
+  1:    //BASS
+    begin
+      Bassplayer.Volume:=round(tbvolume.Position/100);
+    end;
+  end;
 
-Flaut.TBTrayVolume.Position:=1000-TBVolume.Position;
-TBVolume.Hint:='Lautstärke ('+inttostr(TBVolume.Position div 10)+'%)';
-
-
-SetMPVolume(MediaP, TBVolume.Position);
+Flaut.TBTrayVolume.Position:=maxVolume-TBVolume.Position;
+TBVolume.Hint:='Lautstärke ('+inttostr(round(TBVolume.Position/maxVolume))+'%)';
 GVolume.Progress:=TBVolume.Position;
 end;
 
@@ -1289,13 +1334,14 @@ end;
 
 procedure TFmp3.Timer1Timer(Sender: TObject);
 begin
+
  timer1.Enabled:=false;
  fstart.ShowModal;
-
+ Spectrum:=TSpectrum.Create(PBSpectrum.Width, PBSpectrum.Height);
+ EQInit;
  Fsettings.EinstellungenLaden;
  timer2.Enabled:=true;
- gbliste1.width:=gbliste.Clientwidth;
- 
+ gbliste1.width:=gbliste.Clientwidth;  
 end;
 
 procedure TFmp3.TrayIconDblClick(Sender: TObject);
@@ -1328,7 +1374,14 @@ end;
 
 procedure TFmp3.AwebseiteExecute(Sender: TObject);
 begin
- ShellExecute(Application.Handle, 'open',PChar('http://www.g-software.de.gg'), nil, nil, SW_ShowNormal);
+if MessageDlg('Es wird nun die url http://www.g-software.de.gg in Ihrem Browser aufgerufen,'+#13'dabei werden keinerlei Informationen an G-Software übermittelt.'+#13'Wollen Sie diesen Vorgang fortsetzen?',mtInformation,[mbYes,mbNo],0)=mrYes
+  then
+   begin
+   Finfo.Lbrowser.Caption:='Browser wird geöffnet...';
+   Finfo.Lbrowser.Visible:=true;
+   Finfo.Lbrowser.BringToFront;
+   ShellExecute(Application.Handle, 'open',PChar('http://www.g-software.de.gg'), nil, nil, SW_ShowNormal);
+   end else Finfo.Lbrowser.Caption:='Bitte wählen Sie einen anderen Menüpunkt aus.';
 end;
 
 procedure TFmp3.AShuffleExecute(Sender: TObject);
@@ -1364,10 +1417,14 @@ begin
 end;
 
 procedure TFmp3.Loeschen;
-var zuloeschendes:integer;
+var merkeFortschritt,zuloeschendes:integer;
 begin
+   if GListe.fortschrittlichesElement<GListe.markiertesElement
+   then merkeFortschritt:=GListe.fortschrittlichesElement
+   else merkeFortschritt:=GListe.fortschrittlichesElement-1;
 
    zuloeschendes:= ListenIndexZuArrayIndex ( GListe.markiertesElement );
+
 
    if ALoeschmodus.Checked then begin
     if DeleteFile( MP3s [ zuloeschendes ].path + MP3s [ zuloeschendes ].filename )
@@ -1385,6 +1442,9 @@ begin
    end;
 
    ArrayZuListe;
+   Gliste.markiertesElement:=ArrayIndexZuListenIndex(zuloeschendes);
+   Gliste.fortschrittlichesElement:=merkeFortschritt;
+   Gliste.Draw;
 
 end;
 
@@ -1435,7 +1495,23 @@ begin
   begin
     if mp3s[markiert].id3tag.ausgelesen=false then
     begin
-      id3.Lese( mp3s[markiert].path+mp3s[markiert].filename);
+     LeseID3( mp3s[markiert].path+mp3s[markiert].filename,markiert);
+    end;
+  end
+  else   //Wenn kein Mp3
+    begin
+    FExBar.BeginUpdate;
+     FExBar.ExGroups.Delete(1);       //Alten Eintrag löschen
+     FExBar.ExGroups.Add('Metainformationen').
+             AddMenuItem(mp3s[markiert].path,mp3s[markiert].path, 1, 1);
+     FExBar.EndUpdate;
+     FExBar.Repaint;
+    end;
+end;
+
+procedure TFmp3.LeseId3(dateiname:string;markiert:integer);
+begin
+  id3.Lese( dateiname);
       with mp3s[markiert] do
       begin
         id3tag.ID := id3.ID3Tag.ID;
@@ -1453,8 +1529,6 @@ begin
 
         id3tag.ausgelesen:=true;
       end;
-    end;
-  end;
 
  with mp3s[markiert] do
     begin
@@ -1465,14 +1539,13 @@ begin
      ExGroups.Delete(1);       //Alten Eintrag löschen
       with ExGroups.Add('Metainformationen') do
        begin
-        if id3tag.Titel='' then else AddLine(id3tag.Titel, Clmap.FontColor, [fsBold], True);
-        if id3tag.Artist='' then else AddLine(id3tag.Artist, Clmap.FontColor, [], True);
-        if id3tag.Album='' then else AddLine(id3tag.Album, Clmap.FontColor, [], True);
-        if id3tag.Year='' then else AddLine(id3tag.Year, Clmap.FontColor, [], True);
-        if path='' then else AddMenuItem(path, path, 1, 1);
-        if id3tag.Comment='' then else AddLine(id3tag.Comment, Clmap.FontColor, [], True);
-
-        AddLine('Genre: '+inttostr(id3tag.Genre), Clmap.FontColor, [], True);
+        if id3tag.Titel<>'' then AddLine(id3tag.Titel, Clmap.FontColor, [fsBold], True);
+        if id3tag.Artist<>'' then AddLine(id3tag.Artist, Clmap.FontColor, [], True);
+        if id3tag.Album<>'' then AddLine(id3tag.Album, Clmap.FontColor, [], True);
+        if id3tag.Year<>'' then AddLine(id3tag.Year, Clmap.FontColor, [], True);
+        if id3tag.Comment<>'' then AddLine(id3tag.Comment, Clmap.FontColor, [], True);
+        if id3tag.genre<126 then AddLine(ID3GenreName[id3tag.Genre], Clmap.FontColor, [], True);
+        if path<>'' then AddMenuItem(path, path, 1, 1);
         AddLine('Sample: '+inttostr(id3tag.sample), Clmap.FontColor, [], True);
         AddLine('Bitrate: '+inttostr(id3tag.bits), Clmap.FontColor, [], True);
         AddLine('Version: '+inttostr(id3tag.vers), Clmap.FontColor, [], True);
@@ -1482,11 +1555,9 @@ begin
      EndUpdate;
      Repaint;
     end;
- end;
-
-
-
+  end;
 end;
+
 
 
 procedure TFmp3.AweckerExecute(Sender: TObject);
@@ -1537,8 +1608,6 @@ end;
 procedure TFmp3.ADauerAuslesenExecute(Sender: TObject);
 var i:integer;
 begin
-  MessageDlg('Das Auslesen der Einräge kann -besonders bei großen Listen- mehrere Minuten dauern.'+#13+'Wenn Sie während des Vorgangs nichts tun, kann sich dieser möglicherweiße beschleunigen.',mtInformation,[mbOk],0);   //uk
-
   fwarte.PBwarte.Tag:=0;
   fwarte.show;
   fwarte.pbwarte.max:=high(mp3s);
@@ -1546,7 +1615,7 @@ begin
 
   for i:=0 to high(mp3s) do
   begin
-    if mp3s[i].dauer='' then try DauerAuslesen(i) except mp3s[i].dauer:='defekt' end;
+    if mp3s[i].dauer='' then DauerAuslesen(i);
     fwarte.pbwarte.Position:=i;
     application.ProcessMessages;
     if Fwarte.PBwarte.Tag=1 then break;            //uk
@@ -1554,7 +1623,7 @@ begin
   fwarte.close;
 
   ArrayZuListe;
-  PlsSpeichernExecute(fmp3);
+  ArraySpeichern(aktuellePlayliste);
 end;
 
 
@@ -1562,14 +1631,17 @@ procedure TFmp3.DauerAuslesen(index:integer);
 var dauer:integer;
 
 begin
-     MediaP.FileName:= mp3s[index].path + mp3s[index].filename;
-     try
-     MediaP.Open;
-     dauer:=MediaP.Length div 1000;
-     mp3s[index].dauer:= inttostr(dauer div 60)+':'+(format('%.2d',[dauer mod 60]));
-     finally
-     MediaP.Close;
-     end;
+  if not FilterGraph.Active then FilterGraph.Active := true;
+  FilterGraph.ClearGraph;
+
+  try
+   FilterGraph.RenderFile( mp3s[index].path+mp3s[index].filename);
+   dauer:=FilterGraph.Duration div 1000;
+   mp3s[index].dauer:= inttostr(dauer div 60)+':'+(format('%.2d',[dauer mod 60]));
+  except
+   mp3s[index].dauer:='defekt';
+  end;
+  FilterGraph.ClearGraph;
 end;
 
 procedure TFmp3.Gliste2DragOver ( Sender, Source:Tobject; x,y: integer;
@@ -1615,11 +1687,6 @@ begin
   end;
 end;
 
-procedure TFmp3.Button2Click(Sender: TObject);
-begin
-showmessage(aktuellertitel);
-end;
-
 procedure TFmp3.AFarbresretExecute(Sender: TObject);
 begin
 SetColor;
@@ -1646,31 +1713,38 @@ end;
 procedure TFmp3.GHK100KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-TBVolume.Position:=1000;
+TBVolume.Position:=maxVolume;
 end;
 
 procedure TFmp3.GHK25KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-TBVolume.Position:=250;
+TBVolume.Position:=round(maxVolume*0.25);
 end;
 
 procedure TFmp3.GHK50KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-TBVolume.Position:=500;
+TBVolume.Position:=round(maxVolume*0.5);
 end;
 
 procedure TFmp3.GHK75KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-TBVolume.Position:=750;
+TBVolume.Position:=round(maxVolume*0.75);
 end;
 
 
 procedure TFmp3.AupdateExecute(Sender: TObject);
 begin
-ShellExecute(Application.Handle, 'open',PChar('http://www.ematupdate.de.gg'), nil, nil, SW_ShowNormal);
+if MessageDlg('Es wird nun die url http://www.ematupdate.de.gg in Ihrem Browser aufgerufen,'+#13'dabei werden keinerlei Informationen an G-Software übermittelt.'+#13'Wollen Sie diesen Vorgang fortsetzen?',mtInformation,[mbYes,mbNo],0)=mrYes
+  then
+   begin
+   Finfo.Lbrowser.Caption:='Browser wird geöffnet...';
+   Finfo.Lbrowser.Visible:=true;
+   Finfo.Lbrowser.BringToFront;
+   ShellExecute(Application.Handle, 'open',PChar('http://www.ematupdate.de.gg'), nil, nil, SW_ShowNormal);
+   end else Finfo.Lbrowser.Caption:='Bitte wählen Sie einen anderen Menüpunkt aus.';
 end;
 
 procedure TFmp3.PBarChange(Sender: TObject);
@@ -1702,7 +1776,7 @@ begin
 
 
  Gliste.markiertesElement:=GListe.fortschrittlichesElement;
- ElementMarkieren(GListe.fortschrittlichesElement);  //uk für ID3-Tag Auslesung
+ ElementMarkieren(ListenIndexZuArrayIndex(GListe.fortschrittlichesElement));  //uk für ID3-Tag Auslesung
  GListe.Draw;
 end;
 
@@ -1757,11 +1831,13 @@ if ASplitt.Checked
   begin
    GBliste1.width:=GBliste.clientwidth;
    ASplitt.Checked:=false;
+   ASplitt.Caption:='Subplaylist [aus]';
   end
  else
   begin
    RelativeListenteilung;
    ASplitt.Checked:=true;
+   ASplitt.Caption:='Subplaylist [an]';
   end;
 end;
 
@@ -1795,6 +1871,7 @@ if not ASplitt.Checked
    RelativeListenteilung;
 
   end;
+ EQDraw;
 end;
 
 procedure TFmp3.ItemClick(Sender: TObject; Id: Integer); //uk
@@ -1830,8 +1907,7 @@ begin
   Fexbar.SetSkin(BlueImg.Picture.Bitmap);
 
   Fexbar.EndUpdate;
-  Fexbar.Repaint;
-
+  Fexbar.Repaint;    
 end;                                               //uk }
 
 
@@ -1887,8 +1963,6 @@ begin
         end;
 end;
 
-
-
 procedure TFmp3.AsuchfeldfocusExecute(Sender: TObject);  //uk
 begin
  LEsuche.SetFocus;
@@ -1903,6 +1977,128 @@ end;
 procedure TFmp3.LTitelClick(Sender: TObject);
 begin
 Atitelmarkierenclick(fmp3); //uk
+end;
+
+procedure TFmp3.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  FilterGraph.ClearGraph;
+end;
+
+procedure TFmp3.DSTrackBarTimer(sender: TObject; CurrentPos,
+  StopPos: Cardinal);
+  var fortschritt:real;
+begin
+  if dstrackbar.Position>=dstrackbar.max then weiterschalten;
+  ZeichneFortschritt(CurrentPos/StopPos,round(CurrentPos / MiliSecPerDay));
+end;
+
+procedure TFmp3.BassTimerTimer(Sender: TObject);
+var fortschritt:real;
+begin
+  if Bassplayer.position>=Bassplayer.length then weiterschalten;
+  ZeichneFortschritt(Bassplayer.position/Bassplayer.length,Bassplayer.position);
+end;
+
+procedure TFmp3.ZeichneFortschritt(prozent:real;total:integer);
+begin
+  pbar.Caption := inttostr(total div 60)+':'+(format('%.2d',[total mod 60]));
+  Gliste.SetFortschritt(prozent);
+  PBar.Position:=round(prozent*100);
+end;
+
+procedure TFmp3.Button1Click(Sender: TObject);
+begin
+ showmessage(inttostr(bassplayer.length));
+end;
+
+procedure TFmp3.EQInit;
+var i:integer;
+begin
+  for i:=1 to 10 do
+  eqwert[i]:=0;
+
+  IEQMouseUp(fmp3,mbleft,[],0,0);
+end;
+
+procedure TFmp3.IEQMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+
+begin
+ EQtaste:=false;
+ BassPlayer.updateEQ(eqwert[1],eqwert[2],eqwert[3],eqwert[4],eqwert[5],
+                     eqwert[6],eqwert[7],eqwert[8],eqwert[9],eqwert[10]);
+ EQDraw;
+end;
+
+procedure TFmp3.IEQMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+ EQtaste:=true;
+end;
+
+procedure TFmp3.IEQMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+  var schrittweite,
+      aktiverRand1,aktiverRand2, aktivesZentrum, neuerEQwert: integer;
+begin
+ if EQtaste then
+ begin
+ schrittweite:=ieq.width div 11;
+ aktiverRand1:=((schrittweite div 2)-4);
+ aktiverRand2:=((schrittweite div 2)+4);
+ aktivesZentrum:= (x mod schrittweite)-schrittweite div 2 ;
+
+ if (aktivesZentrum>=aktiverRand1) and (aktivesZentrum<=aktiverRand2)
+ then
+      begin
+        neuerEQwert:=round((30*y/ieq.height-15)*-1);
+        if  neuerEQwert>15 then  neuerEQwert:=15;     //Bugpreventing
+        if   neuerEQwert<-15 then  neuerEQwert:=-15;  //
+        eqwert[x div schrittweite+1]:=neuerEQwert;
+        eqdraw;
+      end;
+ end;
+end;
+
+procedure TFmp3.EQDraw;
+var schrittweite,i : integer;
+begin
+ IEQ.Canvas.Brush.Color:=ClMap.SelectedColor;
+ IEQ.Canvas.Pen.Color:=clBlack;
+ IEQ.Canvas.Rectangle(0,0,ieq.width,ieq.height);
+ IEQ.Canvas.Brush.Color:=Gliste.clhintergrund;
+ schrittweite:=ieq.width div 11;
+ for i:=0 to 9 do
+ begin
+  ieq.Canvas.Rectangle(i*schrittweite+schrittweite div 2, ieq.height-round (((eqwert[i+1]+15))/30*ieq.height), (i+1)*schrittweite-3+schrittweite div 2, ieq.height);
+ end;
+
+ //uk | Imitation einer ExGroupBox
+ IEQ.Canvas.Brush.Color:=$00B54900;
+ IEQ.Canvas.Pen.Color:=$00B54900;
+ IEQ.Canvas.Rectangle(10,10,IEQ.Width-12,31);
+ ILsidebar.Draw(IEQ.Canvas,10,10,0);
+ ILsidebar.Draw(IEQ.Canvas,IEQ.Width-17,10,1);
+ IEQ.Canvas.Font.Name:=Fmp3.Font.Name;
+ IEQ.Canvas.Font.Color:=clWhite;
+ IEQ.Canvas.Font.Style:=[fsBold];
+ IEQ.Canvas.TextOut(20,14,'Equalizer');
+end;
+
+procedure TFmp3.TimerSpectrumTimer(Sender: TObject);
+var FFTFata : TFFTData;
+begin
+  BASS_ChannelGetData(bassplayer.channel, @FFTFata, BASS_DATA_FFT1024);
+  Spectrum.Draw (PBSpectrum.Canvas.Handle, FFTFata, {TrackX.Position}50 - 40, {TrackY.Position}50 - 60);
+end;
+
+procedure TFmp3.PBSpectrumClick(Sender: TObject);
+begin
+case Spectrum.Mode of
+0: Spectrum.Mode := 1;
+1: Spectrum.Mode := 0;
+end;
+
 end;
 
 end.

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls;
+  Dialogs, ComCtrls, ExtCtrls, AppEvnts;
 
   type
   TFlaut = class(TForm)
@@ -48,5 +48,7 @@ procedure TFlaut.TimerHideTimer(Sender: TObject);
 begin
 if not TBtrayVolume.Focused then FormDeactivate(flaut);
 end;
+
+
 
 end.
