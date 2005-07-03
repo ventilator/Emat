@@ -1,32 +1,55 @@
 object Flaut: TFlaut
-  Left = 290
-  Top = 491
+  Left = 299
+  Top = 224
   BorderStyle = bsNone
-  ClientHeight = 83
-  ClientWidth = 106
+  ClientHeight = 117
+  ClientWidth = 148
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  FormStyle = fsStayOnTop
+  KeyPreview = True
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDeactivate = FormDeactivate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
-  object TBTrayVolume: TTrackBar
+  object TBXMultiDock1: TTBXMultiDock
     Left = 0
     Top = 0
-    Width = 25
-    Height = 83
-    Align = alLeft
-    Max = 10000
-    Orientation = trVertical
-    TabOrder = 0
-    TickMarks = tmBoth
-    TickStyle = tsNone
-    OnChange = TBTrayVolumeChange
+    Width = 150
+    Height = 117
+    Position = dpLeft
+    object TBXDockablePanel1: TTBXDockablePanel
+      Left = 0
+      Top = 0
+      Caption = 'Emat - Lautst'#228'rke (100%)'
+      CaptionRotation = dpcrAlwaysVert
+      CloseButton = False
+      CloseButtonWhenDocked = False
+      DockedHeight = 74
+      DockMode = dmCannotFloatOrChangeDocks
+      DockPos = 0
+      SupportedDocks = [dkStandardDock, dkMultiDock]
+      TabOrder = 0
+      object TBTrayVolume: TTrackBar
+        Left = 0
+        Top = 0
+        Width = 25
+        Height = 97
+        Align = alLeft
+        Max = 255
+        Orientation = trVertical
+        TabOrder = 0
+        TickMarks = tmBoth
+        TickStyle = tsNone
+        OnChange = TBTrayVolumeChange
+      end
+    end
   end
   object TimerHide: TTimer
     Interval = 300

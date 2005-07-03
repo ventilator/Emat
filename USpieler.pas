@@ -1,0 +1,385 @@
+unit USpieler;
+
+interface
+
+uses  bass, bassplayer, sysutils, ExtCtrls, dialogs, TBX, TBXThemes,
+      spectrum_vis, osc_vis, circle_vis, CommonTypes;
+
+const
+  MAXVISMODE = 8;
+  BASS_RENDER = 0; //0 für Bassplayer, 1 für Manual_Bass
+type
+  TWeiterschaltenEvent = procedure of object;
+
+type
+  TBassInfo = record
+     Channel : cardinal;
+  end;
+
+type
+  TAktiv = record
+    Renderkern    : integer;
+    Pause         : boolean;
+    BassVisOutput : byte;
+    BassInfo      : TBassInfo;
+   end;
+
+type
+  TSpieler = class (TObject)
+
+ private
+    FWeiterSchalten : TWeiterschaltenEvent;
+    procedure EQInit;
+    procedure BassPlayerAbspielfehler;
+    procedure SpielenEnde(Sender:TObject);
+    function GetBassPlayLength(Filename: string): integer;
+    procedure OnSpectrumTimer(Sender: TObject);
+ public
+    BassPlayer  : TBassPlayer;  //public für Spectrum, das komische Handel nutzt
+    eqwert      : array [1..10] of integer;
+    Spectrum    : TSpectrum;
+    OcilloScope : TOcilloScope;
+    CircleScope : TCircleScope;
+    constructor Create;
+    function ZustaendigerRenderKern(Dateiendung:string):integer;
+    function Spiele(FileName: string): boolean;
+    procedure Spule(Prozent: real);
+    procedure EQSetWerte;
+    procedure Pause;
+    procedure Stop;
+    procedure SetVolume(Volume: integer);
+    function GetPosition: cardinal;
+    procedure SetPosition(position: cardinal);
+    function GetLength: cardinal;
+    function GetDauer(FileName: string): cardinal;
+    destructor Destroy; override;
+    procedure SpectrumResize;
+    procedure SetBassVisOutput(Value: byte);
+ published
+    property OnWeiterschalten: TWeiterschaltenEvent
+      read FWeiterschalten write FWeiterschalten;
+ end;
+
+
+
+implementation
+
+uses ump3;
+
+var
+      Aktiv         : TAktiv;
+      SpectrumTimer : TTimer;
+      Abspielfehler : boolean;
+
+constructor TSpieler.Create;
+  begin
+   //Bass
+    BassPlayer := TBassplayer.Create(fmp3);
+    BassPlayer.OnAbspielfehler := BassPlayerAbspielfehler;
+    bassplayer.OnPlayEnd := SpielenEnde;
+    EQInit;
+
+    SpectrumTimer := TTimer.Create(fmp3);
+    SpectrumTimer.Enabled := false;
+    SpectrumTimer.OnTimer := OnSpectrumTimer;
+    SpectrumTimer.Interval := 33;
+
+    Spectrum := TSpectrum.Create(fmp3.PBSpectrum.Width, fmp3.PBSpectrum.Height);
+    OcilloScope := TOcilloScope.Create(fmp3.PBSpectrum.Width,
+      fmp3.PBSpectrum.Height);
+    CircleScope := TCircleScope.Create(fmp3.PBSpectrum.Width,
+      fmp3.PBSpectrum.Height);
+
+    Aktiv.Pause := false;
+
+    fmp3.SpielerTimer.Enabled := false;
+  end;
+
+destructor TSpieler.Destroy;
+begin
+   Bassplayer.Free;
+end;
+
+procedure TSpieler.SpectrumResize;   //uk
+begin
+ // Spectrum:=TSpectrum.Create(fmp3.PBSpectrum.Width,fmp3.PBSpectrum.Height);
+ Spectrum.Resize(fmp3.PBSpectrum.Width,fmp3.PBSpectrum.Height);
+
+end;
+
+procedure TSpieler.SpielenEnde(Sender:Tobject);
+begin
+  if Assigned(OnWeiterschalten) then OnWeiterschalten;
+end;
+
+function TSpieler.ZustaendigerRenderKern(Dateiendung:string):integer;
+begin
+  result:=-1;
+
+  //0 = BASS
+  //Kann kein Set verwenden wegen ".";
+
+  if (Dateiendung='.mp3') or (Dateiendung='.wav') or (Dateiendung='.wma')
+    or (Dateiendung='.ogg') or (Dateiendung='.cda') {or (Dateiendung='.ac3')}
+    then result:=BASS_RENDER;
+end;
+
+function TSpieler.Spiele ( FileName: string ):boolean;
+begin
+  Result:=true;
+  Aktiv.Renderkern := ZustaendigerRenderKern(extractfileext(filename));
+  Aktiv.Pause:= false;
+
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+         Bassplayer.Open( FileName );
+         Bassplayer.Play;
+         if Abspielfehler
+         then
+          begin
+            Result:=false;
+            Abspielfehler:=false;
+          end
+         else
+          begin
+            fmp3.SpielerTimer.Enabled:=true;
+            SpectrumTimer.Enabled:=true;
+          end;
+    end;
+  1: //Bass_FX
+     begin
+        BASS_StreamFree(Aktiv.BassInfo.Channel);
+
+        Aktiv.BassInfo.Channel:=
+         BASS_StreamCreateFile(false, pChar(Filename), 0, 0, 0);
+
+        if Aktiv.BassInfo.Channel <> 0
+        then BASS_ChannelPlay(Aktiv.BassInfo.Channel, true);
+
+     end;
+  end;
+end;
+
+procedure TSpieler.Stop;
+begin
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+      BassPlayer.Stop;
+      fmp3.SpielerTimer.Enabled:=false;
+    end;
+
+  end;
+
+end;
+
+procedure TSpieler.Spule (Prozent:real);
+begin
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+      SetPosition(round(prozent*GetLength));
+    end;
+  end;
+end;
+
+procedure TSpieler.Pause;
+begin
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+      if Aktiv.Pause
+      then
+      begin
+       Bassplayer.Pause(false);
+
+       Aktiv.Pause := not Aktiv.Pause;
+      end
+      else
+      begin
+       Bassplayer.Pause(true);
+       Aktiv.Pause := not Aktiv.Pause;
+      end;
+    end;
+  end;
+end;
+
+procedure TSpieler.SetVolume(Volume:integer);
+begin
+  case Aktiv.Renderkern of
+  0: //BASS {von 0 bis 255}
+    begin
+     Bassplayer.Volume := Volume;
+    end;
+  end;
+end;
+
+function TSpieler.GetDauer(FileName:string):cardinal;
+begin
+  Result := 1; //verhindert Div durch Null
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+       Result := GetBassPlayLength(Filename);
+    end;
+  end;
+end;
+
+///////////////////////////////////EQ///////////////////////////////////////////
+procedure TSpieler.EQInit;
+var i:integer;
+begin
+  for i:=1 to 10 do
+  eqwert[i]:=0;
+
+  EQSetWerte;
+  Bassplayer.SoundEffects:=[Equalizer];
+end;
+
+procedure TSpieler.EQSetWerte;
+var i: integer;
+begin
+for i:=1 to 10 do
+ Bassplayer.SetAEQGain(i,eqwert[i]);
+end;
+////////////////////////////////////////////////////////////////////////////////
+
+procedure TSpieler.BassPlayerAbspielfehler;
+begin
+  Abspielfehler:=true;
+end;
+
+function TSpieler.GetPosition: cardinal;
+begin
+  Result:=0;
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+      Result:=Bassplayer.Position;
+    end;
+  end;
+end;
+
+procedure TSpieler.SetPosition(position: cardinal);
+begin
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+      Bassplayer.Position:=position;
+    end;
+  end;
+end;
+
+function TSpieler.GetLength: cardinal;
+begin
+  Result:=1;
+  case Aktiv.Renderkern of
+  0: //BASS
+    begin
+      Result:=Bassplayer.PlayLength;
+    end;
+  end;
+  if Result=0 then Result:=1; //Verhindert evtl. Div. durch Null 
+end;
+
+
+function TSpieler.GetBassPlayLength(Filename: string) : integer;
+var
+   channel   : integer;
+begin
+    result := 0;
+  { case ChannelType of
+      Channel_NotOpened : exit;
+      Channel_CD, Channel_WMA, Channel_Stream : SongLengthbyte := BASS_StreamGetLength(Channel);
+      Channel_Music  : SongLengthbyte := BASS_MusicGetLength(Channel, true);
+   end; }
+   try
+     Channel := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, 0);
+     result := round(BASS_ChannelBytes2Seconds(
+                                  Channel, BASS_StreamGetLength(Channel) )*1000);
+   finally
+     Bass_StreamFree(Channel);
+   end;
+end;
+
+
+//////////////////////////////////Graphischer EQ////////////////////////////////
+
+procedure TSpieler.OnSpectrumTimer(Sender: TObject);
+var
+  FFTFata  : TFFTData;
+  WaveData : TWaveData;
+begin
+if not fmp3.TBXDockablePanel2.Visible
+  then exit; //uk
+
+
+  if (BASS_ChannelIsActive(bassplayer.ChannelId) = BASS_ACTIVE_PLAYING) then
+   case Aktiv.BassVisOutput of
+     0:
+       begin
+         BASS_ChannelGetData(BassPlayer.ChannelId, @FFTFata, BASS_DATA_FFT1024);
+         Spectrum.Draw (fmp3.PBSpectrum.Canvas.Handle, FFTFata, 0, 0);
+       end;
+     1:
+       begin
+         BASS_ChannelGetData(Bassplayer.ChannelId, @WaveData, 2048);
+         OcilloScope.Draw (fmp3.PBSpectrum.Canvas.Handle, WaveData, 0, 50);
+       end;
+     3:
+       begin
+         BASS_ChannelGetData(Bassplayer.ChannelId, @WaveData, 2048);
+         CircleScope.Draw (fmp3.PBSpectrum.Canvas.Handle, WaveData, 0, 50);
+       end;                                                       //50, 40
+   end;
+end;
+
+procedure TSpieler.SetBassVisOutput(Value: byte);
+begin
+  case Value of
+    0:
+      begin
+        Spectrum.Mode := 0;
+        Aktiv.BassVisOutput := 0;
+      end;
+    1:
+      begin
+        Spectrum.Mode := 1;
+        Aktiv.BassVisOutput := 0;
+      end;
+    3:
+      begin
+        OcilloScope.Mode := 0;
+        Aktiv.BassVisOutput := 1;
+      end;
+    4:
+      begin
+        OcilloScope.Mode := 1;
+        Aktiv.BassVisOutput := 1;
+      end;
+    5:
+      begin
+        OcilloScope.Mode := 2;
+        Aktiv.BassVisOutput := 1;
+      end;
+    6:
+      begin
+        CircleScope.Mode := 0;
+        Aktiv.BassVisOutput := 2;
+      end;
+    7:
+      begin
+        CircleScope.Mode := 1;
+        Aktiv.BassVisOutput := 2;
+      end;
+    8:
+      begin
+        CircleScope.Mode := 2;
+        Aktiv.BassVisOutput := 2;
+      end;
+  end;
+end;
+
+end.
+

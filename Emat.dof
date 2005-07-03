@@ -97,7 +97,7 @@ PackageDCPOutputDir=
 SearchPath=
 Packages=vcl;rtl;vclx;indy;inet;xmlrtl;vclie;inetdbbde;inetdbxpress;dbrtl;dsnap;dsnapcon;vcldb;soaprtl;VclSmp;dbexpress;dbxcds;inetdb;bdertl;vcldbx;webdsnap;websnap;adortl;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;IntrawebDB_50_70;Intraweb_50_70;Rave50CLX;Rave50VCL;dclOfficeXP;dclMultiLineExpD7;dxPack2D7
 Conditionals=
-DebugSourceDirs=
+DebugSourceDirs=E:\Clemens\Dokumente\Delphi\Komponenten\cooltrayicon\;E:\Clemens\Dokumente\Delphi\Komponenten\tb2k-2.1.4\Source\
 UsePackages=0
 [Parameters]
 RunParams=
@@ -105,15 +105,11 @@ HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
-[Language]
-ActiveLang=
-ProjectLang=
-RootDir=
 [Version Info]
-IncludeVerInfo=0
+IncludeVerInfo=1
 AutoIncBuild=0
-MajorVer=1
-MinorVer=0
+MajorVer=0
+MinorVer=75
 Release=0
 Build=0
 Debug=0
@@ -124,13 +120,18 @@ DLL=0
 Locale=1031
 CodePage=1252
 [Version Info Keys]
-CompanyName=
-FileDescription=
-FileVersion=1.0.0.0
-InternalName=
-LegalCopyright=
+CompanyName=G-Software
+FileDescription=Emat
+FileVersion=0.75.0.0
+InternalName=Emat
+LegalCopyright=© 2004-2005 G-Software
 LegalTrademarks=
-OriginalFilename=
-ProductName=
-ProductVersion=1.0.0.0
+OriginalFilename=Emat.exe
+ProductName=Emat
+ProductVersion=0.75
 Comments=
+[Excluded Packages]
+c:\programme\borland\delphi7\Bin\dclite70.bpl=Borland ITE (Integrated Translation Environment)
+c:\programme\borland\delphi7\Bin\dclmcn70.bpl=Borland DataSnap-Verbindungskomponenten
+c:\programme\borland\delphi7\Bin\dclsmpedit70.bpl=Borland Editor-Script-Erweiterungen
+c:\programme\borland\delphi7\Bin\dclemacsedit70.bpl=Borland Emacs Editorerweiterungen

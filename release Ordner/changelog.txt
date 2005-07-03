@@ -1,0 +1,11 @@
+0.75.62
+ -oggtag
+ -liefert die Suche ein einzelnes Medium, so wird dieses optional automatisch abgespielt
+
+0.75.63
+ -Dateikopierfunktion
+
+0.75.64
+ -id3_2
+ -erweiterer Algorithmus um doppelte Medien zu finden (auch bei gleichem Dateinamen)
+ -leider musste das Playlistenformat aktualisiert werden; alle alten Playlisten sind nicht mehr kompatibel

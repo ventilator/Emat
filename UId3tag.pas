@@ -16,6 +16,7 @@ Type
     bits: byte;
     vers: byte;
     layers: byte;
+    ausgelesen: boolean;
 end;
 
 const

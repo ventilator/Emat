@@ -16,6 +16,7 @@ Type
     bits: byte;
     vers: byte;
     layers: byte;
+    ausgelesen: boolean;
 end;
 
 const
@@ -66,9 +67,10 @@ var
   bitrate, version, layer, groese: longint;
 begin
   AssignFile(F, Filename);
-
-  try Reset(F,1);                             // mein
-  except exit; end;                           // mod
+   {$I-}
+  Reset(F,1);
+  if ioresult<>0 then exit;                    
+   {$I+}
   groese:=filesize(f);
   blockread(f,mp3hdrread,4);
   tempbyte:=mp3hdrread[1];

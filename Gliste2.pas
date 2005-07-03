@@ -1,43 +1,70 @@
 unit gliste2;
 
 {
+//PLZ DO NOT USE THAT COMPONENT, CAUSE IT IS NOOB
+
 <Grafische Liste>
 
 Grafische Stringlistenausgabe (also eine Listbox)
 
 Programmiert mit Delphi 7
-Das Design entspricht nicht modernen ergonomischen Gepflogenheiten, sondern meinem Geschmack
+Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
+ sondern meinem Geschmack und meiner Unfähigkeit
 
 © Clemens Grünewald
 0.1.0  01.07.2004 - 20.07.2004
--initial Release
-
+-initial release
 0.1.1
 - bugfixing im Zuge der Emat-Entwicklung
-
-0.2 28.07.2004
+0.2   28.07.2004
 - ~standalonerelease
  + EmatPfeile
-
 0.2.1 <=20.10.2004
-- Bugfixing 
+- Bugfixing
+- keine EmatPfeile mehr
+0.2.2 29.02.05
+- Bugfixing
+0.3   04.02.05
+- dyn Array Struktur
+0.3.1
+- keine dyn Array Struktur mehr aus Performancegründen
+0.3.2   08.03.05
+- PopupMenu                     //uk
+0.3.3   25.04.05
+0.3.4   27.04.05
+- Bugfix (markieren/spulen bug) & (letztes Item anscrollen)
+0.3.5
+- Quicksort (Umkehrquicksort trotzem noch erforderlich!)
+0.3.5a
+- kleiner Fix
+0.3.5b   27.06.05
+- rechter Rand
 }
+
 
 interface
 
 uses
-  SysUtils, Classes, Controls, Dialogs, QGraphics, Messages, Windows, Forms, Graphics;
+  SysUtils, Classes, Controls, Dialogs, Messages, Windows, Forms, Graphics;
 
-const Version='0.2';
-      scrollbarbreite=20;
-      scrollbarhoehe=15;
+const Version='0.35';
+    //  scrollbarbreite=22; variabel
+      scrollbarhoehe=22;  //eigentlich scrollbarzeigerhoehe
       zeilenhoehe=15;
-      scrollbarzeigerhoehe=10;
       scrollschrittweite=3;
       rand=5;
+      randverschiebung=1; //Damit der Rahmen angezeigt wird
+
+type TListenEintraege = record
+   {Nummer : integer;
+   l0,l1,l2,l3,l4 : string;   //Zu langsam
+   markiert : boolean; }
+   l0,l1,l2,l3,l4,
+   Nummer,markiert: TStringlist;
+ end;
 
 type  TRechtsklickevent = procedure (index, x, y:integer) of object;
-type  TDoppelKlickevent = procedure (index:integer) of object;
+type  TDoppelKlickevent = procedure (index: integer) of object;
 type  TElementMarkierenEvent = procedure (index:integer) of object;
 type  TSpulenEvent = procedure (prozent:real) of object;
 type  TKeyDownEvent = procedure (key:word; shift:tshiftstate) of object;
@@ -45,6 +72,7 @@ type  TKeyDownEvent = procedure (key:word; shift:tshiftstate) of object;
 type
   Tgliste2 = class(TCustomControl)
   private
+    scrollbarbreite : integer;
     FRechtsklick :TRechtsklickevent;
     FDoppelKlick :TDoppelKlickevent;
     FElementMarkierenEvent :TElementMarkierenEvent;
@@ -53,12 +81,14 @@ type
     procedure ZeichneScrollbar;
     procedure FOnMouseWheel(var AMsg: TWMMouseWheel); message WM_MOUSEWHEEL;  //
     //http://www.delphipraxis.net/topic29032_bescheuertes+mausrad.html
-    // naja.... alles kann ich auch net ;-); danke an SirThornberry und Schneck
+    //danke an SirThornberry und Schneck
 
     procedure Delay(wartezeit: integer);
     procedure AutoRaufscrollen;
     procedure AutoRunterscrollen;
+    procedure ErzeugePfeile;
 
+    procedure Schreibe(Spalte, Zeile, k: integer);
 
     { Private-Deklarationen }
   protected
@@ -69,15 +99,15 @@ type
       fortschritt:real;
       schriftart:string;
       aktiv:boolean;
+      rand: array [0..5] of integer;
+      Liste: TListenEintraege;
       property canvas;
 
       constructor create(AOwner: TComponent);  override;
       destructor destroy;  override;
 
-      procedure Initialisize(linkerrand,rechterrand:integer);
       procedure ListenReset;
       procedure Delete(Index: integer);
-      procedure Add(links, mitte, rechts: string);      
 
       procedure keypress(var key:char); override;
       procedure keydown (var Key: Word; Shift: TShiftState); override;
@@ -92,8 +122,6 @@ type
       procedure mouseup( Button: TMouseButton;
                       Shift: TShiftState; X, Y: Integer); override;
       procedure MouseLeave(AControl: TControl); dynamic;
-      procedure SetLinkerrand(linkerrand: integer);
-      procedure SetRechterrand(rechterrand: integer);
       procedure SetFortschritt(prozent: real);
       procedure SetFortschrittlichesElement(element: integer);
       procedure Draw;
@@ -103,11 +131,13 @@ type
       procedure incMarkiertesElement;
       function GetVersion:string;
       function GetZeilen:integer;
+      procedure Add (Nummer:integer;markiert:boolean; l0,l1,l2,l3,l4 :string);
 
       procedure dbg(test:integer);
+      procedure SetMainColor(Color: TColor);
+      procedure Sort(SortColindex: byte; AtoZ:boolean=true);      
     { Public-Deklarationen }
   published
-      liste,listelr,listerr:TStringlist;
       property OnRechtsklick: TRechtsklickevent read FRechtsklick write FRechtsklick;
       property OnDoppelklick: TDoppelKlickevent read FDoppelKlick write FDoppelKlick;
       property OnSpulen: TSpulenevent read FSpulenevent write FSpulenevent;
@@ -121,17 +151,16 @@ type
       property OnEndDrag;
       property OnEnter;
       property OnExit;
+      property PopupMenu;
   end;
 
 procedure Register;
 
-implementation
-
-uses ump3;                                                                                            //Emat
+implementation 
                                                            //Pfeilaufabscroll
-var zeilen,randlinks,randrechts,altesMouseover,mousedown_x, scroll:integer;
-var maustaste,flag,dblclickflag,dblclickflag2,initialisiert,darfmausueberzeichnen:boolean;
-    bild, Pfeilauf,Pfeilab: tbitmap;  
+var zeilen,altesMouseover,mousedown_x, scroll:integer;
+var maustaste,flag,initialisiert,darfmausueberzeichnen,dblclickflag:boolean;
+    bild, Pfeilauf,Pfeilab: tbitmap;
               //flag: gegen mousover-flackern
 
 procedure Register;
@@ -145,127 +174,126 @@ begin
   TabStop := true;
   DoubleBuffered:=true;
   dblclickflag:=false;
-  dblclickflag2:=false;
-  initialisiert:=false;
-
 
   //Listenzeichnungsinitialisierung
-  bild:= Tbitmap.Create;
-  bild.Width:= 1600;           //net so doll
-  bild.Height:= 1200;         //aber ich bin müd
+  bild:= Tbitmap.Create; //Breite wird beim Resize zugewiesen
 
+  zeilen:=height div zeilenhoehe;
 
+  scrollbarbreite:=22;
+  erstereintrag:=0;
+  markiertesElement:=-1;
+  fortschrittlichesElement:=-1;
+  clhintergrund:=$EDEDED;
+  clmouseover:=$0078B0EE; //$00BDCDAD;
+  clmarkiert:=clwhite;
+  clscrollbar:=$0078B0EE;
+  clscrollbar2:=$0078B0EE;
+  cltext:=clblack;
+  clfortschritt:=$0078B0EE;
+  clfortschrittrahmen:=$0078B0EE;
+  clhintergrund_inaktiv:=$00C8C8C8;
 
-  Pfeilauf:= TBitmap.Create;
-  Pfeilauf.Width :=16;
-  Pfeilauf.Height :=16;
-  fmp3.ILSymbolleiste.GetBitmap( 7 , Pfeilauf);   //Emat
+  mausueberElement:=-1;
+  ErzeugePfeile;
 
+  //SetLength(Liste,0);
+  Liste.l0:=TStringlist.Create;
+  Liste.l1:=TStringlist.Create;
+  Liste.l2:=TStringlist.Create;
+  Liste.l4:=TStringlist.Create;
+  Liste.l3:=TStringlist.Create;
+  Liste.Nummer:=TStringlist.Create;
+  Liste.markiert:=TStringlist.Create;
 
-  Pfeilab:= TBitmap.Create;
-  Pfeilab.Width :=16;
-  Pfeilab.Height :=16;
-  fmp3.ILSymbolleiste.GetBitmap( 8 , Pfeilab);   //Emat
-  
-
+  initialisiert:=true;  
 end;
 
 destructor Tgliste2.destroy;
 begin;
-   liste.Free;
-   listelr.Free;
-   listerr.Free;
    inherited Destroy;
 end;
 
 procedure Tgliste2.paint;
 begin;
-draw;
   inherited Paint;
+  draw;
 end;
 
 
-procedure Tgliste2.Initialisize(linkerrand,rechterrand:integer);
-begin
-  zeilen:=height div zeilenhoehe;
-  randlinks:=linkerrand;
-  randrechts:=rechterrand;
-  liste:=TStringlist.Create;
-  listelr:=TStringlist.Create;
-  listerr:=TStringlist.Create;
-
-  erstereintrag:=0;
-  markiertesElement:=0;
-  clhintergrund:=$EDEDED;
-  clmouseover:=$00BDCDAD;
-  clmarkiert:=clwhite;
-  clscrollbar:=$00BDCDAD;
-  clscrollbar2:=$00BDCDAD;
-  cltext:=clblack;
-  clfortschritt:=$00BDCDAD;
-  clfortschrittrahmen:=$00BDCDAD;
-  clhintergrund_inaktiv:=$00C8C8C8;
-
-  mausueberElement:=-1;
-  initialisiert:=true;
-end;
 
 procedure Tgliste2.ListenReset;
 begin
-   liste.Free;
-   listelr.Free;
-   listerr.Free;
-
-   liste:=TStringlist.Create;
-   listelr:=TStringlist.Create;
-   listerr:=TStringlist.Create;
+   liste.l0.Clear;
+   liste.l1.Clear;
+   liste.l2.Clear;
+   liste.l3.Clear;
+   liste.l4.Clear;
+   liste.Nummer.Clear;
+   liste.markiert.Clear;
 
    markiertesElement:=-1;
    fortschrittlichesElement:=-1;
-   //ersterEintrag:=0;                       EMAT-Mod für ArrayZuListe bei minimalen Listenoperationen
+   ersterEintrag:=0;
 end;
 
 procedure Tgliste2.Delete(Index:integer);
 begin
-  liste.Delete(index);
-  listelr.Delete(Index);
-  listerr.Delete(index);
+   if index< liste.l0.Count
+   then
+   begin
+   liste.l0.Delete(index);
+   liste.l1.Delete(index);
+   liste.l2.Delete(index);
+   liste.l3.Delete(index);
+   liste.l4.Delete(index);
+   liste.Nummer.Delete(index);
+   liste.markiert.Delete(index);
+   end;
 end;
 
-procedure Tgliste2.Add(links,mitte,rechts:string);
+procedure Tgliste2.Add(Nummer:integer; markiert:boolean; l0,l1,l2,l3,l4 :string);
 begin
-  liste.Add(mitte);
-  listelr.Add(rechts);
-  listerr.Add(links);
+{  SetLength(Liste,High(Liste)+2);
+
+  Liste[High(Liste)].Nummer:=Nummer;
+  Liste[High(Liste)].l0:=l0;
+  Liste[High(Liste)].l1:=l1;
+  Liste[High(Liste)].l2:=l2;
+  Liste[High(Liste)].l3:=l3;
+  Liste[High(Liste)].l4:=l4;
+
+  Liste[High(Liste)].markiert:=markiert; }
+
+  liste.l0.Add(l0);
+  liste.l1.Add(l1);
+  liste.l2.Add(l2);
+  liste.l3.Add(l3);
+  liste.l4.Add(l4);
+  liste.Nummer.Add(inttostr(Nummer));
+  liste.markiert.Add(booltostr(markiert));
 end;
 
-procedure Tgliste2.SetLinkerrand(linkerrand:integer);
-begin
-   randlinks:=linkerrand;
-end;
-
-procedure Tgliste2.SetRechterrand(rechterrand:integer);
-begin
-   randrechts:=rechterrand;
-end;
 
 procedure Tgliste2.Draw;
-var i,k,m,breite     :integer;
-    verkuerzterText :string;
+var i,k,l,breite,hoehe : integer;
 begin
 if not initialisiert then exit;
 
 breite:=width;        //blöde with-do Anweisung!!! Wie heißt die Komponente selbst?
+hoehe :=height;
 
-if ersterEintrag<0 then ersterEintrag:=0;          //warum weiß ich nicht mehr... zur Sicherheit?
-if ersterEintrag>liste.Count-1 then ersterEintrag:=liste.Count-1;
-if markiertesElement>liste.Count-1 then markiertesElement:=liste.Count-1;
+if ersterEintrag<0 then ersterEintrag:=0;          //... zur Sicherheit
+try
+if ersterEintrag>liste.l0.Count-1 then ersterEintrag:=liste.l0.Count-1;
+if markiertesElement>liste.l0.Count-1 then markiertesElement:=liste.l0.Count-1;
+except ///hm liste.count undefiniert?
+end;
 
 with bild do begin
-
-     //Löschen
+  //Löschen
   if aktiv then
-  begin
+  begin       
   canvas.Pen.Color:=clhintergrund;
   canvas.Brush.Color:=clhintergrund;
   end
@@ -279,19 +307,19 @@ with bild do begin
   if darfmausueberzeichnen then begin
   canvas.Pen.Color:=clmouseover;
   canvas.Brush.Color:=clmouseover;
-  canvas.Rectangle(0,(mausueberElement-ersterEintrag)*zeilenhoehe,
-                      width,(mausueberElement-ersterEintrag+1)*zeilenhoehe);
+  canvas.Rectangle(0,(mausueberElement-ersterEintrag)*zeilenhoehe+randverschiebung,
+                      width,(mausueberElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
   end;
 
   //Markietes hervorheben
   canvas.Pen.Color:=clmarkiert;
   canvas.Brush.Color:=clmarkiert;
-  canvas.Rectangle(0,(markiertesElement-ersterEintrag)*zeilenhoehe,
-                      breite,(markiertesElement-ersterEintrag+1)*zeilenhoehe);
+  canvas.Rectangle(0,(markiertesElement-ersterEintrag)*zeilenhoehe+randverschiebung,
+                      breite,(markiertesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
 
 
   //Text
-  if liste.Count>0 then begin           //Wenn Liste nicht leer
+  if liste.l0.Count-1>=0 then begin           //Wenn Liste nicht leer
 
   canvas.Font.Color:=cltext;
   canvas.Font.Name:=schriftart;
@@ -299,14 +327,15 @@ with bild do begin
   k:=0;
   for i:=erstereintrag to erstereintrag+zeilen do
     begin
-    if i=liste.Count then break;                           //falls weniger Einträge als darstellbar
+    if i>liste.l0.Count-1 then break;   //falls weniger Einträge als darstellbar
 
     if aktiv then
     begin
       canvas.Pen.Color:=clhintergrund;
       canvas.Brush.Color:=clhintergrund;
     end
-    else begin
+    else
+    begin
       canvas.Pen.Color:=clhintergrund_inaktiv;
       canvas.Brush.Color:=clhintergrund_inaktiv;
     end;
@@ -315,70 +344,110 @@ with bild do begin
 
     if i=markiertesElement then canvas.Brush.Color:=clmarkiert;
 
-    canvas.TextOut(rand,zeilenhoehe*k,listerr[i]);
+      //Textausgabe
+    for l:=0 to 4 do Schreibe(l,i,k);
 
-    if canvas.TextWidth(liste[i])>breite-randrechts-randlinks //Wenns nicht reinpasst...
-    then
-     begin
-       verkuerzterText:=liste[i];
-       repeat
-        verkuerzterText:=copy(verkuerzterText,1,length(verkuerzterText)-1);
-       until (canvas.TextWidth(verkuerzterText+'...')<breite-randrechts-randlinks)
-              or (length(verkuerzterText)=0);
-
-      canvas.TextOut(randlinks,zeilenhoehe*k,verkuerzterText+'...');
-     end
-    else canvas.TextOut(randlinks,zeilenhoehe*k,liste[i]);
-    canvas.TextOut(breite-canvas.TextWidth(listelr[i])-scrollbarbreite-rand,zeilenhoehe*k,listelr[i]);
     inc(k);
     end;
 
     end;
-      //Fortschritt hervorheben
-  if (ersterEintrag<=fortschrittlichesElement) and (ersterEintrag+zeilen>fortschrittlichesElement) then begin
+
+  //Fortschritt hervorheben
+  if (ersterEintrag<=fortschrittlichesElement) and (ersterEintrag+zeilen>fortschrittlichesElement)
+     and (fortschrittlichesElement<>-1)
+  then
+  begin
   canvas.Pen.Color:=clfortschritt;
   canvas.Brush.Color:=clfortschritt;
   canvas.Pen.Mode:=pmmask;
 
   canvas.RoundRect(trunc(fortschritt*(breite-scrollbarbreite)-3),
-                  (fortschrittlichesElement-ersterEintrag)*zeilenhoehe,
+                  (fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung,
                    trunc(fortschritt*(breite-scrollbarbreite)+3),
-                  (fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe ,2,2);
+                  (fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung ,2,2);
   canvas.Pen.Mode:=pmcopy;
 
   canvas.Pen.Color:=clfortschrittrahmen;
   canvas.Brush.Color:=clfortschrittrahmen;
-  canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe);
-  canvas.LineTo(breite,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe);
-  canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe);
-  canvas.LineTo(breite,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe);
-
+  canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung);
+  canvas.LineTo(breite,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung);
+  canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
+  canvas.LineTo(breite,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
   end;
+        //Umrandung
+   canvas.Pen.Color:=clmouseover;
+   canvas.Pen.Width:=1;
+   canvas.MoveTo(breite-1,0);
+   canvas.LineTo(0,0);
+   canvas.LineTo(0,hoehe-1);
+   canvas.LineTo(breite-1,hoehe-1);
+   canvas.LineTo(breite-1,0);
  end;
-    //Scrollbar ;-)
-   ZeichneScrollbar;
+    //Scrollbar
+   if liste.l0.Count-1>=zeilen
+   then
+   begin
+        scrollbarbreite:=22;
+        ZeichneScrollbar;
+   end
+   else scrollbarbreite:=0;
+
+
 
    canvas.Draw(0,0,bild);
 end;
 
-procedure Tgliste2.ZeichneScrollbar;
+procedure Tgliste2.Schreibe(Spalte,Zeile,k:integer);
+var randrechts,randlinks:integer;
+    verkuerzterText,text : string;
+begin
+ case Spalte of
+ 0: text:=liste.l0[Zeile];
+ 1: text:=liste.l1[Zeile];
+ 2: text:=liste.l2[Zeile];
+ 3: text:=liste.l3[Zeile];
+ 4: text:=liste.l4[Zeile];
+ end;
 
+ randlinks:=rand[Spalte];
+ randrechts:=rand[Spalte+1];
+
+    if bild.canvas.TextWidth(text)>randrechts-randlinks //Wenns nicht reinpasst...
+    then
+     begin
+       verkuerzterText:=text;
+       repeat
+        verkuerzterText:=copy(verkuerzterText,1,length(verkuerzterText)-1);
+       until (bild.canvas.TextWidth(verkuerzterText+'...')<randrechts-randlinks)
+              or (length(verkuerzterText)=0);
+
+      bild.canvas.TextOut(randlinks,zeilenhoehe*k+randverschiebung,verkuerzterText+'...');
+     end
+    else bild.canvas.TextOut(randlinks,zeilenhoehe*k+randverschiebung,text);
+end;
+
+
+
+procedure Tgliste2.ZeichneScrollbar;
 begin
 
   bild.canvas.Pen.Color:=clscrollbar;
   bild.canvas.Brush.Color:=clhintergrund;
   bild.canvas.Rectangle(width-scrollbarbreite,0,width,height);
   bild.canvas.Brush.Color:=clscrollbar;
-  bild.canvas.Rectangle(width-scrollbarbreite,0,width,scrollbarhoehe);
-  bild.canvas.Rectangle(width-scrollbarbreite,height-scrollbarhoehe,width,height);
     //Anzeigebalken
-  scroll:=trunc( (ersterEintrag / (liste.Count-zeilen)* ( (height-scrollbarhoehe*2)) + scrollbarhoehe ));
-  bild.canvas.Brush.Color:=clscrollbar2;
-  bild.canvas.Rectangle( width-scrollbarbreite , scroll-scrollbarzeigerhoehe ,  width , scroll+scrollbarzeigerhoehe );
 
+  if liste.l0.Count-1-zeilen<>0
+  then
+  scroll:=round( (ersterEintrag) / (liste.l0.Count-1-zeilen) * ( height-pfeilauf.Height*2 -scrollbarhoehe )
+                  + pfeilauf.Height)
+  else scroll:=0;
+  bild.canvas.Brush.Color:=clscrollbar2;
+  bild.canvas.Rectangle( width-scrollbarbreite , scroll ,  width , scroll+scrollbarhoehe
+   );
     //Auf-Ab-Pfeil
-  bild.canvas.Draw( width-scrollbarbreite+2 , 0 , Pfeilauf);
-  bild.canvas.Draw( width-scrollbarbreite+2 , height-scrollbarhoehe , Pfeilab);
+  bild.canvas.Draw( width-scrollbarbreite+1 , 1 , Pfeilauf);
+  bild.canvas.Draw( width-scrollbarbreite+1 , height-pfeilab.Height-1 , Pfeilab);
 
 end;
 
@@ -391,21 +460,27 @@ end;
 
 procedure Tgliste2.KeyDown (var Key: Word; Shift: TShiftState);
 begin
+  inherited KeyDown (Key,Shift);
+  if assigned(OnKeyDown) then OnKeyDown(key,Shift);
+
+  Setfocus;
+  Aktiv:=true;
+
   case key of
   VK_DOWN   : Runterscrollen;
   VK_UP     : Raufscrollen;
-  VK_NEXT	  : Runterscrollen;
+  VK_NEXT   : Runterscrollen;
   VK_PRIOR  : Raufscrollen;
   65      : decMarkiertesElement;
   89      : incMarkiertesElement;
   end;
-  inherited KeyDown (Key,Shift);
-  if assigned(OnKeyDown) then OnKeyDown(key,Shift);
+
+
 end;
 
 procedure Tgliste2.incMarkiertesElement;
 begin
- if markiertesElement<liste.count
+ if markiertesElement<=liste.l0.Count-1
  then
  begin
    inc(markiertesElement);
@@ -438,76 +513,93 @@ end;
 
 procedure Tgliste2.click;
 begin
-   Setfocus;
+
 end;
 
 procedure Tgliste2.dblclick;
 begin
-  if mousedown_x<width-scrollbarbreite then begin   //wenn auf Liste
+  inherited dblclick;
 
-   fortschrittlichesElement:=markiertesElement;
+  if mousedown_x<width-scrollbarbreite then    //wenn auf Liste
+  begin
+ //  fortschrittlichesElement:=markiertesElement;   EMAT-MOD falls Element defekt
+ //  fortschritt:=0;
    dblclickflag:=true;
-   dblclickflag2:=false;
-   fortschritt:=0;
 
-   if fortschrittlichesElement<=high(ump3.mp3s) then
    if Assigned(OnDoppelklick) then OnDoppelklick(markiertesElement);
-
-   inherited dblclick;
   end;
 end;
+
 
 procedure Tgliste2.mousedown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var markiert:integer;
 begin
-if assigned(OnEnter) then OnEnter(fmp3);
+  inherited mousedown(Button,Shift,X,Y);
+ // if assigned(OnEnter) then OnEnter(self);   //Emat-mod, sonst nicht aufrufen
+  Setfocus;
+  Aktiv:=true;
 
-maustaste:=true;
-markiert:=y div zeilenhoehe + ersterEintrag;
-IF (markiert>liste.Count-1) then exit;
+  maustaste:=true;
+  markiert:=((y-randverschiebung) div zeilenhoehe) + ersterEintrag;
 
-   if x<width-scrollbarbreite then begin   //wenn auf Liste
-      if markiertesElement<>markiert then begin
+  if (markiert<=liste.l0.Count-1)
+  then
+   begin
+
+   if x<width-scrollbarbreite then
+    begin   //wenn auf Liste
+      if markiertesElement<>markiert
+      then
+       begin
           markiertesElement:=markiert;
           if Assigned(OnElementMarkieren) then OnElementMarkieren(markiert);
-          BeginDrag(false);
-          end;                                                 //linke Taste
-      if (markiert=fortschrittlichesElement) and (button=mbleft) and (dblclickflag2) then begin
-         if Assigned(OnSpulen)
-         then
-          begin
-          OnSpulen(x/(width-scrollbarbreite));
-          SetFortschritt( x/(width-scrollbarbreite) );
-          end;
-
+       end
+      else
+        begin
+          if (markiert=fortschrittlichesElement) and (button=mbleft)
+                and (not dblclickflag)
+           then
+            begin
+             if Assigned(OnSpulen)
+             then
+              begin
+              OnSpulen(x/(width-scrollbarbreite));
+              SetFortschritt( x/(width-scrollbarbreite) );
+              end;
+           end;
          end;
-      if dblclickflag then begin dblclickflag2:=true;  dblclickflag:=false; end; //Fortschrittspreventing
-                                                                                 //beim erstem Markieren
+     dblclickflag:=false;
+     draw;
+     if (button=mbleft) then BeginDrag(false);
 
-      if (button=mbright) then begin      //rechte Taste
+      if (button=mbright) then
+       begin      //rechte Taste
          if Assigned(OnRechtsklick)
          then
           begin
-          draw;
           OnRechtsklick(markiert, x, y);
           end;
-         end;
-
-      draw;
+       end;
 
    end
-   else begin   //wenn auf Scrollbar
+   else
+   begin   //wenn auf Scrollbar
 
-        if y<scrollbarhoehe then AutoRaufscrollen;
-        if y>(height-scrollbarhoehe) then AutoRunterscrollen;
-        if (y>scrollbarhoehe) and (y<(height-scrollbarhoehe)) then begin
-            ersterEintrag:=trunc( (y-scrollbarhoehe)/(height-scrollbarhoehe*2 ) * (liste.Count-1-zeilen) );
-            draw;
-            end;
+        if y<=pfeilauf.Height then AutoRaufscrollen;
+        if y>=(height-pfeilab.Height) then AutoRunterscrollen;
+        if (y>pfeilauf.Height) and (y<(height-pfeilab.Height-scrollbarhoehe))
+        then             ersterEintrag:=round( (y-pfeilauf.Height) /
+    {existiert auch bei mousemove} (height-pfeilauf.Height*2-scrollbarhoehe )
+                                       * (liste.l0.Count-1-zeilen) );
+        if (y>=(height-pfeilab.Height-scrollbarhoehe)) and (y<(height-pfeilab.Height))
+        then ersterEintrag:=liste.l0.Count-1-zeilen;
+   draw;
    end;
 
    mousedown_x:=x;
+   end;
 end;
+
 
 procedure Tgliste2.SetFortschritt(prozent:real);
 begin
@@ -524,20 +616,23 @@ end;
 
 procedure Tgliste2.mousemove (Shift: TShiftState; X,Y: Integer);
 begin
-if x<width-scrollbarbreite then begin   //nur wenn neben der Scrollbar
-        mausueberElement:=y div zeilenhoehe + ersterEintrag;
+if x<width-scrollbarbreite then
+ begin   //nur wenn neben der Scrollbar
+        mausueberElement:=(y-randverschiebung) div zeilenhoehe + ersterEintrag;
 
-   IF  mausueberElement<liste.Count then begin
+   IF  mausueberElement<=liste.l0.Count-1 then begin
 
       darfmausueberzeichnen:=true;
 
-      if (altesMouseover<>mausueberElement) and (mausueberElement>-1) then begin //nur wenn wirklich neues gemausübert wird
+      if (altesMouseover<>mausueberElement) and (mausueberElement>-1) then
+      begin //nur wenn wirklich neues gemausübert wird
         draw;
         altesMouseover:=mausueberElement;
         flag:=true;
       end;
 
-      if (mausueberElement=markiertesElement) and (flag) then begin   //nicht wenn über Markiertem
+      if (mausueberElement=markiertesElement) and (flag) then
+       begin   //nicht wenn über Markiertem
          mausueberElement:=-1;
          draw;
          flag:=false;
@@ -545,26 +640,41 @@ if x<width-scrollbarbreite then begin   //nur wenn neben der Scrollbar
      end else begin
         mausueberelement:=-1;
         if darfmausueberzeichnen then draw;
-        darfmausueberzeichnen:=false; 
+        darfmausueberzeichnen:=false;
         end;
-
-end else begin //auf Scrollbar
-        if (y>scrollbarhoehe) and (y<(height-scrollbarhoehe)) then
-         while  maustaste do begin
-            ersterEintrag:=trunc( (y-scrollbarhoehe-1)/(height-scrollbarhoehe*2-1 ) * (liste.Count-zeilen+7) );
-            draw;                                                                   //alles ein bisschen
-            delay(1);                                                               //schwammig
+ end
+ else
+ begin //auf Scrollbar
+  {  if x>width
+    then maustaste:=false     //Aus liste herausgehen
+    else   }
+      begin
+        if (y>=pfeilauf.Height) and (y<=(height-pfeilab.Height-scrollbarhoehe)) then
+         while  maustaste do
+          begin
+            ersterEintrag:=round( (y-pfeilauf.Height) /
+                                      (height-pfeilauf.Height*2-scrollbarhoehe )
+                                       * (liste.l0.Count-1-zeilen) );
+            draw;
+            delay(1);
           end;
 
-end;
-
+        if (y>=(height-pfeilab.Height-scrollbarhoehe)) and (y<(height-pfeilab.Height))
+        then
+         while  maustaste do
+          begin
+           ersterEintrag:=liste.l0.Count-1-zeilen;
+            draw;
+            delay(1);
+          end;
+      end;    
+end;  
 end;
 
 
 
 procedure Tgliste2.MouseLeave(AControl: TControl);
 begin
-
 maustaste:=false;    //stimmt ja gar net
 end;
 
@@ -573,68 +683,71 @@ end;
 procedure Tgliste2.mouseup(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
 maustaste:=false;
-
 end;
 
 
 
 procedure Tgliste2.Runterscrollen;
-begin
-    inc(ersterEintrag,scrollschrittweite);
-    if ersterEintrag>liste.count-zeilen then ersterEintrag:=liste.count-zeilen;
+begin     
+    if ersterEintrag<liste.l0.Count-zeilen
+    then inc(ersterEintrag,scrollschrittweite);
     Draw;
-
 end;
 
 procedure Tgliste2.Raufscrollen;
 begin
-   dec(erstereintrag,scrollschrittweite);
-   if erstereintrag<0 then erstereintrag:=0;
+   if erstereintrag>0
+     then dec(erstereintrag,scrollschrittweite);
    Draw;
-
 end;
 
 procedure Tgliste2.AutoRunterscrollen;
 begin
-while maustaste do begin
-    runterscrollen;
-    delay(60);
- end;
+  while maustaste do
+    begin
+      runterscrollen;
+      delay(60);
+    end;
 
 end;
 
 procedure Tgliste2.AutoRaufscrollen;
 begin
-while maustaste do begin
-    raufscrollen;
-    delay(60);
- end;
+  while maustaste do
+    begin
+      raufscrollen;
+      delay(60);
+    end;
 end;
 
 procedure Tgliste2.dbg(test:integer);
 begin
- showmessage(inttostr(test));
-
+  showmessage(inttostr(test));
 end;
 
-PROCEDURE Tgliste2.Delay(wartezeit: integer);
-VAR anfangsseit:integer;
-  BEGIN
-    anfangsseit := GetTickCount;
-      WHILE abs(GetTickCount) - anfangsseit <= wartezeit do  BEGIN
-        Application.ProcessMessages;
-        Sleep(1);
-      END;
-  END;
+procedure Tgliste2.Delay(wartezeit: integer);
+var
+  anfangsseit: integer;
+begin
+  anfangsseit := GetTickCount;
+  while abs(GetTickCount) - anfangsseit <= wartezeit do
+    begin
+      Application.ProcessMessages;
+      Sleep(1);
+    end;
+end;
 
 function Tgliste2.GetVersion:string;
 begin
-  result:=Version;
+  result := Version;
 end;
 
 procedure Tgliste2.resize;
 begin
-  zeilen:=height div zeilenhoehe;  
+  zeilen := height div zeilenhoehe;
+  bild.Width := width;
+  bild.Height := height;
+  rand[5] := width-scrollbarbreite;
 inherited resize;
 end;
 
@@ -643,5 +756,165 @@ begin
   Result:=zeilen;
 end;
 
+procedure Tgliste2.ErzeugePfeile;
+var Punkte: array of TPoint;
+    Rand: integer;
+begin
+  setlength(Punkte,3);
+  Rand:=3;
 
+(*pfeilauf*)
+
+  Pfeilauf:= TBitmap.Create;
+  Pfeilauf.Width :=20;
+  Pfeilauf.Height :=20;
+
+  Punkte[0].X:=Pfeilauf.Width div 2;
+  Punkte[0].Y:=rand;
+  Punkte[1].X:=rand;
+  Punkte[1].Y:=Pfeilauf.Height-rand;
+  Punkte[2].X:=Pfeilauf.Width-rand;
+  Punkte[2].Y:=Pfeilauf.Height-rand;
+
+  Pfeilauf.Canvas.Pen.Color:=clhintergrund;
+  Pfeilauf.Canvas.Brush.Color:=clscrollbar;
+  Pfeilauf.Canvas.Rectangle(0,0,Pfeilauf.Width,Pfeilauf.Height);
+
+  Pfeilauf.Canvas.Pen.Color:=clblack;
+  Pfeilauf.Canvas.Brush.Color:=clblack;
+  Pfeilauf.Canvas.Polygon(Punkte);
+
+
+(*pfeilab*)
+
+  Pfeilab:= TBitmap.Create;
+  Pfeilab.Width :=20;
+  Pfeilab.Height :=20;
+
+  Punkte[0].X:=rand;
+  Punkte[0].Y:=rand;
+  Punkte[1].X:=Pfeilab.Width-rand;
+  Punkte[1].Y:=rand;
+  Punkte[2].X:=Pfeilab.Width div 2;
+  Punkte[2].Y:=Pfeilab.Height-rand;
+
+  Pfeilab.Canvas.Pen.Color:=clhintergrund;
+  Pfeilab.Canvas.Brush.Color:=clscrollbar;
+  Pfeilab.Canvas.Rectangle(0,0,Pfeilab.Width,Pfeilab.Height);
+
+  Pfeilab.Canvas.Pen.Color:=clblack;
+  Pfeilab.Canvas.Brush.Color:=clblack;
+  Pfeilab.Canvas.Polygon(Punkte);
+end;
+
+procedure Tgliste2.SetMainColor(Color: TColor);
+begin
+    clscrollbar:=Color;
+    clscrollbar2:=Color;
+    clfortschritt:=Color;
+    clfortschrittrahmen:=Color;
+    ErzeugePfeile;
+    Draw;
+end;
+
+procedure Tgliste2.Sort( SortColIndex:byte; AtoZ:boolean=true);
+
+ procedure QuickSort(var A: TStringlist; iLo, iHi: Integer);
+  var
+    Lo, Hi  : Integer;
+    Mid : string;
+  begin
+    Lo := iLo;
+    Hi := iHi;
+    Mid := A[(Lo + Hi) div 2];
+    repeat
+      while lowercase(A[Lo]) < lowercase(Mid) do Inc(Lo);
+      while lowercase(A[Hi]) > lowercase(Mid) do Dec(Hi);
+      if Lo <= Hi then
+      begin
+        liste.l0.Exchange(Lo,Hi);
+        liste.l1.Exchange(Lo,Hi);
+        liste.l2.Exchange(Lo,Hi);
+        liste.l3.Exchange(Lo,Hi);
+        liste.l4.Exchange(Lo,Hi);
+        liste.Nummer.Exchange(Lo,Hi);
+        liste.markiert.Exchange(Lo,Hi);
+  {      T := A[Lo];
+        A[Lo] := A[Hi];
+        A[Hi] := T; }
+        Inc(Lo);
+        Dec(Hi);
+      end;
+    until Lo > Hi;
+    if Hi > iLo then QuickSort(A, iLo, Hi);
+    if Lo < iHi then QuickSort(A, Lo, iHi);
+  end;
+
+var
+  i{, j, Pos }: Integer;
+  //SListe     : ^TStringlist;
+begin
+            {
+case SortColIndex of
+//0 : SListe:=@liste.l0;
+1 : SListe:=@liste.l1;
+2 : SListe:=@liste.l2;
+3 : SListe:=@liste.l3;
+4 : SListe:=@liste.l4;
+else SListe:=@liste.l0;
+end;
+
+
+  for i := 0 to SListe.Count-2 do
+  begin
+    Pos := i;
+    for j := i+1 to SListe.Count-1 do
+     begin
+      if AtoZ
+        then
+          if lowercase(SListe.Strings[j]) > lowercase(SListe.Strings[Pos])
+            then Pos := j ;
+
+      if not AtoZ then
+          if lowercase(SListe.Strings[j]) < lowercase(SListe.Strings[Pos])
+            then Pos := j;
+     end;
+        liste.l0.Exchange(Pos,i);
+        liste.l1.Exchange(Pos,i);
+        liste.l2.Exchange(Pos,i);
+        liste.l3.Exchange(Pos,i);
+        liste.l4.Exchange(Pos,i);
+        liste.Nummer.Exchange(Pos,i);
+        liste.markiert.Exchange(Pos,i);
+  end;
+        {   }
+ //Quicksort
+
+    case SortColIndex of
+    1 :  QuickSort(liste.l1,0,liste.l0.Count-1);
+    2 :  QuickSort(liste.l2,0,liste.l0.Count-1);
+    3 :  QuickSort(liste.l3,0,liste.l0.Count-1);
+    4 :  QuickSort(liste.l4,0,liste.l0.Count-1);
+    else  QuickSort(liste.l0,0,liste.l0.Count-1);
+    end;
+
+if not AtoZ then  //Hier fehlt der Umkehrquicksort !!! (Notbehelf)
+  begin
+   for i:=0 to ((liste.l0.Count-1) div 2) do
+   begin
+        liste.l0.Exchange(i,liste.l0.Count-1-i);
+        liste.l1.Exchange(liste.l0.Count-1-i,i);
+        liste.l2.Exchange(liste.l0.Count-1-i,i);
+        liste.l3.Exchange(liste.l0.Count-1-i,i);
+        liste.l4.Exchange(liste.l0.Count-1-i,i);
+        liste.Nummer.Exchange(liste.l0.Count-1-i,i);
+        liste.markiert.Exchange(liste.l0.Count-1-i,i);
+   end;
+  end;
+
+ markiertesElement:=-1;
+ fortschrittlichesElement:=-1;
+ ersterEintrag:=0;
+
+ end;
 end.

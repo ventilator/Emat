@@ -4,16 +4,20 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, AppEvnts;
+  Dialogs, ComCtrls, ExtCtrls, AppEvnts, TB2Dock, TBXDkPanels;
 
   type
   TFlaut = class(TForm)
-    TBTrayVolume: TTrackBar;
     TimerHide: TTimer;
+    TBXMultiDock1: TTBXMultiDock;
+    TBXDockablePanel1: TTBXDockablePanel;
+    TBTrayVolume: TTrackBar;
     procedure FormCreate(Sender: TObject);
     procedure TBTrayVolumeChange(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure TimerHideTimer(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private-Deklarationen }
   public
@@ -31,7 +35,8 @@ uses ump3;
 
 procedure TFlaut.FormCreate(Sender: TObject);
 begin
-Flaut.Width:=TBTrayVolume.Width;
+Flaut.Width:=48;
+Flaut.Height:=130;
 end;
 
 procedure TFlaut.TBTrayVolumeChange(Sender: TObject);
@@ -49,6 +54,10 @@ begin
 if not TBtrayVolume.Focused then FormDeactivate(flaut);
 end;
 
-
+procedure TFlaut.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+Fmp3.FormKeyDown(Fmp3,Key,Shift);
+end;
 
 end.

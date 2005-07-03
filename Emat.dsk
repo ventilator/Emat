@@ -1,0 +1,548 @@
+[Closed Files]
+File_0=SourceModule,'E:\Clemens\Dokumente\Delphi\Komponenten\tbx-2_0\TBXDkPanels.pas',0,1,4153,1,4173,0,0
+File_1=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3player.pas',0,1,1,1,111,0,0
+File_2=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3_\Gliste2.pas',0,1,10,17,33,0,0
+File_3=SourceModule,'c:\programme\borland\delphi7\source\vcl\Graphics.pas',0,1,149,3,167,0,0
+File_4=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\TBXOffice2003Theme.pas',0,1,1,13,16,0,0
+File_5=SourceModule,'c:\programme\borland\delphi7\source\vcl\Forms.pas',0,1,4747,1,4770,0,0
+File_6=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Exbar.pas',0,1,1716,1,1739,0,0
+File_7=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UId3tag.pas',0,1,1,1,1,0,0
+
+[Modules]
+Module0=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
+Module1=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+Module2=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\CommonTypes.pas
+Module3=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\spectrum_vis.pas
+Module4=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\osc_vis.pas
+Module5=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\circle_vis.pas
+Module6=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\MPEGaudio.pas
+Module7=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\BASSPlayer.pas
+Module8=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ustart.pas
+Module9=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Uscreenout.pas
+Module10=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\OggVorbis.pas
+Module11=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Usave.pas
+Module12=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Bass.pas
+Module13=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Emat.dpr
+Module14=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\USpieler.pas
+Module15=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ulaut.pas
+Module16=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ulang.pas
+Module17=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UInfo.pas
+Module18=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Gliste2.pas
+Module19=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ID3v1.pas
+Module20=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ID3v2.pas
+Module21=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UDatenbank.pas
+Module22=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\changelog.txt
+Count=23
+EditWindowCount=2
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas]
+ModuleType=SourceModule
+FormState=1
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas]
+ModuleType=SourceModule
+FormState=1
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\CommonTypes.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\spectrum_vis.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\osc_vis.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\circle_vis.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\MPEGaudio.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\BASSPlayer.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ustart.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Uscreenout.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\OggVorbis.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Usave.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Bass.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Emat.dpr]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\USpieler.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ulaut.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ulang.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UInfo.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Gliste2.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ID3v1.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ID3v2.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UDatenbank.pas]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\changelog.txt]
+ModuleType=SourceModule
+FormState=0
+FormOnTop=0
+
+[C:\Programme\Borland\Delphi7\Projects\ProjectGroup1.bpg]
+FormState=0
+FormOnTop=0
+
+[EditWindow1]
+ViewCount=1
+CurrentView=0
+View0=0
+CodeExplorer=CodeExplorer@EditWindow1
+MessageView=MessageView@EditWindow1
+Create=1
+Visible=0
+State=0
+Left=249
+Top=133
+Width=868
+Height=646
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=860
+ClientHeight=617
+LeftPanelSize=0
+RightPanelSize=0
+BottomPanelSize=0
+
+[View0]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+CursorX=1
+CursorY=940
+TopLine=806
+LeftCol=1
+
+[EditWindow0]
+ViewCount=23
+CurrentView=2
+View0=1
+View1=2
+View2=3
+View3=4
+View4=5
+View5=6
+View6=7
+View7=8
+View8=9
+View9=10
+View10=11
+View11=12
+View12=13
+View13=14
+View14=15
+View15=16
+View16=17
+View17=18
+View18=19
+View19=20
+View20=21
+View21=22
+View22=23
+CodeExplorer=CodeExplorer@EditWindow0
+MessageView=MessageView@EditWindow0
+Create=1
+Visible=1
+State=0
+Left=239
+Top=110
+Width=1044
+Height=881
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=1036
+ClientHeight=852
+LeftPanelSize=269
+LeftPanelClients=CodeExplorer@EditWindow0
+LeftPanelData=000004000000000000000000000000000000000000000000000100000000000000000C000000436F64654578706C6F726572FFFFFFFF
+RightPanelSize=0
+BottomPanelSize=85
+BottomPanelClients=MessageView@EditWindow0
+BottomPanelData=000004000000000000000000000000000000000000000000000100000000000000000B0000004D65737361676556696577FFFFFFFF
+
+[View1]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+CursorX=53
+CursorY=782
+TopLine=755
+LeftCol=1
+
+[View2]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\changelog.txt
+CursorX=22
+CursorY=10
+TopLine=1
+LeftCol=1
+
+[View3]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
+CursorX=1
+CursorY=519
+TopLine=510
+LeftCol=1
+
+[View4]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UDatenbank.pas
+CursorX=5
+CursorY=2
+TopLine=1
+LeftCol=1
+
+[View5]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ID3v2.pas
+CursorX=33
+CursorY=10
+TopLine=1
+LeftCol=1
+
+[View6]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ID3v1.pas
+CursorX=1
+CursorY=272
+TopLine=268
+LeftCol=1
+
+[View7]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Gliste2.pas
+CursorX=1
+CursorY=531
+TopLine=511
+LeftCol=1
+
+[View8]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UInfo.pas
+CursorX=1
+CursorY=127
+TopLine=127
+LeftCol=1
+
+[View9]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ulang.pas
+CursorX=65
+CursorY=42
+TopLine=17
+LeftCol=3
+
+[View10]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ulaut.pas
+CursorX=1
+CursorY=1
+TopLine=1
+LeftCol=1
+
+[View11]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\USpieler.pas
+CursorX=1
+CursorY=302
+TopLine=284
+LeftCol=1
+
+[View12]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Emat.dpr
+CursorX=28
+CursorY=11
+TopLine=1
+LeftCol=1
+
+[View13]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Bass.pas
+CursorX=20
+CursorY=768
+TopLine=736
+LeftCol=1
+
+[View14]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Usave.pas
+CursorX=39
+CursorY=12
+TopLine=1
+LeftCol=1
+
+[View15]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\OggVorbis.pas
+CursorX=1
+CursorY=666
+TopLine=662
+LeftCol=1
+
+[View16]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Uscreenout.pas
+CursorX=12
+CursorY=29
+TopLine=1
+LeftCol=1
+
+[View17]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Ustart.pas
+CursorX=1
+CursorY=1
+TopLine=1
+LeftCol=1
+
+[View18]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\BASSPlayer.pas
+CursorX=1
+CursorY=2310
+TopLine=1
+LeftCol=1
+
+[View19]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\MPEGaudio.pas
+CursorX=32
+CursorY=39
+TopLine=1
+LeftCol=1
+
+[View20]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\circle_vis.pas
+CursorX=1
+CursorY=1
+TopLine=1
+LeftCol=1
+
+[View21]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\osc_vis.pas
+CursorX=1
+CursorY=1
+TopLine=1
+LeftCol=1
+
+[View22]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\spectrum_vis.pas
+CursorX=28
+CursorY=126
+TopLine=1
+LeftCol=1
+
+[View23]
+Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\CommonTypes.pas
+CursorX=1
+CursorY=1
+TopLine=1
+LeftCol=1
+
+[Watches]
+Count=1
+Watch0='Mp3Daten',256,0,18,1,0,'Überwachte Ausdrücke'
+
+[Breakpoints]
+Count=0
+
+[AddressBreakpoints]
+Count=0
+
+[Main Window]
+Create=1
+Visible=1
+State=0
+Left=0
+Top=0
+Width=1280
+Height=110
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=1272
+ClientHeight=81
+
+[ProjectManager]
+Create=1
+Visible=0
+State=0
+Left=337
+Top=217
+Width=438
+Height=305
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=430
+ClientHeight=279
+TBDockHeight=305
+LRDockWidth=438
+Dockable=1
+
+[AlignmentPalette]
+Create=1
+Visible=0
+State=0
+Left=200
+Top=112
+Width=156
+Height=84
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=150
+ClientHeight=60
+
+[PropertyInspector]
+Create=1
+Visible=1
+State=0
+Left=0
+Top=462
+Width=239
+Height=527
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=231
+ClientHeight=501
+TBDockHeight=527
+LRDockWidth=239
+Dockable=1
+SplitPos=85
+ArrangeBy=Name
+SelectedItem=Caption
+ExpandedItems=
+HiddenCategories=
+
+[ObjectTree]
+Create=1
+Visible=1
+State=0
+Left=0
+Top=110
+Width=240
+Height=352
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=232
+ClientHeight=326
+TBDockHeight=352
+LRDockWidth=240
+Dockable=1
+
+[CodeExplorer@EditWindow0]
+Create=1
+Visible=1
+State=0
+Left=0
+Top=12
+Width=269
+Height=752
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=269
+ClientHeight=752
+TBDockHeight=305
+LRDockWidth=269
+Dockable=1
+
+[MessageView@EditWindow0]
+Create=1
+Visible=1
+State=0
+Left=12
+Top=0
+Width=1024
+Height=85
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=1024
+ClientHeight=85
+TBDockHeight=85
+LRDockWidth=443
+Dockable=1
+
+[CodeExplorer@EditWindow1]
+Create=1
+Visible=0
+State=0
+Left=204
+Top=162
+Width=140
+Height=305
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=132
+ClientHeight=279
+TBDockHeight=305
+LRDockWidth=140
+Dockable=1
+
+[MessageView@EditWindow1]
+Create=1
+Visible=0
+State=0
+Left=198
+Top=107
+Width=443
+Height=85
+MaxLeft=-1
+MaxTop=-1
+ClientWidth=435
+ClientHeight=59
+TBDockHeight=85
+LRDockWidth=443
+Dockable=1
+
+[DockHosts]
+DockHostCount=0
+

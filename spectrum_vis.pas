@@ -5,7 +5,7 @@ unit spectrum_vis;
 }
 
 interface
-  uses Windows, Dialogs, Graphics, SysUtils, CommonTypes, Classes;
+  uses Windows, Dialogs, Graphics, SysUtils, CommonTypes, Classes, bassplayer;
 
  type TSpectrum = Class(TObject)
     private
@@ -25,6 +25,7 @@ interface
        FFTPeacks  : array [0..128] of Integer;
        FFTFallOff : array [0..128] of Integer;
 
+
     public
 
 
@@ -33,6 +34,7 @@ interface
       SpecHeight : Integer;
       PenColor : TColor;
       PeakColor: TColor;
+     procedure Resize(Width, Height: Integer);
          //
      Constructor Create (Width, Height : Integer);
      procedure Draw(HWND : THandle; FFTData : TFFTData; X, Y : Integer);
@@ -55,6 +57,7 @@ interface
  var Spectrum : TSpectrum;
 
 implementation
+
 
      Constructor TSpectrum.Create(Width, Height : Integer);
       begin
@@ -79,6 +82,14 @@ implementation
           ColWidth := 5;
           ShowPeak := True;
       end;
+
+     procedure TSpectrum.Resize(Width, Height : Integer);
+     begin
+          VisBuff.Width := Width;
+          VisBuff.Height := Height;
+          BackBmp.Width := Width;
+          BackBmp.Height := Height;
+     end;
 
      procedure TSpectrum.SetBackGround (Active : Boolean; BkgCanvas : TGraphic);
       begin
