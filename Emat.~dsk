@@ -9,8 +9,8 @@ File_6=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Exba
 File_7=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UId3tag.pas',0,1,1,1,1,0,0
 
 [Modules]
-Module0=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
-Module1=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+Module0=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+Module1=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
 Module2=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\CommonTypes.pas
 Module3=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\spectrum_vis.pas
 Module4=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\osc_vis.pas
@@ -35,12 +35,12 @@ Module22=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\changelog.txt
 Count=23
 EditWindowCount=2
 
-[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas]
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas]
 ModuleType=SourceModule
 FormState=1
 FormOnTop=0
 
-[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas]
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas]
 ModuleType=SourceModule
 FormState=1
 FormOnTop=0
@@ -178,13 +178,13 @@ BottomPanelSize=0
 [View0]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
 CursorX=1
-CursorY=940
-TopLine=806
+CursorY=946
+TopLine=812
 LeftCol=1
 
 [EditWindow0]
 ViewCount=23
-CurrentView=2
+CurrentView=0
 View0=1
 View1=2
 View2=3
@@ -231,9 +231,9 @@ BottomPanelData=0000040000000000000000000000000000000000000000000001000000000000
 
 [View1]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
-CursorX=53
-CursorY=782
-TopLine=755
+CursorX=62
+CursorY=8
+TopLine=1
 LeftCol=1
 
 [View2]
@@ -245,9 +245,9 @@ LeftCol=1
 
 [View3]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
-CursorX=38
-CursorY=343
-TopLine=334
+CursorX=29
+CursorY=570
+TopLine=550
 LeftCol=1
 
 [View4]
@@ -322,9 +322,9 @@ LeftCol=1
 
 [View14]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Usave.pas
-CursorX=39
-CursorY=12
-TopLine=1
+CursorX=18
+CursorY=184
+TopLine=164
 LeftCol=1
 
 [View15]

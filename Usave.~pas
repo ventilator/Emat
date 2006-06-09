@@ -158,7 +158,7 @@ try
   ini.WriteBool('Allgemein','HDD-Loesch',fmp3.TBXI_HDDLoeschmodus.Checked);
   fmp3.ListBox1.Items.SaveToFile(extractfilepath(ini.FileName)+LBPLSINI);
   ini.WriteBool('Allgemein','SysHKey',fmp3.TBXCBSysHKey.Checked);
-  ini.ReadBool('Allgemein','SingleAutoPlay',fmp3.TBXCBSearchAutoPlay.Checked);
+  ini.WriteBool('Allgemein','SingleAutoPlay',fmp3.TBXCBSearchAutoPlay.Checked);
   ini.WriteString('Style', 'Wallpaper', fmp3.OpenPD.FileName);
   ini.WriteInteger('Vis', 'Mode', fmp3.PBSpectrum.Tag);            //uk
   S_EQ;

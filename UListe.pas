@@ -567,7 +567,7 @@ begin
   if (fmp3.datenbank.GetShownFiles(ListenNummer,FileList)) and
      (fmp3.PathD.Execute) then
   begin
-   Zielpfad:=fmp3.PathD.PathName;
+   Zielpfad:=fmp3.PathD.Path;
    if DirectoryExists( Zielpfad ) then
    begin
      fmp3.Fplaylisten[ ListenNummer ].TBXPBauslesen.Max := FileList.Count;

@@ -9,8 +9,8 @@ File_6=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Exba
 File_7=SourceModule,'E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UId3tag.pas',0,1,1,1,1,0,0
 
 [Modules]
-Module0=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
-Module1=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+Module0=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
+Module1=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
 Module2=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\CommonTypes.pas
 Module3=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\spectrum_vis.pas
 Module4=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\osc_vis.pas
@@ -35,12 +35,12 @@ Module22=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\changelog.txt
 Count=23
 EditWindowCount=2
 
-[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas]
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas]
 ModuleType=SourceModule
 FormState=1
 FormOnTop=0
 
-[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas]
+[E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas]
 ModuleType=SourceModule
 FormState=1
 FormOnTop=0
@@ -178,13 +178,13 @@ BottomPanelSize=0
 [View0]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
 CursorX=1
-CursorY=940
-TopLine=806
+CursorY=946
+TopLine=815
 LeftCol=1
 
 [EditWindow0]
 ViewCount=23
-CurrentView=2
+CurrentView=0
 View0=1
 View1=2
 View2=3
@@ -225,15 +225,15 @@ LeftPanelSize=269
 LeftPanelClients=CodeExplorer@EditWindow0
 LeftPanelData=000004000000000000000000000000000000000000000000000100000000000000000C000000436F64654578706C6F726572FFFFFFFF
 RightPanelSize=0
-BottomPanelSize=85
+BottomPanelSize=0
 BottomPanelClients=MessageView@EditWindow0
-BottomPanelData=000004000000000000000000000000000000000000000000000100000000000000000B0000004D65737361676556696577FFFFFFFF
+BottomPanelData=00000400010000000B0000004D6573736167655669657700000000000000000000000000000000000100000000000000000B0000004D65737361676556696577FFFFFFFF
 
 [View1]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\ump3.pas
-CursorX=53
-CursorY=782
-TopLine=755
+CursorX=3
+CursorY=11
+TopLine=1
 LeftCol=1
 
 [View2]
@@ -245,9 +245,9 @@ LeftCol=1
 
 [View3]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\UListe.pas
-CursorX=1
-CursorY=519
-TopLine=510
+CursorX=29
+CursorY=570
+TopLine=550
 LeftCol=1
 
 [View4]
@@ -322,9 +322,9 @@ LeftCol=1
 
 [View14]
 Module=E:\Clemens\Dokumente\Delphi\Eigene Programme\P12-4 Mp3\Usave.pas
-CursorX=39
-CursorY=12
-TopLine=1
+CursorX=18
+CursorY=184
+TopLine=164
 LeftCol=1
 
 [View15]
@@ -486,18 +486,18 @@ State=0
 Left=0
 Top=12
 Width=269
-Height=752
+Height=840
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=269
-ClientHeight=752
+ClientHeight=840
 TBDockHeight=305
 LRDockWidth=269
 Dockable=1
 
 [MessageView@EditWindow0]
 Create=1
-Visible=1
+Visible=0
 State=0
 Left=12
 Top=0

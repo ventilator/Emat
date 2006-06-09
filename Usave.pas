@@ -149,7 +149,7 @@ try
   ini.WriteInteger('Style','Top',fmp3.Top);
   ini.WriteInteger('Style','Width',fmp3.Width);
   ini.WriteInteger('Style','Height',fmp3.Height);
-  ini.WriteString('Dialogs','PathD',fmp3.PathD.PathName);
+  ini.WriteString('Dialogs','PathD',fmp3.PathD.Path);
   ini.WriteBool('Style','TaskbarButton',fmp3.TBXCBtaskbuttton.Checked);
   ini.WriteBool('Style','MinToTray',fmp3.TBXCBmintotray.Checked);
   ini.WriteBool('Style','ShowTray',fmp3.TBXCBtrayicon.Checked);
@@ -181,7 +181,7 @@ begin
   fmp3.Top:=ini.ReadInteger('Style','Top',Screen.Height div 2 - fmp3.Height div 2);
   fmp3.Width:=ini.ReadInteger('Style','Width',750);
   fmp3.Height:=ini.ReadInteger('Style','Height',650);
-  fmp3.PathD.PathName:=ini.ReadString('Dialogs','PathD','');
+  fmp3.PathD.Path:=ini.ReadString('Dialogs','PathD','');
   fmp3.TBXCBscrolltitle.Checked:=ini.ReadBool('Style','TaskScroll',true);
   fmp3.TBXCBtrayicon.Checked:=ini.ReadBool('Style','ShowTray',true);
   fmp3.TBXCBtaskbuttton.Checked:=ini.ReadBool('Style','TaskbarButton',true);

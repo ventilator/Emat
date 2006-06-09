@@ -4,25 +4,30 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Gliste2, ActnCtrls, ToolWin, StdCtrls, ExtCtrls, ActnList,
-  XPStyleActnCtrls, StdActns, UPathDialog,ImgList, ComCtrls, Grids, mmsystem,
-  registry, CoolTrayIcon, Menus, shellapi, Buttons, CustomizeDlg,
-  strutils, LMDCustomComponent, LMDGlobalHotKey, Exbar, usave, XPMan,
-  DSPack, dsutil, bassplayer, commontypes, TB2Dock,TBXDkPanels, TB2Toolbar,
-  TB2Item, TBX, udatenbank, uspieler, (*TB2MDI,*) TBXExtItems,
+  Dialogs, ToolWin, ActnList, clipbrd,
+  ImgList, ComCtrls, Grids, mmsystem, ActnColorMaps,
+  registry,  Menus, shellapi, Buttons, CustomizeDlg, ExtDlgs,
+  strutils,  LMDGlobalHotKey, XPMan, ActnMan,
+  commontypes,
+  StdCtrls, StdActns, ExtCtrls,
+  TB2Dock,TBXDkPanels, TB2Toolbar,
+  TB2Item, TBX, TBXExtItems,
   TB2Common, TB2ExtItems, TBXLists, TBXToolPals, TBXStatusBars, jpeg, Uliste,
   TBXAcroTheme, TBXSentimoTheme, TBXAthenXTheme, TBXMonaiTheme, TBXMonaiXPTheme,
   TBXRomaTheme, TBXOffice11XPTheme, TBXOfficeKTheme, TBXOffice11AdaptiveTheme,
   TBXNexosTheme, TBXNexos2Theme, TBXNexos3Theme, TBXNexos4Theme, TBXNexos5Theme,
   TBXOfficeCTheme, TBXTristanTheme, TBXTristan2Theme, TBXOffice2003Theme,
   TBXXitoTheme, TBXNewDefaultTheme, TBXNewOfficeXPTheme, TBXEosTheme,
-  TBXEMoneyTheme, TBXAthenTheme, TBXSwitcher, TBXThemes, (*TBXMDI,*) ActnMan,
-  ActnColorMaps, clipbrd, ulang, ExtDlgs, uincex, TBXMDI, TBXProgressBar,
+  TBXEMoneyTheme, TBXAthenTheme, TBXSwitcher, TBXThemes,
+  TBXMDI, TBXProgressBar,
   LMDControl, LMDBaseControl, LMDBaseGraphicControl, LMDBaseLabel,
-  LMDCustomLabel, LMDLabel, bass;
+  LMDCustomLabel, LMDLabel, bass, LMDContainerComponent, LMDBaseDialog,
+  LMDDirDlg, LMDCustomComponent,
+  CoolTrayIcon, Exbar,
+  udatenbank, usave, uspieler, ulang, uincex, bassplayer;
 
 
-const Version   = '0.75.64';
+const Version   = '0.75.65-D2k5testbuilt';
       maxVolume = 255;
       Anzahl_TBXDockablePanel = 7;
       Anzahl_TBXToolbars      = 3;
@@ -42,7 +47,6 @@ type TAktiv = record
 
 type
   TFmp3 = class(TForm)
-    PathD: TPathDialog;
     ILSymbolleiste: TImageList;
     SaveD: TSaveDialog;
     OpenD: TOpenDialog;
@@ -226,6 +230,7 @@ type
     TBX_del_play_item: TTBXItem;
     TBXCBSysHKey: TTBXCheckBox;
     TBXCBSearchAutoPlay: TTBXCheckBox;
+    PathD: TLMDDirDlg;
     procedure PBarMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TBVolumeChange(Sender: TObject);
@@ -403,7 +408,6 @@ type
 
 var
   Fmp3        : TFmp3;
-  Playlistenliste : TGliste2;
   Save        : TSave;
   basshandle  : HWND;
 
@@ -717,7 +721,7 @@ begin
   if PathD.Execute
   then
    begin
-    Datenbank.OrdnerAnListeAnhaengen(PathD.PathName,Aktiv.Liste);
+    Datenbank.OrdnerAnListeAnhaengen(PathD.Path,Aktiv.Liste);
     DatenbankListeAusgeben(Aktiv.Liste);
    end;
 end;
@@ -777,9 +781,9 @@ begin
                             Datenbank.Mp3DatenMeta[ListenNummer].SpeicherPfad));
   Fplaylisten[ ListenNummer ].ES.Text:=
                             Datenbank.Mp3DatenMeta[ListenNummer].SuchText;
-  Fplaylisten[ ListenNummer ].TBXStatusBar1.Panels[1].Caption := Format(
+  Fplaylisten[ ListenNummer ].TBXStatusBar1.Panels[0].Caption := Format(
     CPLSTITELS, [Files]);  //uk
-  Fplaylisten[ ListenNummer ].TBXStatusBar1.Panels[2].Caption := Format(
+  Fplaylisten[ ListenNummer ].TBXStatusBar1.Panels[1].Caption := Format(
     CPLSMB, [round(FilesSize/(1024*1024))]);
     end;
 end;

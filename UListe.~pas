@@ -349,7 +349,7 @@ begin
            end;
 
        inc(i);
-       until (i=High(fmp3.Datenbank.Mp3Daten[ListenNummer])+1)       
+       until (i=High(fmp3.Datenbank.Mp3Daten[ListenNummer])+1);       
 
      fmp3.DatenbankListeAusgeben(ListenNummer);
      fmp3.Fplaylisten[ ListenNummer ].TBXPBauslesen.Caption:='';        

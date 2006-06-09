@@ -910,16 +910,6 @@ object Fmp3: TFmp3
     PopupMenu = TBXPopupMenu2
     Position = dpBottom
   end
-  object PathD: TPathDialog
-    Title = 
-      'Bitte w'#228'hlen Sie einen Ordner aus, den Sie nach Audiodateien dur' +
-      'chsuchen wollen.'#13#10'Das Scannen nach Dateien kann mehrere Minuten ' +
-      'dauern.'
-    Options = []
-    EnableOk = True
-    Left = 256
-    Top = 152
-  end
   object ILSymbolleiste: TImageList
     Height = 20
     Width = 20
@@ -3719,5 +3709,10 @@ object Fmp3: TFmp3
     OnKeyDown = GH_DelKeyDown
     Left = 456
     Top = 90
+  end
+  object PathD: TLMDDirDlg
+    CaptionTitle = 'Bitte w'#228'hlen Sie den gew'#252'nschten Ordner aus.'
+    Left = 288
+    Top = 186
   end
 end
