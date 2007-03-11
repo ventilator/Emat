@@ -1,0 +1,15 @@
+<h2>Features</h2>
+<ul>
+  <li>Spielt mp3,wma,ogg und ac3 sowie weiterer Formate (z.B mp2)</li>
+  <li>Ordnet die Playliste in einer Spezialsortierung nach der Ordnerstruktur und dem id3tag, da die meisten mp3-Sammlungen recht mangelhaft getaggt sind</li>
+  <li>Verschiedene visuelle Stile</li> 
+  <li>Kann das aktuelle Lied auch in 3D-Spielen anzeigen</li>
+  <li>Komfortable Suchfunktion</li>
+  <li>Designt nach dem Prinzip der kurzen Mauswege und wenigstens Tastendrücke</li>
+  <li>Systemweite Hot-Keys um auch in Spielen heraus das Lied zu wechseln</li>
+  <li>Einfache Funktionen um doppelte und unnötige Dateien zu löschen</li>
+  <li>Automatische Verlaufs- und Favoritenliste</li>
+  <li>Leichte Methodik um den ID3-Tag mehrere Mp3s zu ändern</li>
+  <li>Multible gleichzeitig offene Playlisten</li>
+  <li>Liest auch id3v2 2.4 utf-16 tags</li>           
+</ul>
