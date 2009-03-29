@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+ <head>
+  <title>Changelog</title>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+ </head>
+ <body>
+  <h1>Emat-Changelog</h1>
+    <h2>Veränderungen in Version 0.80.16</h2>
+  <ul>
+   <li>Unterstützung von .flac-Dateien (Free Lossless Audio Codec)</li>  
+   <li>Unbenannte Playlisten werden optional beim Beenden trotzdem gespeichert</li>
+   <li>Unbenannte Playlisten werden nach dem Benennen beim Beenden auch wieder beim nächsten Start geladen</li>
+   <li>Shuffel war nach dem Start immer an</li>
+   <li>Wird ein Titel pausiert, wird er auch auf Play fortgesetzt</li>
+   <li>Favoriten nennen sich nun Top 100</li>
+   <li>Top 100 Markierfehlverhalten korrigiert</li>
+   <li>Werden Ordner und Musikdateinen auf dem Programmfenster fallen gelassen, können diese nun optional der aktuellen Playliste hinzugefügt werden, anstatt eine neue Playliste zu erzeugen</li>
+   <li>Die Suche findet nun Titel 50-60% schneller</li>    
+  
+  <h2>Veränderungen in Version 0.80.15e</h2>
+  <ul>
+   <li>Weitere optische OSD-Verbesserungen (mehr Informationen, bessere Lesbarkeit)</li>  
+   <li>"Doppelte Musikdateien finden" warnt jetzt davor, dass es sehr lange brauchen könnte (Verhindert außerdem ungewollte Wartezeiten nach Fehlklicks)</li>
+   <li>"Einzelnes Medium automatisch abspielen" standardmäßig deaktiviert, da es einige unbedarfte Nutzer verwirrt (Azi)</li>
+   <li>Beim Wechsel zwischen offenen Listen werden die Titel nicht mehr automatisch abgespielt, wenn sich nur ein Titel in der Liste befindet (Azi)</li>
+   <li>"In Verlauf einreihen" in "Als nächstes abspielen" umbenannt (Azi)</li>
+   <li>"Einzelnes Medium automatisch abspielen" nur jetzt nur noch in der spielenden Playliste angewendet</li>
+   <li>"Einzelnes Medium automatisch abspielen" heißt jetzt "Eindeutige Suchtreffer sofort spielen" (David)</li>
+   
+   
+  </ul>
+  <ul style="color: blue;">
+   <li>Hochqualitatives Ematicon, das auch unter großen Vergrößerungen noch gut aussieht</li>
+   <li>Shuffle-Stärke (-> Schnelleinstellungen) konfigurierbar</li>
+  </span>  
+  </ul>
+  <h3>Anmerkungen</h3>
+  <ul>
+   <li>Das Problem mit den OSD Fehlermeldungen ist nicht mehr aufgetreten, steht aber weiter unter Beobachung</li>
+   <li>Das nächste Release wird einen neuen Optionsdialog mit einstellbaren globalen Hotkeys enthalten (Userwunsch)</li>
+  </ul>
+  <h2>Veränderungen in Version 0.80.15</h2>
+  <ul>
+   <li>Das zu groß geratene Emat-Icon wieder durch das alte ersetzt</li>
+   <li> Das
+   <acronym title="'Titelanzeige in allen Anwendungen'"> OSD
+   </acronym>
+   nutzt nun Arial (Vekorschrift) anstatt der kantigen WindowsXP Standardschrift (Pixelschrift)</li>
+   <li>Das OSD verkleinert den Text, sollte der zu groß für den Bildschirm sein </li>
+  </ul>
+  <h3>Anmerkungen</h3>
+  <ul>
+   <li>Das OSD kann in seltenen Fällen hunderte Fehlermeldungen produzieren und Emat zum Absturz bringen. Als vorläufige Maßnahme bitte das OSD deaktivieren.</li>
+  </ul>
+  <h2>Veränderungen in Version 0.80.14</h2>
+  <ul style="color: blue;">
+   <li>OSD deutlich verbessert, jedoch weiterhin nicht perfekt. Falls Probleme auftreten, einfach deaktivieren. (Im Detail: Es wird jetzt zuverlässig über alle Anwendungen gezeichnet, jedoch könnte der Bildschirm kurz flackern, wenn es wieder verschwindet. Die lange geplante Einführung eines DirectX-Overlay, wie es z.B Fraps benutzt, ist bisher an der Implementierung gescheitert. Jedoch wäre es interessant unter Windows Vista, da dort auch der Desktop mit Hilfe von DirectX gerendert wird.)</li>
+   <li>Dynamisches Paneele-Menü wieder aktiviert d.h. die Haken werden wieder korrekt gesetzt (was durch das Verschieben des Menüs verloren gegangen ist).</li>
+   <li>Dynamisches Paneele-Menü jetzt alphabetisch geordnet</li>
+   <li>Standard-Hintergrundbild wird geladen, wenn das eingestelle gelöscht/verschoben wurde.</li>
+   <li>Wenn ein Titel durch die Option "Einzelnes Medium automatisch abspielen" gestartet wird, wird kein Eintrag in der Suchhistory mehr erstellt. <br />
+   Effekt: Kein Abspielen von Titeln bei der Eingabe in das Suchfeld <br />
+   Beispiel: Man hat über diese Option den Titel "Die Ärzte - Backpfeifengesicht" mit der Eingabe "Backp" gestartet. Nun hört man einen anderen Titel und möchte dann "Die Siffer - Born Toulouse" abspielen. Man gibt "Born Tou" und der Titel wird abgespielt. Dabei wird aber bereits bei der Eingabe von "B" das besagte "Backp" vorgeschlagen, gesucht, gefunden und gestartet. Die Folge ist ein hässlicher Kurz-Anklang des Ärzte-Songs und erst dann kommt man in den Genuss der Siffer.<br />
+   Es kann sein, dass diese Änderung nicht sofort den gewünschten Effekt bringt, weil noch ältere solcher Einträge, die einen Titel starten, existieren. Zur Lösung dieses Problems kann Emat beendet werden, im Emat-Verzeichnis im Verzeichnis \custom die Datei "searchstrings.set" gelöscht und Emat wieder gestartet werden.</li>
+   <li> Neuer HotKey für das Anzeigen des gespielten Titels: Strg + F4 (Strg + Alt + H geht weiterhin.)</li>
+   <li>Hintergrundverlauf des Covers passt sich der Größe seines Pannels an.</li>
+   <li>Hintergrundverlauf nun auch bei der Analog- und Binäruhr (verbessert)</li>
+   <li>Panel "Titel-Löschoptionen" erstellt; entsprechende Symbole aus Hauptmenü-Leiste entfernt (Es konnte vorkommen, dass man aus Versehen einen Titel löschte, anstelle eine Playliste zu fokusieren.)</li>
+   <li>Laufender Titel wird nun in der Titel-Leiste des Haupt-Fensters angezeigt.</li>
+   <li>Und einige nicht erwähnenswerte (u.a. kosmetische) Veränderungen</li>
+
+    </ul>   
+   <li>In den Favoriten gibt es jetzt im Kontextmenü die Möglichkeit den Titel ins Suchfeld einzutragen (das ist nützlich, wenn man einen einzelnen Titel immer wieder hören möchte).</li>
+   <li>In den Metainformationen auch</li>
+   <li>Ein kleiner Schreibfehler (eine "0" statt ein "i") verhinderte, dass "Verzeichnisse erneut einlesen" nicht funktioniert, wenn man mehr als ein Verzeichnis in seiner Playliste hinzugefügt hat. Ist dies der Fall, muss die Playliste neu erstellt werden, da diese Verzeichnisse nicht abgespeichert wurden</li>
+   <li>In seltenen Fällen sind beim erneunten Einlesen aufgrund dieses Fehlers leere Listeneinträge entstanden. Diese können unter Extras->Spezial->"Leere Listeneinträge löschen" entfernt werden</li>
+   <li>Das uralte Problem, dass der Shuffle beim ersten Anschalten das Gegenteil von sich behauptet hat, wurde behoben</li>
+   <li>Emat nutzt jetzt die Bass.dll in Version 2.3 zur Musikwiedergabe; beim Upgrade müssen folglicherweise auch alle dll-Dateien mit den neuen mitgelieferten Versionen ersetzt werden.</li>
+   <li>Unterstützung von .aac, .mp4 und .m4a (MP4-Audio) Dateien (B@ngung). Falls jemand noch exotischere Formate abspielen will, bitte melden.</li>
+   <li></li>
+     </span>
+  <h3>Anmerkungen</h3>
+  <ul>
+   <li>
+   <span style="color: blue;"> Blau
+   </span>
+   markierte Veränderungen sind von David, nicht von Clemens, vorgenommen worden.</li>
+   <li>Erste Anzeichen deuten darauf hin, dass Emat fast reibungsfrei unter Windows Vista läuft; jedoch funktioniert dort das OSD nicht zuverlässig</li>
+  </ul>
+  <h2>Veränderungen in Version 0.80.13</h2>
+  <ul>
+   <li>Die Einstellungen des OSDs werden jetzt wirklich gespeichert</li>
+   <li>Unechte Verzeichnisse können nicht mehr einer Playliste hinzugefügt werden (z.B. Arbeitsplatz, Netzwerkumgebung)</li>
+   <li>Das Navigieren in der Liste per Tastatur aktualisiert nun auch das Cover und die Metainformationen (anonym)</li>
+   <li>Das Navigieren in der Liste per Tastatur positioniert den Zeiger nicht mehr nur in der Mitte, sondern man kann jetzt auch nach 'unten' gehen (Es sieht besser aus)</li>
+   <li>"Verzeichnisse erneut einlesen" entsperrte nach getaner Arbeit das Programmfenster nicht mehr (Die Fehlervermeidungsmaßnahme bringt selbst Fehler mit sich...)</li>
+   <li>Einige weiße Flächen mit einem Verlauf gefüllt (Leider wird er erst nach einem Neustart größer)</li>
+   <li>Die Coversuche kann man jetzt auch abschalten (Bei großen Covern ist die Einleseverzögerung doch recht deutlich)</li>
+   <li>Der Hint des Menüeintrages "Verzeichnisse erneut einlesen" zeigt jetzt die Suchpfade an (Diese Funktion wird wahrscheinlich niemand kennen wollen)</li>
+   <li>Emat kann automatisch die Prozesspriorität auf "Hoch" stellen (auf "Normal" ruckelt die Musik im Spiel "Titan Quest")</li>
+   <li>Die Maus kann beim Scrollen der Playliste per Scrollbar auch über den eigentlichen Listeneinträgen schweben (Foerdi)</li>
+   <li>Einzelne Playlisteneinträge können nun manuell an eine andere Stelle verschoben werden</li>
+   <li>Die Favoritenliste ist nun auch in der Lage mehr als 99 Abspielvorgänge zuverlässig anzuzeigen</li>
+   <li>In der History können nun Elemente verschoben, gelöscht und per Drag &amp; Drop hinzugefügt werden</li>
+  </ul>
+  <h3>Anmerkungen</h3>
+  <ul>
+   <li>Die Mediatasten einer Tastatur/Fernbedienung systemweit abzufangen ist in Planung</li>
+   <li>Markierte Medien lassen sich nach Anwenderberichten per Entf/Löschicon nicht löschen. Ich konnte den Fehler nicht nachvollziehen; bei bestehenden Problemen bitte melden. Möglicherwiese werden Dateien nicht gelöscht, wenn der Papierkorb auf dem System deaktiviert ist.</li>
+   <li>Der Emat Bildschirmschoner: In Windows den Bildschirmschoner "3D-Objekte" auswählen, in den Eigenschaften "Fahne mit Muster" und als Muster das Emat-Logo auswählen. Fertig ;-)<br />
+   Man kann auch ein anderes Muster nehmen; Hauptsache man erinnert sich bei Anblick der Fahne an Emat.</li>
+   <li>Um das Suchverhalten deutlicher zu machen, trägt das Suchfeld folgenden Hint:<br />
+   Beispiel einer UND-Suche: "Coldplay Live" (Das Leerzeichen ist das Trennzeichen)<br />
+   Findet alle Live-Titel von Coldplay<br />
+   Beispiel einer ODER-Suche: "Madonna; H.I.M" (Das Semikolon ist das Trennzeichen)<br />
+   Findet alle Titel von Madonna und von H.I.M<br />
+   Anmerkung: Die ODER-Suche ist höherwertiger als die UND Suche: "Coldplay Live; ACDC Highway"<br />
+   Findet alle Live-Titel von Coldplay und Highway to Hell von ACDC, aber keine Live-Titel von ACDC.</li>
+   <li>Falls eine der genannten Veränderungen von einem Benutzer gemeldet wurde, dessen Namen aber nicht im Changelog auftaucht, heißt dies, dass der Fehler bereits von mir entfernt oder vorher von einem anderen gemeldet wurde. Trotzdem vielen Dank für die Rückmeldung, sie werden alle gelesen</li>
+  </ul>
+  <h2>Veränderungen in Version 0.80.12</h2>
+  <ul>
+   <li>Tastendrücke werden korrekt in das Suchfeld eingetragen, wenn die Playliste markiert ist ("j" wie in Winamp oder früheren Versionen ist nicht nötig)</li>
+   <li>Im Verlauf werden zu lange Texte korrekt abgekürzt</li>
+   <li>Die Statusanzeige beim Hinzufügen bleibt nicht mehr über allen anderen Fenstern, dafür wird die Hauptanwendung deaktiviert (zur Fehlervermeidung)</li>
+   <li>Die Einstellungen des OSD / Auto-OSD wurde nicht gespeichert (daflear)</li>
+   <li>Eine maximierte Playliste sollte jetzt in jedem Fall nach einem Neustart wieder maximiert sein</li>
+   <li>Ich "abspielen" war ohne p geschrieben und monatelang hats niemand gemerkt (christian hats mir einen Tag später, nachdem es mir aufgefallen ist, geschrieben)</li>
+   <li>Manche Beschriftungen zeigten nur schwarze Balken; das Problem hängt anscheinend von verschiedenen visuellen Stilen in Windows ab (christian)</li>
+   <li>Die Funktionen "Alle Ordner auflisten, die weniger als 4 Dateien enthalten" und "Alle leeren Ordner löschen" braucht wohl niemand, ich habe sie nur geschrieben um schneller meine Mp3-Sammlung sortieren zu können. Deswegen wurden sie wieder entfernt</li>
+   <li>Das Popup-Menü der Playliste wird deaktiviert, wenn keine Medien markiert sind (christian)</li>
+   <li>"Spalten wählen" erhält einen Statushaken (christian)</li>
+  </ul>
+  <h3>Anmerkungen</h3>
+  <ul>
+   <li>Namen in Klammern würdigen die Menschen, denen der Fehler in der Software aufgefallen ist und mir gemeldet haben. Danke.</li>
+   <li>"Doppelte Musikdateien finden" braucht sehr, sehr lange und die Ergebnisse lassen zu wünschen übrig.<br />
+   Die Software "Seek &amp; Destroy Music Duplicates" scheint eine leistungsfähige Alternative zu sein. Allerdings konnte ich sie noch nicht testen, da sie Java 1.5 benötigt</li>
+  </ul>
+  <h2>Veränderungen seit dem 0.75er Versionszweig</h2>
+  <ul>
+   <li>Binärformat der Playlisten wurde grundlegend geändert (Upgrade leider nicht möglich), aber die Playlisten sind jetzt 70-80% kleiner</li>
+   <li>Internes Speicherformat geändert, Arbeitsspeicherverbrauch halbiert (nur noch ca. 10-15 MB)</li>
+   <li>Suchdauer auf die Hälfte verkürzt</li>
+   <li>Binäruhr und zwei weitere sinnlose Uhren wieder hinzugefügt (auf Bitten eines Anwenders)</li>
+   <li>Mehrere Medien können jetzt gleichzeitig markiert, gelöscht und getaggt werden (wenn man z.B den Albumnamen eines gesamten Albums ändern möchte)</li>
+   <li>Musikdateien werden jetzt ca. 8x so schnell wie früher in die Playliste hinzugefügt, dafür steigt dabei der Arbeitsspeicherverbrauch auch nicht mehr ins Unermessliche (das war und ist ein Delphifehler &rArr; die Funktion SetLength hat wohl ein Speicherleck, wenn die 20000 mal aufgerufen wird. Daher wird sie nun nur noch einmal aufgerufen)<br />
+   Eine hübsche Animation verkürzt jetzt scheinbar die Wartezeit</li>
+   <li>Auto-OSD Aktivierung (Songtitel werden automatisch auch im Warcraft angezeigt)</li>
+   <li>Ordner löschen geändert (Untermenü bietet drei zu löschende Ordnerebenen an)</li>
+   <li>Dateien und Ordner werden grundsätzlich immer in den Papierkorb verschoben (kein endgültiges Löschen eines Ordners mehr)</li>
+   <li>"Lots of internal changes and minor tweaks"</li>
+  </ul>
+  <h3>Anmerkungen</h3>
+  <ul>
+   <li>Auch wenn es vielleicht anders scheint, werden beim 'Verzeichnisse neu einlesen' wirklich nur die neuen Medien hinzugefügt</li>
+   <li>Ich rate dringed davon ab, die Visualisierung zu aktivieren (bei mir funktioniert sie nur sporadisch, vielleicht hast du mehr Glück)</li>
+   <li>Der Equalizer ist und bleibt defekt. Warum sollte man in die (perfekte) Abmischung eines Tonstudius eingreifen? Nur weil man meint man könnte es besser. Und die Profis, die es wirklich besser können, nehmen sicherlich kein Emat (ohne jetzt einen Anwender beleidigen zu wollen...)</li>
+   <li>offizielle Entschuldigung an daflear für die unbedachte Veröffentlichung der (instabilen) Version 0.80.03</li>
+   <li>die großen Sprünge in den Versionsnummern sollten nicht als Anzeichen für große Veränderungen gesehen werden. Ich vergebe einfach nur gerne viele neue Versionsnummern bei jeder Änderung eines einzigen Pixels...</li>
+   <li>Ein Hilfesystem ist in Arbeit, ich habe nur keine Lust es auch noch mit Inhalt zu füllen</li>
+   <li>Der Dialog 'Tragbares Gerät' enthält wirklich bisher nur funktionslose Knöpfe. Glaubt mir endlich</li>
+  </ul>
+  <h3>Tipp</h3>
+  <ul>
+   <li>Wenn man seine Mp3-Sammlung unwiederruflich mit dem "Magic Mp3 Tagger" neu taggen lässt, sollte man sich nicht darüber ärgern, dass nach der 10 Stunden langen Prozedur kein id3-tag mehr auslesbar ist (weil man unbedingt utf-16 Unterstützung haben wollte; man könnte ja chinesische Mp3s haben), man ca. 3521 teils leere Ordner mehr hat und kein Cover mehr gefunden wird, weil die jetzt in anderen Ordnern liegen. Man sollte sich lieber freuen, dass man nach dem kompletten Datenverlusst (danke an den verbuggten S-ATA Kontroller Sil3112) zwei Wochen zuvor zumindest Teile des Emat-Quellcodes wiederherstellen konnte.</li>
+  </ul>
+  <h2>Ende des Changelogs - &copy; Clemens Grünewald</h2>
+ </body>
+</html>

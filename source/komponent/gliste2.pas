@@ -82,6 +82,10 @@ Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
 - Maus kann beim Scrollen auch über der Liste schweben
 0.4.8   23/25.9.06
 - OnItemMove hinzugefügt
+0.4.9   20.04.2007
+- SetSelected
+0.4.9.1 25.02.2008
+- Zweiter Klick des Doppelklicks markiert nicht mehr
 }
 
 
@@ -226,6 +230,9 @@ type
                                l0,l1,l2,l3,l4 :string);
 
       function GetFirstMultiSelectedItem(var Index:integer):boolean;
+
+      //Markiert ein Element (falls möglich)
+      procedure SetSelected(ID:integer);
 
     { Public-Deklarationen }
   published
@@ -461,243 +468,250 @@ procedure Tgliste2.Draw;
   end;
 
 
-procedure DMarkierung;
-begin
-  with bild do begin
-    canvas.Pen.Color:=clmarkiert;
-    canvas.Brush.Color:=clmarkiert;
-    canvas.Rectangle(
-        0,
-        (markiertesElement-ersterEintrag)*zeilenhoehe+randverschiebung,
-        width,
-        (markiertesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
-  end;
-end;
-
-
-procedure DMouseOver;
-begin
-  with bild do begin
-  if darfmausueberzeichnen then
+  procedure DMarkierung;
   begin
-    canvas.Pen.Color:=clmouseover;
-    canvas.Brush.Color:=clmouseover;
-    canvas.Rectangle(
-        0,
-        (mausueberElement-ersterEintrag)*zeilenhoehe+randverschiebung,
-        width,
-        (mausueberElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
-  end;
-  end;
-end;
-
-
-procedure DText;
-var i,k,l  : integer;
-begin
-  with bild do begin
-
-    if liste.l0.Count-1>=0 then          //wenn Liste nicht leer
-    begin
-
-    canvas.Font.Color:=cltext;
-    canvas.Font.Name:=schriftart;
-
-    k:=0;
-    for i:=erstereintrag to erstereintrag+zeilen do
-      begin
-        if i<liste.l0.Count             //falls weniger Einträge als darstellbar
-        then
-         begin
-
-          if (focused) or (aktiv) then
-          begin
-            canvas.Pen.Color:=clhintergrund;
-           // canvas.Brush.Color:=Canvas.Pixels[1,zeilenhoehe*k+1];
-            canvas.Brush.Color:=clblue;
-          end
-          else
-          begin
-            canvas.Pen.Color:=clhintergrund_inaktiv;
-            canvas.Brush.Color:=clhintergrund_inaktiv;
-          end;
-
-          if i=markiertesElement
-           then canvas.Brush.Color:=clmarkiert
-           else
-            if (i=mausueberElement) and (darfmausueberzeichnen)
-             then canvas.Brush.Color:=clmouseover;
-
-          if strtobool(liste.markiert[i])
-           then canvas.Font.Style:=[fsunderline]
-           else canvas.Font.Style:=[];
-
-          canvas.brush.style:=bsClear;
-            //Textausgabe
-          for l:=0 to 4 do Schreibe(l,i,k);
-
-          inc(k);
-          canvas.brush.style:=bssolid;
-          end
-
-          else
-          break;
-         end;
-
-      end;
-  end;
-end;
-
-
-procedure DHintergrund;
-begin
-  with bild do begin
-    //Löschen  bzw. Hintergrund
-    if (focused) or (aktiv) then
-    begin
-      canvas.Pen.Color:=clhintergrund;
-      canvas.Brush.Color:=clhintergrund;
-    end
-    else
-    begin
-      canvas.Pen.Color:=clhintergrund_inaktiv;
-      canvas.Brush.Color:=clhintergrund_inaktiv;
+    with bild do begin
+      canvas.Pen.Color:=clmarkiert;
+      canvas.Brush.Color:=clmarkiert;
+      canvas.Rectangle(
+          0,
+          (markiertesElement-ersterEintrag)*zeilenhoehe+randverschiebung,
+          width,
+          (markiertesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
     end;
-    if (gradientback) and ((focused) or (aktiv))
-    then
-       drawgradient(canvas,clhintergrund,clhintergrund2,clientrect)
-    else
-    canvas.Rectangle(0,0,width,height);
-
- end;
-end;
-
-
-procedure DFortschritt;
-begin
-  with bild do begin
-    //Fortschritt hervorheben
-    if (ersterEintrag<=fortschrittlichesElement) and (ersterEintrag+zeilen>fortschrittlichesElement)
-       and (fortschrittlichesElement<>-1)
-    then
-    begin
-     { if (fortschrittlichesElement = mausueberElement) and
-                              (fortschrittlichesElement <> markiertesElement) then
-      begin
-        canvas.Pen.Color:=clblack;
-        canvas.Brush.Color:=clblack;
-      end else
-      begin
-        canvas.Pen.Color:=clfortschritt;
-        canvas.Brush.Color:=clfortschritt;
-      end;   }
-
-    canvas.Pen.Color:=(clfortschritt + clblack) div 2;
-    canvas.Brush.Color:=canvas.Pen.Color;
-
-    canvas.RoundRect(trunc(fortschritt*(self.width-scrollbarbreite)-3),
-                    (fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung,
-                     trunc(fortschritt*(self.width-scrollbarbreite)+3),
-                    (fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung, 0,0);
-
-
-
-
-     { if (fortschrittlichesElement = mausueberElement) and
-                              (fortschrittlichesElement <> markiertesElement) then
-      begin
-        canvas.Pen.Color:=clblack;
-        canvas.Brush.Color:=clblack;
-      end else
-      begin
-        canvas.Pen.Color:=clfortschrittrahmen;
-        canvas.Brush.Color:=clfortschrittrahmen;
-      end;  }
-
-    canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung);
-    canvas.LineTo(self.width,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung);
-    canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
-    canvas.LineTo(self.width,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
-    end;
-
   end;
-end;
 
 
-procedure DRahmen;
-begin
-  with bild do begin
-   canvas.Pen.Color:=clmouseover;
-   canvas.Pen.Width:=1;
-   canvas.MoveTo(self.width-1,0);
-   canvas.LineTo(0,0);
-   canvas.LineTo(0,self.Height-1);
-   canvas.LineTo(self.width-1,self.Height-1);
-   canvas.LineTo(self.width-1,0);
- end;
-end;
-
-
-procedure DScrollbar;
-var scroll, zeichenhoehe : integer;
-    prozent: extended;
-begin
-  with bild do begin
-    //Scrollbar
-   if liste.l0.Count>zeilen
-   then
-   begin
-        scrollbarbreite:=22;
-        canvas.Pen.Color:=clscrollbar;
-        canvas.Brush.Color:=clhintergrund;
-
-        canvas.Rectangle(width-scrollbarbreite,0,width,height);
-
-        canvas.Brush.Color:=clscrollbar;
-
-          //Anzeigebalken
-        prozent:=ersterEintrag / (liste.l0.Count-zeilen);
-        if prozent>1 then prozent:=1;
-
-        zeichenhoehe:= height-pfeilauf.Height*2;
-        scrollbarhoehe:=round(zeilen/(liste.l0.Count)*zeichenhoehe);
-        if scrollbarhoehe<10 then scrollbarhoehe:=20;
-
-        dec(zeichenhoehe,scrollbarhoehe);
-
-        scroll:=round( prozent
-                       * ( zeichenhoehe)
-                       + pfeilauf.Height + scrollbarhoehe div 2);
-
-
-        canvas.Rectangle( width-scrollbarbreite+2 , scroll - scrollbarhoehe div 2,
-                          width-2 , scroll + scrollbarhoehe div 2 );
-
-        //Auf-Ab-Pfeil
-        canvas.Draw( width-scrollbarbreite+1 , 1 , Pfeilauf);
-        canvas.Draw( width-scrollbarbreite+1 , height-pfeilab.Height-1 , Pfeilab);
-
-
-   end
-   else scrollbarbreite:=0;
-  end;
-end;
-
-
-procedure DDragTarget;
-begin
-  if DrawDragTarget then
-    with bild do
+  procedure DMouseOver;
+  begin
+    with bild do begin
+    if darfmausueberzeichnen then
     begin
       canvas.Pen.Color:=clmouseover;
       canvas.Brush.Color:=clmouseover;
       canvas.Rectangle(
-        0,
-        (DragTarget-ersterEintrag)*zeilenhoehe+randverschiebung-3,
-        width,
-        (DragTarget-ersterEintrag)*zeilenhoehe+randverschiebung+3 );
+          0,
+          (mausueberElement-ersterEintrag)*zeilenhoehe+randverschiebung,
+          width,
+          (mausueberElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
     end;
-end;
+    end;
+  end;
+
+
+  procedure DText;
+  var i,k,l  : integer;
+  begin
+    with bild do begin
+
+      if liste.l0.Count-1>=0 then          //wenn Liste nicht leer
+      begin
+
+      canvas.Font.Color:=cltext;
+      canvas.Font.Name:=schriftart;
+
+      k:=0;
+      for i:=erstereintrag to erstereintrag+zeilen do
+        begin
+          if i<liste.l0.Count             //falls weniger Einträge als darstellbar
+          then
+           begin
+
+            if (focused) or (aktiv) then
+            begin
+              canvas.Pen.Color:=clhintergrund;
+             // canvas.Brush.Color:=Canvas.Pixels[1,zeilenhoehe*k+1];
+              canvas.Brush.Color:=clblue;
+            end
+            else
+            begin
+              canvas.Pen.Color:=clhintergrund_inaktiv;
+              canvas.Brush.Color:=clhintergrund_inaktiv;
+            end;
+
+            if i=markiertesElement
+             then canvas.Brush.Color:=clmarkiert
+             else
+              if (i=mausueberElement) and (darfmausueberzeichnen)
+               then canvas.Brush.Color:=clmouseover;
+
+            if strtobool(liste.markiert[i])
+             then canvas.Font.Style:=[fsunderline]
+             else canvas.Font.Style:=[];
+
+            canvas.brush.style:=bsClear;
+              //Textausgabe
+            for l:=0 to 4 do Schreibe(l,i,k);
+
+            inc(k);
+            canvas.brush.style:=bssolid;
+            end
+
+            else
+            break;
+           end;
+
+        end;
+    end;
+  end;
+
+
+  procedure DHintergrund;
+  begin
+    with bild do begin
+      //Löschen  bzw. Hintergrund
+      if (focused) or (aktiv) then
+      begin
+        canvas.Pen.Color:=clhintergrund;
+        canvas.Brush.Color:=clhintergrund;
+      end
+      else
+      begin
+        canvas.Pen.Color:=clhintergrund_inaktiv;
+        canvas.Brush.Color:=clhintergrund_inaktiv;
+      end;
+      if (gradientback) and ((focused) or (aktiv))
+      then
+         drawgradient(canvas,clhintergrund,clhintergrund2,clientrect)
+      else
+      canvas.Rectangle(0,0,width,height);
+
+   end;
+  end;
+
+
+  procedure DFortschritt;
+  begin
+    with bild do begin
+      //Fortschritt hervorheben
+      if (ersterEintrag<=fortschrittlichesElement) and (ersterEintrag+zeilen>fortschrittlichesElement)
+         and (fortschrittlichesElement<>-1)
+      then
+      begin
+       { if (fortschrittlichesElement = mausueberElement) and
+                                (fortschrittlichesElement <> markiertesElement) then
+        begin
+          canvas.Pen.Color:=clblack;
+          canvas.Brush.Color:=clblack;
+        end else
+        begin
+          canvas.Pen.Color:=clfortschritt;
+          canvas.Brush.Color:=clfortschritt;
+        end;   }
+
+      canvas.Pen.Color:=(clfortschritt + clblack) div 2;
+      canvas.Brush.Color:=canvas.Pen.Color;
+
+      canvas.RoundRect(trunc(fortschritt*(self.width-scrollbarbreite)-3),
+                      (fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung,
+                       trunc(fortschritt*(self.width-scrollbarbreite)+3),
+                      (fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung, 0,0);
+
+
+
+
+       { if (fortschrittlichesElement = mausueberElement) and
+                                (fortschrittlichesElement <> markiertesElement) then
+        begin
+          canvas.Pen.Color:=clblack;
+          canvas.Brush.Color:=clblack;
+        end else
+        begin
+          canvas.Pen.Color:=clfortschrittrahmen;
+          canvas.Brush.Color:=clfortschrittrahmen;
+        end;  }
+
+      canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung);
+      canvas.LineTo(self.width,(fortschrittlichesElement-ersterEintrag)*zeilenhoehe+randverschiebung);
+      canvas.MoveTo(0,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
+      canvas.LineTo(self.width,(fortschrittlichesElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
+      end;
+
+    end;
+  end;
+
+
+  procedure DRahmen;
+  begin
+    with bild do begin
+     canvas.Pen.Color:=clmouseover;
+     canvas.Pen.Width:=1;
+     canvas.MoveTo(self.width-1,0);
+     canvas.LineTo(0,0);
+     canvas.LineTo(0,self.Height-1);
+     canvas.LineTo(self.width-1,self.Height-1);
+     canvas.LineTo(self.width-1,0);
+   end;
+  end;
+
+
+  procedure DScrollbar;
+  var scroll, zeichenhoehe : integer;
+      prozent: extended;
+      Balken : TRect;
+  begin
+    with bild do begin
+      //Scrollbar
+     if liste.l0.Count>zeilen
+     then
+     begin
+          scrollbarbreite:=22;
+          canvas.Pen.Color:=clscrollbar;
+          canvas.Brush.Color:=clhintergrund;
+
+          canvas.Rectangle(width-scrollbarbreite,0,width,height);
+
+          canvas.Brush.Color:=clscrollbar;
+
+            //Anzeigebalken
+          prozent:=ersterEintrag / (liste.l0.Count-zeilen);
+          if prozent>1 then prozent:=1;
+
+          zeichenhoehe:= height-pfeilauf.Height*2;
+          scrollbarhoehe:=round(zeilen/(liste.l0.Count)*zeichenhoehe);
+          if scrollbarhoehe<10 then scrollbarhoehe:=20;
+
+          dec(zeichenhoehe,scrollbarhoehe);
+
+          scroll:=round( prozent
+                         * ( zeichenhoehe)
+                         + pfeilauf.Height + scrollbarhoehe div 2);
+
+          Balken.Left   := width-scrollbarbreite+2;
+          Balken.Top    := scroll - scrollbarhoehe div 2;
+          Balken.Right  := width-2;
+          Balken.Bottom := scroll + scrollbarhoehe div 2;
+
+
+  //        DrawGradient(canvas,clscrollbar,clhintergrund,Balken);
+
+          canvas.Rectangle(balken);
+
+          //Auf-Ab-Pfeil
+          canvas.Draw( width-scrollbarbreite+1 , 1 , Pfeilauf);
+          canvas.Draw( width-scrollbarbreite+1 , height-pfeilab.Height-1 , Pfeilab);
+
+
+     end
+     else scrollbarbreite:=0;
+    end;
+  end;
+
+
+  procedure DDragTarget;
+  begin
+    if DrawDragTarget then
+      with bild do
+      begin
+        canvas.Pen.Color:=clmouseover;
+        canvas.Brush.Color:=clmouseover;
+        canvas.Rectangle(
+          0,
+          (DragTarget-ersterEintrag)*zeilenhoehe+randverschiebung-3,
+          width,
+          (DragTarget-ersterEintrag)*zeilenhoehe+randverschiebung+3 );
+      end;
+  end;
 
 //var timetemp:integer;        DrawZeitmessung
 
@@ -939,7 +953,7 @@ begin
           liste.markiert[i]:=BoolToStr(false);
 //
 
-      if markiertesElement<>markiert
+      if (markiertesElement<>markiert) and (not dblclickflag)
       then
        begin
           markiertesElement:=markiert;
@@ -1425,6 +1439,18 @@ begin
   then Result:=strtoint(liste.nummer[Result]);
 end;
 
+
+procedure Tgliste2.SetSelected(ID:integer);
+  var i : integer;
+begin
+  for i:=0 to liste.Nummer.Count-1 do
+    if strtoint(liste.Nummer[i])=ID
+    then
+      begin
+        markiertesElement:=i;
+        Draw;
+      end;
+end;
 
 procedure Tgliste2.WMGetDlgCode(var Message: TWMGetDlgCode);
 begin

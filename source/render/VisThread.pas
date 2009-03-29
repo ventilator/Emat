@@ -78,25 +78,25 @@ begin
   bmpA               := TBitmap32.Create;
   bmpA.Width         := 400;
   bmpA.Height        := 400;
-  bmpA.StretchFilter := sfLinear;
+//  bmpA.StretchFilter := sfLinear;
   bmpA.DrawMode      := dmBlend;
 
   bmpB               := TBitmap32.Create;
   bmpB.Width         := 400;
   bmpB.Height        := 400;
-  bmpB.StretchFilter := sfLinear;
+//  bmpB.StretchFilter := sfLinear;
   bmpB.DrawMode      := dmBlend;
 
   bmpC               := TBitmap32.Create;
   bmpC.Width         := 400;
   bmpC.Height        := 400;
-  bmpC.StretchFilter := sfLinear;
+//  bmpC.StretchFilter := sfLinear;
   bmpC.DrawMode      := dmBlend;
 
   Echo               := TBitmap32.Create;
   Echo.Width         := 400;
   Echo.Height        := 400;
-  Echo.StretchFilter := sfLinear;
+//  Echo.StretchFilter := sfLinear;
   Echo.DrawMode      := dmBlend;
   Echo.MasterAlpha   := 128;
 

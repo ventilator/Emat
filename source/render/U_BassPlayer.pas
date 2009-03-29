@@ -219,7 +219,7 @@ begin
         begin
   //        // Set The OpenDialog additional, to the supported PlugIn Formats
   //        open1.Filter := Open1.Filter + '|' + Info.Formats[a].name + ' ' + '(' +
-            Info.Formats[a].exts + ') , ' + fd.cFileName + '|' + Info.Formats[a].exts;
+  //          Info.Formats[a].exts + ') , ' + fd.cFileName + '|' + Info.Formats[a].exts;
           // Lets Show in the Listview the supported Formats
 
           if (Info.Formats[a].name <> nil) then

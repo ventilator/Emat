@@ -1,8 +1,8 @@
 object FPlayliste: TFPlayliste
   Left = 308
   Top = 221
-  Width = 706
-  Height = 646
+  ClientHeight = 610
+  ClientWidth = 690
   Color = clBtnFace
   TransparentColorValue = clWhite
   Font.Charset = DEFAULT_CHARSET
@@ -258,22 +258,26 @@ object FPlayliste: TFPlayliste
   object GBliste: TTBXAlignmentPanel
     Left = 0
     Top = 49
-    Width = 698
-    Height = 546
+    Width = 690
+    Height = 541
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 698
+    ExplicitHeight = 547
   end
   object TBXAlignmentPanel1: TTBXAlignmentPanel
     Left = 0
-    Top = 595
-    Width = 698
+    Top = 590
+    Width = 690
     Height = 20
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 596
+    ExplicitWidth = 698
     object TBXStatusBar1: TTBXStatusBar
       Left = 0
       Top = 0
-      Width = 698
+      Width = 690
       Height = 20
       Hint = 'Suchzeit'
       Align = alClient
@@ -299,25 +303,28 @@ object FPlayliste: TFPlayliste
           Tag = 0
         end>
       UseSystemFont = False
+      ExplicitWidth = 698
     end
     object TBXAlignmentPanel2: TTBXAlignmentPanel
       Left = 0
       Top = 0
-      Width = 698
+      Width = 690
       Height = 20
       Align = alClient
       TabOrder = 1
       Visible = False
+      ExplicitWidth = 698
     end
   end
   object TBXAlignmentPanel3: TTBXAlignmentPanel
     Left = 0
     Top = 0
-    Width = 698
+    Width = 690
     Height = 49
     Align = alTop
     TabOrder = 2
     Visible = False
+    ExplicitWidth = 698
     object TBXDock1: TTBXDock
       Left = 0
       Top = 0
@@ -511,8 +518,8 @@ object FPlayliste: TFPlayliste
       OnClick = TBXItem4Click
     end
     object TBXIQueHistory: TTBXItem
-      Caption = 'In Verlauf einreihen'
-      Hint = 'Spielt das Element als n'#228'chstes ab'
+      Caption = 'Als n'#228'chstes abspielen'
+      Hint = 'Reiht den Titel in den Verlauf ein'
       OnClick = TBXIQueHistoryClick
     end
     object TBXI_CopyFileNow: TTBXItem

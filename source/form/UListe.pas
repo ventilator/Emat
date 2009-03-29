@@ -256,12 +256,24 @@ begin
 end;
 
 procedure TFPlayliste.FormActivate(Sender: TObject);
+var
+   AutoPlayStatus:boolean;
+
 begin
   fmp3.Aktiv.Liste:=ListenNummer;
   fmp3.SetListsInaktive(ListenNummer); //Anmerkung: Warum?????   //Wegen Farbe
 //  fmp3.Esuche.Text:=fmp3.Datenbank.Mp3DatenMeta[ListenNummer].SuchText ;
                  //wird in datenbanklisteaktualisieren gemacht
+
+  //Damit beim Listenwechsel nicht automatisch beim Eintragen ins Suchfeld
+  //das Autoplay anspringt               
+  AutoPlayStatus:= fmp3.TBXCBSearchAutoPlay.Checked;
+  fmp3.TBXCBSearchAutoPlay.Checked:=false;
+
   fmp3.DatenbankListeAusgeben(ListenNummer);
+
+  fmp3.TBXCBSearchAutoPlay.Checked:=AutoPlayStatus;
+
   fmp3.EnableMenues();
 
   //Setzt den Haken für Spalen wählen
@@ -527,11 +539,11 @@ begin
 
   FileList:= TStringList.Create;
 
-  if (fmp3.datenbank.GetShownFiles(ListenNummer,FileList)) and
-     (fmp3.LMDDDMp3Player.Execute)
+  if (fmp3.datenbank.GetShownFiles(ListenNummer,FileList))
+
  then
   begin
-     zielpfad:=fmp3.LMDDDMp3Player.Path;
+     zielpfad:=fmp3.SelDirectory('');
      if DirectoryExists( Zielpfad ) then
      begin
          fmp3.Fplaylisten[ ListenNummer ].TBXAlignmentPanel2.Visible := true;
@@ -613,8 +625,8 @@ begin
   fmp3.Datenbank.GetMediumFullFileName(ListenNummer,fmp3.aktiv.MarkiertesElement,FileName)
   then
    if not
-   copyfileex(filename,fmp3.LMDDDMp3Player.Path+extractfilename(filename))
-   then showmessage(Filename + ' konnte nicht nach '+fmp3.LMDDDMp3Player.Path+' kopiert werden');
+   copyfileex(filename,fmp3.aktiv.SelDirPath+extractfilename(filename))
+   then showmessage(Filename + ' konnte nicht nach '+fmp3.aktiv.SelDirPath+' kopiert werden');
 end;
 
 procedure TFPlayliste.FormResize(Sender: TObject);

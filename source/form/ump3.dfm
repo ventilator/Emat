@@ -1,10 +1,10 @@
 object Fmp3: TFmp3
   Left = 239
   Top = 210
-  Width = 1036
-  Height = 780
   BorderWidth = 2
   Caption = 'Emat designing'
+  ClientHeight = 740
+  ClientWidth = 1016
   Color = clAppWorkSpace
   TransparentColorValue = clWhite
   Ctl3D = False
@@ -191,27 +191,29 @@ object Fmp3: TFmp3
   object ihintergrund: TImage
     Left = 195
     Top = 201
-    Width = 589
-    Height = 500
+    Width = 581
+    Height = 494
     Align = alClient
     Center = True
+    ExplicitWidth = 589
+    ExplicitHeight = 500
   end
   object TBXMultiDock1: TTBXMultiDock
     Left = 0
     Top = 35
-    Width = 1024
+    Width = 1016
     Height = 166
     PopupMenu = TBXPopupMenu3
     object TBXDockablePanel8: TTBXDockablePanel
       Tag = 3
-      Left = 584
+      Left = 581
       Top = 0
       MinClientHeight = 8
       MinClientWidth = 8
       Caption = 'Bin'#228'ruhr'
       DblClickUndock = True
       DockedHeight = 162
-      DockPos = 584
+      DockPos = 581
       FloatingWidth = 128
       FloatingHeight = 162
       SplitHeight = 200
@@ -224,14 +226,14 @@ object Fmp3: TFmp3
       object TBXAPclock0: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 89
+        Width = 87
         Height = 162
         Align = alClient
         TabOrder = 0
         object LMDFBinClock: TLMDFill
           Left = 0
           Top = 0
-          Width = 89
+          Width = 87
           Height = 162
           Align = alClient
           Bevel.Mode = bmCustom
@@ -243,6 +245,7 @@ object Fmp3: TFmp3
           FillObject.Style = sfGradient
           FillObject.Gradient.Color = clGray
           FillObject.Gradient.ColorCount = 236
+          ExplicitWidth = 89
         end
         object PH1: TLMDSimplePanel
           Left = 4
@@ -410,13 +413,13 @@ object Fmp3: TFmp3
     end
     object TBXDockablePanel3: TTBXDockablePanel
       Tag = 3
-      Left = 695
+      Left = 690
       Top = 0
       Caption = 'Playlisten'
       DblClickUndock = True
       DockedWidth = 100
       DockedHeight = 162
-      DockPos = 695
+      DockPos = 690
       SplitHeight = 54
       SplitWidth = 193
       SupportedDocks = [dkStandardDock, dkMultiDock]
@@ -426,19 +429,19 @@ object Fmp3: TFmp3
       object TBXAPplaylistList: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 171
+        Width = 170
         Height = 162
         Align = alClient
         TabOrder = 0
       end
     end
     object TBXDockablePanel10: TTBXDockablePanel
-      Left = 379
+      Left = 377
       Top = 0
       Caption = 'Verlauf'
       DockedWidth = 182
       DockedHeight = 162
-      DockPos = 379
+      DockPos = 377
       FloatingWidth = 128
       FloatingHeight = 128
       SplitHeight = 86
@@ -449,18 +452,18 @@ object Fmp3: TFmp3
       object TBXAPhistory: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 183
+        Width = 182
         Height = 162
         Align = alClient
         TabOrder = 0
       end
     end
     object TBXDockablePanel12: TTBXDockablePanel
-      Left = 888
+      Left = 882
       Top = 0
       Caption = 'Uhr'
       DockedHeight = 162
-      DockPos = 888
+      DockPos = 882
       SplitWidth = 120
       SupportedDocks = [dkStandardDock, dkMultiDock]
       TabOrder = 3
@@ -468,34 +471,11 @@ object Fmp3: TFmp3
       object TBXAlignmentPanel19: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 98
+        Width = 96
         Height = 162
         Align = alClient
         Color = clWhite
         TabOrder = 0
-        DesignSize = (
-          98
-          162)
-        object LMDClock1: TLMDClock
-          Left = 0
-          Top = 0
-          Width = 96
-          Height = 160
-          Bevel.Mode = bmCustom
-          Digital.Horzsize = 9
-          Digital.Vertsize = 7
-          FillObject.Style = sfGradient
-          FillObject.Gradient.Color = clGray
-          FillObject.Gradient.ColorCount = 236
-          HourHand.Color = clAqua
-          HourHand.Thickness = 5
-          MinuteHand.Color = clTeal
-          MinuteHand.Thickness = 3
-          SecondHand.Thickness = 1
-          Transparent = True
-          CustomDateTimeFormat = 'hh:nn:ss'
-          Anchors = [akLeft, akTop, akRight, akBottom]
-        end
       end
     end
     object TBXDockablePanel4: TTBXDockablePanel
@@ -515,31 +495,30 @@ object Fmp3: TFmp3
       object TBXAlignmentPanel7: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 357
+        Width = 355
         Height = 162
         Align = alClient
         TabOrder = 0
         object TBXPageScroller2: TTBXPageScroller
           Left = 0
           Top = 0
-          Width = 357
+          Width = 355
           Height = 162
           Align = alClient
-          DoubleBuffered = False
           Range = 0
           TabOrder = 0
           object TBXAlignmentPanel1: TTBXAlignmentPanel
             Left = 0
             Top = 38
-            Width = 357
+            Width = 355
             Height = 38
             Align = alTop
             TabOrder = 1
             DesignSize = (
-              357
+              355
               38)
             object CbArtist: TTBXCheckBox
-              Left = 341
+              Left = 339
               Top = 0
               Width = 17
               Height = 17
@@ -552,7 +531,7 @@ object Fmp3: TFmp3
             object LEartist: TLabeledEdit
               Left = 1
               Top = 19
-              Width = 352
+              Width = 350
               Height = 19
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 39
@@ -575,15 +554,15 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel9: TTBXAlignmentPanel
             Left = 0
             Top = 190
-            Width = 357
+            Width = 355
             Height = 38
             Align = alTop
             TabOrder = 6
             DesignSize = (
-              357
+              355
               38)
             object CBComment: TTBXCheckBox
-              Left = 341
+              Left = 339
               Top = 0
               Width = 17
               Height = 17
@@ -596,7 +575,7 @@ object Fmp3: TFmp3
             object LEcomment: TLabeledEdit
               Left = 1
               Top = 19
-              Width = 352
+              Width = 350
               Height = 19
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 53
@@ -618,15 +597,15 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel10: TTBXAlignmentPanel
             Left = 0
             Top = 152
-            Width = 357
+            Width = 355
             Height = 38
             Align = alTop
             TabOrder = 4
             DesignSize = (
-              357
+              355
               38)
             object CBGenre: TTBXCheckBox
-              Left = 341
+              Left = 339
               Top = 0
               Width = 17
               Height = 17
@@ -639,7 +618,7 @@ object Fmp3: TFmp3
             object LEgenere: TLabeledEdit
               Left = 1
               Top = 19
-              Width = 352
+              Width = 350
               Height = 19
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 29
@@ -661,7 +640,7 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel11: TTBXAlignmentPanel
             Left = 0
             Top = 114
-            Width = 357
+            Width = 355
             Height = 38
             Align = alTop
             TabOrder = 3
@@ -712,15 +691,15 @@ object Fmp3: TFmp3
             object TBXAlignmentPanel17: TTBXAlignmentPanel
               Left = 57
               Top = 0
-              Width = 300
+              Width = 298
               Height = 38
               Align = alClient
               TabOrder = 1
               DesignSize = (
-                300
+                298
                 38)
               object CBYear: TTBXCheckBox
-                Left = 284
+                Left = 282
                 Top = 0
                 Width = 17
                 Height = 17
@@ -733,7 +712,7 @@ object Fmp3: TFmp3
               object LEyear: TLabeledEdit
                 Left = 1
                 Top = 19
-                Width = 294
+                Width = 292
                 Height = 19
                 Anchors = [akLeft, akTop, akRight]
                 EditLabel.Width = 20
@@ -757,15 +736,15 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel12: TTBXAlignmentPanel
             Left = 0
             Top = 76
-            Width = 357
+            Width = 355
             Height = 38
             Align = alTop
             TabOrder = 2
             DesignSize = (
-              357
+              355
               38)
             object CBAlbum: TTBXCheckBox
-              Left = 341
+              Left = 339
               Top = 0
               Width = 17
               Height = 17
@@ -778,7 +757,7 @@ object Fmp3: TFmp3
             object LEalbum: TLabeledEdit
               Left = 1
               Top = 19
-              Width = 352
+              Width = 350
               Height = 19
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 29
@@ -801,14 +780,14 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel13: TTBXAlignmentPanel
             Left = 0
             Top = 228
-            Width = 357
+            Width = 355
             Height = 13
             Align = alTop
             TabOrder = 5
             object Label1: TLabel
               Left = 0
               Top = 0
-              Width = 357
+              Width = 355
               Height = 13
               Align = alTop
               Caption = 'Pfad'
@@ -820,20 +799,21 @@ object Fmp3: TFmp3
               Font.Style = []
               ParentColor = False
               ParentFont = False
+              ExplicitWidth = 22
             end
           end
           object TBXAlignmentPanel14: TTBXAlignmentPanel
             Left = 0
             Top = 0
-            Width = 357
+            Width = 355
             Height = 38
             Align = alTop
             TabOrder = 0
             DesignSize = (
-              357
+              355
               38)
             object cbtitle: TTBXCheckBox
-              Left = 341
+              Left = 339
               Top = 1
               Width = 17
               Height = 17
@@ -846,7 +826,7 @@ object Fmp3: TFmp3
             object LETitle: TLabeledEdit
               Left = 1
               Top = 19
-              Width = 352
+              Width = 350
               Height = 19
               Anchors = [akLeft, akTop, akRight]
               EditLabel.Width = 20
@@ -869,14 +849,14 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel15: TTBXAlignmentPanel
             Left = 0
             Top = 141
-            Width = 357
+            Width = 355
             Height = 21
             Align = alBottom
             TabOrder = 7
             object TBXBSaveID3: TTBXButton
               Left = 0
               Top = 0
-              Width = 357
+              Width = 355
               Height = 21
               Align = alClient
               Caption = #196'nderungen Speichern'
@@ -888,18 +868,18 @@ object Fmp3: TFmp3
           object TBXAlignmentPanel18: TTBXAlignmentPanel
             Left = 0
             Top = 241
-            Width = 357
+            Width = 355
             Height = 25
-            Align = alClient
             Margins.Left = 1
             Margins.Top = 1
             Margins.Right = 3
             Margins.Bottom = 3
+            Align = alClient
             TabOrder = 8
             object Mpath: TMemo
               Left = 1
               Top = 1
-              Width = 353
+              Width = 351
               Height = 21
               TabStop = False
               Align = alClient
@@ -915,17 +895,17 @@ object Fmp3: TFmp3
     Left = 9
     Top = 201
     Width = 186
-    Height = 500
+    Height = 494
     PopupMenu = TBXPopupMenu3
     Position = dpLeft
     object TBXDockablePanel1: TTBXDockablePanel
       Tag = 1
       Left = 0
-      Top = 350
+      Top = 346
       Caption = 'Equalizer (defekt)'
       DblClickUndock = True
       DockedWidth = 182
-      DockPos = 350
+      DockPos = 346
       SplitHeight = 129
       SupportedDocks = [dkStandardDock, dkMultiDock]
       TabOrder = 0
@@ -936,23 +916,24 @@ object Fmp3: TFmp3
         Left = 0
         Top = 0
         Width = 182
-        Height = 112
+        Height = 110
         Align = alClient
         TabOrder = 0
         object IEQ: TPaintBox
           Left = 0
           Top = 0
           Width = 182
-          Height = 91
+          Height = 89
           Align = alClient
           OnMouseDown = IEQMouseDown
           OnMouseMove = IEQMouseMove
           OnMouseUp = IEQMouseUp
           OnPaint = IEQPaint
+          ExplicitHeight = 91
         end
         object TBXButton4: TTBXButton
           Left = 0
-          Top = 91
+          Top = 89
           Width = 182
           Height = 21
           Align = alBottom
@@ -966,12 +947,12 @@ object Fmp3: TFmp3
     end
     object TBXDockablePanel11: TTBXDockablePanel
       Left = 0
-      Top = 198
-      Caption = 'Favoriten'
+      Top = 196
+      Caption = 'Top 100'
       DefaultDock = TBXMultiDock2
       DockedWidth = 182
       DockedHeight = 172
-      DockPos = 198
+      DockPos = 196
       FloatingWidth = 128
       FloatingHeight = 128
       SplitHeight = 148
@@ -982,7 +963,7 @@ object Fmp3: TFmp3
         Left = 0
         Top = 0
         Width = 182
-        Height = 130
+        Height = 128
         Align = alClient
         TabOrder = 0
       end
@@ -1004,18 +985,18 @@ object Fmp3: TFmp3
         Left = 0
         Top = 0
         Width = 182
-        Height = 176
+        Height = 174
         Align = alClient
         Color = clBlack
         TabOrder = 0
         DesignSize = (
           182
-          176)
+          174)
         object Icover: TImage
           Left = 0
           Top = 0
           Width = 182
-          Height = 176
+          Height = 174
           Anchors = [akLeft, akTop, akRight, akBottom]
           Center = True
           IncrementalDisplay = True
@@ -1023,12 +1004,13 @@ object Fmp3: TFmp3
           Proportional = True
           Visible = False
           OnClick = IcoverClick
+          ExplicitHeight = 176
         end
         object LMDFGradientCover: TLMDFill
           Left = 0
           Top = 0
           Width = 182
-          Height = 176
+          Height = 174
           Align = alClient
           Bevel.Mode = bmCustom
           Caption.Font.Charset = DEFAULT_CHARSET
@@ -1039,25 +1021,26 @@ object Fmp3: TFmp3
           FillObject.Style = sfGradient
           FillObject.Gradient.Color = clGray
           FillObject.Gradient.ColorCount = 236
+          ExplicitHeight = 176
         end
       end
     end
   end
   object TBXMultiDock3: TTBXMultiDock
-    Left = 784
+    Left = 776
     Top = 201
     Width = 231
-    Height = 500
+    Height = 494
     PopupMenu = TBXPopupMenu3
     Position = dpRight
     object TBXDockablePanel7: TTBXDockablePanel
       Tag = 7
       Left = 0
-      Top = 266
+      Top = 264
       Caption = 'Einstellungen'
       DblClickUndock = True
       DockedWidth = 227
-      DockPos = 266
+      DockPos = 264
       FloatingWidth = 128
       FloatingHeight = 128
       SplitHeight = 79
@@ -1069,7 +1052,7 @@ object Fmp3: TFmp3
         Left = 0
         Top = 0
         Width = 227
-        Height = 58
+        Height = 56
         Align = alClient
         AutoRange = True
         DoubleBuffered = True
@@ -1176,7 +1159,7 @@ object Fmp3: TFmp3
         end
         object TBXLabel5: TTBXLabel
           Left = 0
-          Top = 683
+          Top = 700
           Width = 227
           Height = 14
           Align = alTop
@@ -1185,7 +1168,7 @@ object Fmp3: TFmp3
         end
         object TBXLink1: TTBXLink
           Left = 0
-          Top = 697
+          Top = 714
           Width = 227
           Height = 15
           Cursor = crHandPoint
@@ -1204,7 +1187,7 @@ object Fmp3: TFmp3
         end
         object TBXLink2: TTBXLink
           Left = 0
-          Top = 712
+          Top = 729
           Width = 227
           Height = 15
           Cursor = crHandPoint
@@ -1242,8 +1225,7 @@ object Fmp3: TFmp3
             'Liefert die Suchfunktion ein einzelnes Medium, so wird dieses au' +
             'tomatisch abgespielt werden.'
           Align = alTop
-          Caption = 'Einzelnes Medium automatisch abspielen'
-          State = cbChecked
+          Caption = 'Eindeutige Suchtreffer sofort spielen'
           TabOrder = 13
           TabStop = False
           Wrapping = twEndEllipsis
@@ -1293,7 +1275,7 @@ object Fmp3: TFmp3
         end
         object Mosdexenames: TMemo
           Left = 0
-          Top = 633
+          Top = 650
           Width = 227
           Height = 50
           Align = alTop
@@ -1360,16 +1342,42 @@ object Fmp3: TFmp3
           TabOrder = 21
           TabStop = False
           OnChange = TBXB_HighPriorityChange
+          object TBXCheckBox2: TTBXCheckBox
+            Left = 0
+            Top = 0
+            Width = 227
+            Height = 17
+            Hint = 
+              'Die Prozesspriorit'#228't wird beim Start auf Hoch gesetzt (Verhinder' +
+              't Ruckler in Titan Quest und '#228'hnlich auslastenden Spielen)'
+            Align = alTop
+            Caption = 'Emat mit hoher Priorit'#228't ausf'#252'hren'
+            TabOrder = 0
+            TabStop = False
+            OnChange = TBXB_HighPriorityChange
+          end
+        end
+        object TBXCBAutoSave: TTBXCheckBox
+          Left = 0
+          Top = 633
+          Width = 227
+          Height = 17
+          Align = alTop
+          Caption = 'Unbenannte Playlisten speichern'
+          State = cbChecked
+          TabOrder = 22
+          TabStop = False
+          OnChange = TBXB_HighPriorityChange
         end
       end
     end
     object TBXDockablePanel15: TTBXDockablePanel
       Left = 0
-      Top = 212
+      Top = 210
       Caption = 'Tragbares Ger'#228't'
       DockedWidth = 227
       DockedHeight = 109
-      DockPos = 212
+      DockPos = 210
       SplitHeight = 54
       SupportedDocks = [dkStandardDock, dkMultiDock]
       TabOrder = 1
@@ -1458,7 +1466,7 @@ object Fmp3: TFmp3
         Top = 11
         Width = 25
         Height = 25
-        TabOrder = 4
+        DoubleBuffered = True
         Glyph.Data = {
           36040000424D3604000000000000360000002800000010000000100000000100
           20000000000000040000C30E0000C30E00000000000000000000FFFFFF00FFFF
@@ -1494,6 +1502,8 @@ object Fmp3: TFmp3
           D3FF8DC7DEFF94D0E8FF9BDAF3FFA0E0FAFFA1E2FCFF7DA0B5FFFFFFFF00FFFF
           FF00FFFFFF007094ABFF7195ACFF7296ADFF7398AEFF7599AFFF769AB0FF779C
           B1FF799DB1FF799EB3FF7B9FB4FF7DA0B5FF7DA2B6FF7FA3B7FF}
+        ParentDoubleBuffered = False
+        TabOrder = 4
       end
       object Edit1: TEdit
         Left = 55
@@ -1507,12 +1517,12 @@ object Fmp3: TFmp3
     object TBXDockablePanel2: TTBXDockablePanel
       Tag = 2
       Left = 0
-      Top = 346
+      Top = 342
       Caption = 'Visualisierung'
       DblClickUndock = True
       DockedWidth = 227
       DockedHeight = 172
-      DockPos = 346
+      DockPos = 342
       FloatingWidth = 128
       FloatingHeight = 128
       SplitHeight = 138
@@ -1527,15 +1537,16 @@ object Fmp3: TFmp3
         Left = 0
         Top = 0
         Width = 227
-        Height = 95
+        Height = 93
         Align = alClient
         TabOrder = 0
         object I32_Vis: TImage32
           Left = 0
           Top = 0
           Width = 227
-          Height = 95
+          Height = 93
           Align = alClient
+          Bitmap.ResamplerClassName = 'TNearestResampler'
           BitmapAlign = baTopLeft
           PopupMenu = TBXPMVisualisierung
           Scale = 1.000000000000000000
@@ -1545,7 +1556,7 @@ object Fmp3: TFmp3
       end
       object TBXVisPause: TTBXButton
         Left = 0
-        Top = 95
+        Top = 93
         Width = 227
         Height = 21
         Hint = 'Reduziert die CPU-Last auf wenige Prozent'
@@ -1560,7 +1571,7 @@ object Fmp3: TFmp3
     object TBXDockablePanel14: TTBXDockablePanel
       Left = 0
       Top = 0
-      Caption = 'Titel-L'#246'schoptionen'
+      Caption = 'Schnelleinstellungen'
       DockedWidth = 227
       DockPos = 0
       FloatingWidth = 128
@@ -1571,9 +1582,9 @@ object Fmp3: TFmp3
       Visible = False
       object TBXTdeloptions: TTBXToolbar
         Left = 0
-        Top = 0
+        Top = 20
         Width = 227
-        Height = 190
+        Height = 168
         Align = alClient
         BorderStyle = bsNone
         Caption = 'Hauptmen'#252
@@ -1592,13 +1603,18 @@ object Fmp3: TFmp3
         Stretch = True
         TabOrder = 0
         Color = clMenu
+        object TBXLI_ShuffleRange: TTBXLabelItem
+          Caption = '[Shufflerange]'
+        end
+        object TBXSeparatorItem8: TTBXSeparatorItem
+        end
         object TBControlItem1: TTBControlItem
           Control = TBXI_HDDLoeschmodus2
         end
         object TBControlItem2: TTBControlItem
           Control = TBXI_HDDLoeschmodus
         end
-        object TBXSeparatorItem8: TTBXSeparatorItem
+        object TBXSeparatorItem16: TTBXSeparatorItem
         end
         object TBXItem13: TTBXItem
           Caption = 'Markierten Titel l'#246'schen'
@@ -1618,7 +1634,7 @@ object Fmp3: TFmp3
         end
         object TBXI_HDDLoeschmodus2: TTBXRadioButton
           Left = 0
-          Top = 0
+          Top = 22
           Width = 249
           Height = 17
           Hint = 'Titel beim L'#246'schen (Entf) nur aus der Liste entfernen'
@@ -1627,7 +1643,7 @@ object Fmp3: TFmp3
         end
         object TBXI_HDDLoeschmodus: TTBXRadioButton
           Left = 0
-          Top = 17
+          Top = 39
           Width = 225
           Height = 17
           Hint = 'Titel auch in den Papierkorb verschieben'
@@ -1635,12 +1651,37 @@ object Fmp3: TFmp3
           TabOrder = 1
         end
       end
+      object TBXAlignmentPanel20: TTBXAlignmentPanel
+        Left = 0
+        Top = 0
+        Width = 227
+        Height = 20
+        Align = alTop
+        TabOrder = 1
+        object TBXPB_shuffle: TTBXProgressBar
+          Left = 0
+          Top = 0
+          Width = 227
+          Height = 20
+          Min = 1
+          AltMode = False
+          Percentage = True
+          Position = 0
+          PosTextPrefix = 'Schuffle-St'#228'rke ('
+          PosTextSuffix = '%)'
+          ShowPosText = True
+          Align = alClient
+          OnMouseDown = TBXPB_shuffleMouseDown
+          OnMouseMove = TBXPB_shuffleMouseMove
+          OnMouseUp = TBXPB_shuffleMouseUp
+        end
+      end
     end
   end
   object TBXMultiDock4: TTBXMultiDock
     Left = 0
-    Top = 701
-    Width = 1024
+    Top = 695
+    Width = 1016
     Height = 36
     PopupMenu = TBXPopupMenu3
     Position = dpBottom
@@ -1670,14 +1711,14 @@ object Fmp3: TFmp3
       object TBXAlignmentPanel6: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 721
+        Width = 718
         Height = 32
         Align = alClient
         TabOrder = 0
         object TBXPBar: TTBXProgressBar
           Left = 0
           Top = 0
-          Width = 721
+          Width = 718
           Height = 16
           Max = 3000
           AltMode = False
@@ -1689,11 +1730,12 @@ object Fmp3: TFmp3
           ShowHint = True
           OnMouseDown = PBarMouseDown
           OnMouseMove = TBXPBarMouseMove
+          ExplicitWidth = 721
         end
         object TBXAlignmentPanel5: TTBXAlignmentPanel
           Left = 0
           Top = 16
-          Width = 721
+          Width = 718
           Height = 16
           Align = alBottom
           Font.Charset = DEFAULT_CHARSET
@@ -1706,19 +1748,18 @@ object Fmp3: TFmp3
           object TBXPageScroller5: TTBXPageScroller
             Left = 0
             Top = 0
-            Width = 721
+            Width = 718
             Height = 16
             Align = alClient
-            DoubleBuffered = False
             Range = 0
             TabOrder = 0
             DesignSize = (
-              721
+              718
               16)
             object Etitel: TEdit
               Left = 0
               Top = 0
-              Width = 721
+              Width = 718
               Height = 16
               Cursor = crArrow
               TabStop = False
@@ -1741,13 +1782,13 @@ object Fmp3: TFmp3
     end
     object TBXDockablePanel5: TTBXDockablePanel
       Tag = 5
-      Left = 893
+      Left = 888
       Top = 0
       Caption = 'Lautst'#228'rke'
       DblClickUndock = True
       DockedWidth = 190
       DockedHeight = 32
-      DockPos = 893
+      DockPos = 888
       FloatingWidth = 128
       FloatingHeight = 48
       SplitWidth = 115
@@ -1757,14 +1798,14 @@ object Fmp3: TFmp3
       object TBXAlignmentPanel4: TTBXAlignmentPanel
         Left = 0
         Top = 0
-        Width = 93
+        Width = 90
         Height = 32
         Align = alClient
         TabOrder = 0
         object TBXPBVolume: TTBXProgressBar
           Left = 0
           Top = 0
-          Width = 93
+          Width = 90
           Height = 32
           Hint = 
             '5 % leiser: - (Globaler Hotkey: Strg + F1)'#13#10'25 % leiser: Strg + ' +
@@ -1780,73 +1821,53 @@ object Fmp3: TFmp3
           OnMouseDown = TBXPBVolumeMouseDown
           OnMouseMove = TBXPBVolumeMouseMove
           OnMouseUp = TBXPBVolumeMouseUp
+          ExplicitWidth = 93
         end
       end
     end
     object TBXDockablePanel13: TTBXDockablePanel
-      Left = 743
+      Left = 740
       Top = 0
       Caption = 'Digitaluhr'
       DockedHeight = 32
-      DockPos = 743
+      DockPos = 740
       SplitWidth = 150
       SupportedDocks = [dkStandardDock, dkMultiDock]
       TabOrder = 2
       Visible = False
-      DesignSize = (
-        128
-        32)
-      object LMDClock2: TLMDClock
-        Left = 0
-        Top = 0
-        Width = 152
-        Height = 24
-        Bevel.Mode = bmCustom
-        Digital.Horzsize = 9
-        Digital.Vertsize = 7
-        DigitalOnly = True
-        HourHand.Color = clAqua
-        HourHand.Thickness = 5
-        MinuteHand.Color = clTeal
-        MinuteHand.Thickness = 3
-        SecondHand.Thickness = 1
-        Transparent = True
-        CustomDateTimeFormat = 'hh:nn:ss'
-        Anchors = [akLeft, akTop, akRight, akBottom]
-      end
     end
   end
   object TBXDock1: TTBXDock
     Left = 0
     Top = 26
-    Width = 1024
+    Width = 1016
     Height = 9
   end
   object TBXDock2: TTBXDock
     Left = 0
     Top = 201
     Width = 9
-    Height = 500
+    Height = 494
     Position = dpLeft
   end
   object TBXDock3: TTBXDock
-    Left = 1015
+    Left = 1007
     Top = 201
     Width = 9
-    Height = 500
+    Height = 494
     Position = dpRight
   end
   object TBXDock4: TTBXDock
     Left = 0
-    Top = 737
-    Width = 1024
+    Top = 731
+    Width = 1016
     Height = 9
     Position = dpBottom
   end
   object TBXToolbar1: TTBXToolbar
     Left = 0
     Top = 0
-    Width = 1024
+    Width = 1016
     Height = 26
     Align = alTop
     BorderStyle = bsNone
@@ -2024,6 +2045,10 @@ object Fmp3: TFmp3
           Caption = 'Ung'#252'ltige, leere Listeneintr'#228'ge l'#246'schen'
           OnClick = TBXI_DelInvalideItemsClick
         end
+        object TBXItem24: TTBXItem
+          Caption = 'Performancetest der Suche durchf'#252'hren'
+          OnClick = TBXItem24Click
+        end
       end
     end
     object TBXSubmenuItem12: TTBXSubmenuItem
@@ -2095,7 +2120,7 @@ object Fmp3: TFmp3
     object TBXItem7: TTBXItem
       Caption = '<'
       Hint = 'Suchfeld l'#246'schen (Strg + <)'
-      ImageIndex = 31
+      ImageIndex = 29
       Images = ILSymbolleiste
       OnClick = TBXItem7Click
     end
@@ -3729,7 +3754,7 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000363636000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E9E9E900E9E9E900000000000000000000000000000000000000
       000000000000E9E9E900E9E9E90000000000000000000000000000000000E7E7
@@ -3737,9 +3762,9 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000000000000000000000C3D0000074
-      7C0000404400003D410000454A00004A4F00004C5100004C5100004C5100004C
-      510000484D00003C4000003C4000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000000000000000C4D0000071
+      7800003D4100003F430000494D00005156000054590000545900005459000054
+      590000535800003F4300003C4000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000DBDBDB0095959500DFDFDF00000000000000000000000000000000000000
       0000DBDBDB0095959500DFDFDF0000000000000000000000000000000000DFDF
@@ -3747,9 +3772,9 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000097979700919191009191910091919100919191009191
       9100979797000000000000000000979797009191910091919100919191009191
-      91009191910097979700000000000000000000000000000000002EEEFF0000E7
-      FC0000B2C20000BBCC0001EAFF0025EDFF0034EEFF0034EEFF0034EEFF0034EE
-      FF0030EEFF0000E1F5000096A300000000000000000000000000000000000000
+      91009191910097979700000000000000000000000000000000002FEEFF0001E4
+      F70000A8B60000B2C00003E5F80028EEFF003BF0FF003BF0FF003BEFFF003BEF
+      FF003BEFFF000EEAFD0000ACBA00000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000CECE
       CE008B8B8B008B8B8B00DDDDDD0000000000000000000000000000000000CECE
       CE008B8B8B008B8B8B00DDDDDD0000000000000000000000000000000000DDDD
@@ -3757,9 +3782,9 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000929292008B8B8B008B8B8B008B8B8B008B8B8B008B8B
       8B00929292000000000000000000929292008B8B8B008B8B8B008B8B8B008B8B
-      8B008B8B8B0092929200000000000000000000000000333333004DBECC0052EC
-      FF001BE6FF000CE4FF0046EBFF0077F0FF008EF3FF008FF3FF008FF3FF008FF3
-      FF008EF3FF0071EFFF0032E8FF0000464E00A9A9A90000000000000000000000
+      8B008B8B8B00929292000000000000000000000000002C2C2C0056CFDD0054ED
+      FF0018E6FF0002E3FE003BE3F70070E8F7008BEBF7008CECF7008CECF7008CEC
+      F7008CECF70079E9F70047E4F700019DB0005151510000000000000000000000
       00000000000000000000000000000000000000000000FEFEFE00B8B8B8008484
       84008484840084848400DBDBDB000000000000000000FEFEFE00B8B8B8008484
       84008484840084848400DBDBDB0000000000000000000000000000000000DBDB
@@ -3767,9 +3792,9 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000008B8B8B00848484000887F7000087FF000887F7008484
       84008B8B8B0000000000000000008B8B8B00848484000887F7000087FF000887
-      F700848484008B8B8B00000000000000000000000000878787002D6D770056E7
-      FF0006DCFF00009EB80000000000000000000000000000000000000000000000
-      00000000000000000000000000003C3C3C000000000000000000000000000000
+      F700848484008B8B8B00000000000000000000000000F9F9F900040B0C0059E8
+      FF000ADDFE000093A900000000001F1F1F001F1F1F001F1F1F001F1F1F001F1F
+      1F001F1F1F001F1F1F001F1F1F001F1F1F000000000000000000000000000000
       000000000000000000000000000000000000F9F9F900A1A1A1007C7C7C007C7C
       7C005882A2007C7C7C00D8D8D80000000000F9F9F900A1A1A1007C7C7C007C7C
       7C005882A2007C7C7C00D8D8D80000000000000000000000000000000000D8D8
@@ -3777,8 +3802,8 @@ object Fmp3: TFmp3
       CF00000000000000000000000000000000000000000000000000000000000000
       00000000000000000000848484007C7C7C000891F7000092FF000891F7007C7C
       7C00848484000000000000000000848484007C7C7C000891F7000092FF000891
-      F7007C7C7C008484840000000000000000000000000000000000000000005AE3
-      FF0001D3FF0000657A0000000000000000000000000000000000000000000000
+      F7007C7C7C008484840000000000000000000000000000000000000000005DE4
+      FF000DD6FE000061750000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000F2F2F2009191910074747400657986001695
       E50052809C0074747400D6D6D600F2F2F2009191910074747400657986001695
@@ -3787,8 +3812,8 @@ object Fmp3: TFmp3
       740091919100E2E2E20000000000000000000000000000000000000000000000
       000000000000000000007C7C7C0074747400079AF600009DFF00079AF6007474
       74007C7C7C0000000000000000007C7C7C0074747400079AF600009DFF00079A
-      F600747474007C7C7C0000000000000000000000000000000000000000005DDD
-      FF0011CEFF00004D610000030400C4C4C4000000000000000000000000000000
+      F600747474007C7C7C00000000000000000000000000000000000000000060DF
+      FF0024D3FF0000576D00000A0D00D5D5D5000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000E5E5E5007C7C7C006B6B6B00567789000DA0EC0000A8
       FF0047809D006B6B6B00BBBBBB007C7C7C006B6B6B00567789000DA0EC0000A8
@@ -3797,9 +3822,9 @@ object Fmp3: TFmp3
       89006B6B6B006B6B6B00A1A1A100F1F1F1000000000000000000000000000000
       00000000000000000000747474006B6B6B0007A4F60000A8FF0007A4F6006B6B
       6B00747474000000000000000000747474006B6B6B0007A4F60000A8FF0007A4
-      F6006B6B6B007474740000000000000000000000000000000000000000005FD7
-      FF0030CCFF000063830000161E00000000000000000000000000000000000000
-      00000000000000000000000000003C3C3C000000000000000000000000000000
+      F6006B6B6B0074747400000000000000000000000000000000000000000062D9
+      FF003FD1FF000073970000303F00000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
       000000000000D5D5D5006969690062626200457A900008ADF30000B3FF0000B3
       FF00407E9900626262006767670062626200457A900008ADF30000B3FF0000B3
       FF00407E990062626200C8C8C80000000000000000000000000000000000C8C8
@@ -3807,9 +3832,9 @@ object Fmp3: TFmp3
       FF003686A8005D6669006262620069696900B3B3B300F9F9F900000000000000
       000000000000000000006B6B6B006262620006AEF50000B3FF0006AEF5006262
       62006B6B6B0000000000000000006B6B6B006262620006AEF50000B3FF0006AE
-      F500626262006B6B6B0000000000000000000000000000000000333333004DA8
-      CC0046CBFF000089BF00002E4000002E4000002E4000002E4000002E4000002E
-      4000002E4000002E4000002E4000001922006F6F6F0000000000000000000000
+      F500626262006B6B6B0000000000000000000000000000000000585858004594
+      B10050CEFF00009EDA0000374C00002E4000002E4000002E4000002E4000002E
+      4000002E4000002E4000002E4000002C3D000E0E0E0000000000000000000000
       0000C8C8C8005C5C5C0058585800387D950000BDFF0000BDFF0000BDFF0000BD
       FF00397B92005858580058585800387D950000BDFF0000BDFF0000BDFF0000BD
       FF00397B920058585800C4C4C40000000000000000000000000000000000C4C4
@@ -3817,9 +3842,9 @@ object Fmp3: TFmp3
       FF0000BDFF000BB0E9003B798F00585858005858580070707000D6D6D6000000
       00000000000000000000626262005858580006B7F50000BDFF0006B7F5005858
       5800626262000000000000000000626262005858580006B7F50000BDFF0006B7
-      F500585858006262620000000000000000000000000000000000999999002652
-      660054C8FF000AB0FF000077B000006EA2000077B0000082C0000084C3000084
-      C3000084C3000079B30000547C00003853000000000000000000000000000000
+      F500585858006262620000000000000000000000000000000000000000000000
+      000059CAFF0019B7FF000081BD000079B100008BCA00009CE40000A0E90000A0
+      E90000A0E9000099DF00006D9F00004666000000000000000000000000000000
       0000ECECEC006E6E6E004F4F4F00455F66000FB0DE0000C7FF0000C7FF0000C7
       FF0033798C004F4F4F004F4F4F00455F66000FB0DE0000C7FF0000C7FF0000C7
       FF0033798C004F4F4F00C1C1C10000000000000000000000000000000000C1C1
@@ -3828,8 +3853,8 @@ object Fmp3: TFmp3
       00000000000000000000595959004F4F4F0005BFF40000C7FF0005BFF4004F4F
       4F00595959000000000000000000595959004F4F4F0005BFF40000C7FF0005BF
       F4004F4F4F005959590000000000000000000000000000000000000000000000
-      00005BC4FF0034B7FF0001A4FF001BAEFF0050C1FF0070CCFF0079CFFF0079CF
-      FF0079CFFF006ECBFF0031B5FF000088D4000000000000000000000000000000
+      00005EC6FF0039B9FF0000A2FA0011ABFF0052C1FF0077CEFF0084D3FF0084D3
+      FF0084D3FF007FD2FF004ABFFF00019DF2000000000000000000000000000000
       000000000000F6F6F6007A7A7A00454545004545450016A4C40000D0FF0000D0
       FF002D7686004545450067676700454545004545450016A4C40000D0FF0000D0
       FF002D76860045454500BDBDBD0000000000000000000000000000000000BDBD
@@ -3838,7 +3863,7 @@ object Fmp3: TFmp3
       00000000000000000000505050004545450004C7F30000D0FF0004C7F3004545
       4500505050000000000000000000505050004545450004C7F30000D0FF0004C7
       F300454545005050500000000000000000000000000000000000000000000000
-      00005EBFFF003FB3FF000092F100001E32000000000000000000000000000000
+      000061C1FF0042B5FF000087DD00004977000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000FDFDFD008F8F8F003C3C3C003C3C3C001A95AA0000D9
       FF00277380003C3C3C00B9B9B9008F8F8F003C3C3C003C3C3C001A95AA0000D9
@@ -3848,7 +3873,7 @@ object Fmp3: TFmp3
       00000000000000000000474747003C3C3C0004CFF30000D9FF0004CFF3003C3C
       3C00474747000000000000000000474747003C3C3C0004CFF30000D9FF0004CF
       F3003C3C3C004747470000000000000000000000000000000000000000000000
-      000060BAFF0041ADFF00006DC000002A4A006F6F6F0000000000000000000000
+      000062BCFF004AB2FF00006FC200004070000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000A4A4A40033333300333333002075
       800021707A0033333300B7B7B70000000000A4A4A40033333300333333002075
@@ -3857,8 +3882,8 @@ object Fmp3: TFmp3
       4400B0B0B0000000000000000000000000000000000000000000000000000000
       000000000000000000003F3F3F003333330003D6F20000E1FF0003D6F2003333
       33003F3F3F0000000000000000003F3F3F003333330003D6F20000E1FF0003D6
-      F200333333003F3F3F0000000000000000000000000000000000000000004343
-      43004685BB0049ABFF000061B400002240000000000000000000000000000000
+      F200333333003F3F3F0000000000000000000000000000000000000000008585
+      85003460850053B0FF00006ECB00002240000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000B9B9B900323232002B2B
       2B001D676E002B2B2B00B4B4B4000000000000000000B9B9B900323232002B2B
@@ -3867,8 +3892,8 @@ object Fmp3: TFmp3
       F300000000000000000000000000000000000000000000000000000000000000
       00000000000000000000373737002B2B2B0003DDF20000E9FF0003DDF2002B2B
       2B00373737000000000000000000373737002B2B2B0003DDF20000E9FF0003DD
-      F2002B2B2B00373737000000000000000000000000000000000000000000A9A9
-      A900203B550052AAFF00006FDC00002040000000000000000000000000000000
+      F2002B2B2B003737370000000000000000000000000000000000000000000000
+      0000000000005AAEFF000380F700002951000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000D0D0D0003838
       38002323230023232300B1B1B100000000000000000000000000D0D0D0003838
@@ -3878,8 +3903,8 @@ object Fmp3: TFmp3
       00000000000000000000303030002323230002E3F10000F0FF0002E3F1002323
       2300303030000000000000000000303030002323230002E3F10000F0FF0002E3
       F100232323003030300000000000000000000000000000000000000000000000
-      00000000000066AFFF002D91FF000053AD000032680000265000002650000027
-      5100002751000027510000265000001F4000001F400000000000000000000000
+      0000000000006DB3FF0049A0FF000061C8000038740000285400002853000029
+      550000295500002855000029550000214500001F400000010300F9F9F9000000
       000000000000000000000000000000000000000000000000000000000000E4E4
       E400414141001C1C1C00AFAFAF0000000000000000000000000000000000E4E4
       E400414141001C1C1C00AFAFAF0000000000000000000000000000000000AFAF
@@ -3888,8 +3913,8 @@ object Fmp3: TFmp3
       00000000000000000000292929001C1C1C001C1C1C001C1C1C001C1C1C001C1C
       1C00292929000000000000000000292929001C1C1C001C1C1C001C1C1C001C1C
       1C001C1C1C002929290000000000000000000000000000000000000000000000
-      0000000000008EC2FF0088BFFF005BA6FF004399FF003793FF003491FF003491
-      FF003491FF003491FF003491FF000A7AFF000054B70000142B00A9A9A9000000
+      0000000000008FC2FF0092C3FF0065ACFF00499CFF003B95FF003793FF003893
+      FF003893FF003793FF003893FF001A83FE00005DCC0000347200292929000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000EFEFEF0050505000ADADAD00000000000000000000000000000000000000
       0000EFEFEF0050505000ADADAD0000000000000000000000000000000000ADAD
@@ -3898,8 +3923,8 @@ object Fmp3: TFmp3
       0000000000000000000024242400161616001616160016161600161616001616
       1600242424000000000000000000242424001616160016161600161616001616
       1600161616002424240000000000000000000000000000000000000000000000
-      000000000000A3CBFF00A4CCFF0093C2FF008FC0FF008FC0FF008FC0FF008FC0
-      FF008FC0FF008FC0FF008EC0FF007CB6FF004597FF000056C500333333000000
+      000000000000A2CBFF00A6CDFF0095C3FF0091C1FF0091C1FF0091C1FF0091C1
+      FF0091C1FF0091C1FF0091C1FF0085BBFF0058A1FF000975FD00000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000F9F9F900E3E3E300000000000000000000000000000000000000
       000000000000F9F9F900E3E3E30000000000000000000000000000000000DDDD
@@ -3908,8 +3933,8 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000D3D3D3000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000033333300000000000000
+      0000000000000707070007070700070707000707070007070700070707000707
+      0700070707000707070007070700070707000707070007070700F3F3F3000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3983,10 +4008,10 @@ object Fmp3: TFmp3
       F9E3FFFFFFFF00008000FFF1F1E1FFFC060300008000FFE1E1E07FFC06030000
       80007F8181E01FFC060300008000FF0101E00FFC06030000C1FFFE0001E003FC
       06030000C0FFFC0001E000FC06030000C000F80001E0003C06030000C0007000
-      01E0001C06030000C000700001E0001C06030000E000780001E0007C06030000
+      01E0001C06030000E000700001E0001C06030000E000780001E0007C06030000
       E0007C0001E001FC06030000E07FFF0101E007FC06030000E07FFF8181E00FFC
-      06030000E0003FC1C1E03FFC06030000F0003FE1E1E0FFFC06030000F0001FF1
-      F1E1FFFC06030000F0001FF9F9E7FFFFFFFF0000F0003FFFFFFFFFFFFFFF0000
+      06030000F0003FC1C1E03FFC06030000F0001FE1E1E0FFFC06030000F0001FF1
+      F1E1FFFC06030000F0001FF9F9E7FFFFFFFF0000F8001FFFFFFFFFFFFFFF0000
       00000000000000000000000000000000000000000000}
   end
   object SaveD: TSaveDialog
@@ -4006,10 +4031,36 @@ object Fmp3: TFmp3
     IconList = ILanimation
     CycleInterval = 0
     Icon.Data = {
-      0000010001001010040000000000280100001600000028000000100000002000
-      0000010004000000000080000000000000000000000000000000000000000000
-      000000008000008000000080800080000000800080008080000080808000C0C0
-      C0000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF000000
+      0000010001001010200000000000680400001600000028000000100000002000
+      0000010020000000000000040000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4024,36 +4075,6 @@ object Fmp3: TFmp3
     Left = 208
     Top = 416
   end
-  object GHK_vorher: TLMDGlobalHotKey
-    HotKey = 16504
-    OnKeyDown = GHK_vorherKeyDown
-    Left = 208
-    Top = 496
-  end
-  object GHK_pause: TLMDGlobalHotKey
-    HotKey = 16506
-    OnKeyDown = GHK_pauseKeyDown
-    Left = 272
-    Top = 496
-  end
-  object GHK_nachher: TLMDGlobalHotKey
-    HotKey = 16507
-    OnKeyDown = GHK_nachherKeyDown
-    Left = 304
-    Top = 496
-  end
-  object GHK_leiser: TLMDGlobalHotKey
-    HotKey = 16496
-    OnKeyDown = GHK_leiserKeyDown
-    Left = 208
-    Top = 464
-  end
-  object GHK_lauter: TLMDGlobalHotKey
-    HotKey = 16497
-    OnKeyDown = GHK_lauterKeyDown
-    Left = 240
-    Top = 464
-  end
   object SpielerTimer: TTimer
     Enabled = False
     Interval = 150
@@ -4061,146 +4082,12 @@ object Fmp3: TFmp3
     Left = 272
     Top = 264
   end
-  object LMDGHKShuffle: TLMDGlobalHotKey
-    HotKey = 16498
-    OnKeyDown = LMDGHKShuffleKeyDown
-    Left = 272
-    Top = 464
-  end
   object ILanimation: TImageList
     Left = 208
     Top = 352
     Bitmap = {
       494C01010B000E00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
-      0000000000003600000028000000400000004000000001002000000000000040
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4586,12 +4473,8 @@ object Fmp3: TFmp3
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
-      2800000040000000400000000100010000000000000200000000000000000000
-      000000000000000000000000FFFFFF0000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000FFFFFFFFFFFF00000C02C03001830000
+      2800000040000000300000000100010000000000800100000000000000000000
+      000000000000000000000000FFFFFF00FFFFFFFFFFFF00000C02C03001830000
       0000802001030000000000200103000000000020010700000000000000070000
       0002001000870000040300100083000000000000000300000400000000010000
       0E04702083010000FFFFFFF8FFC30000FFFFFFF8FFC30000FFFFFFFCFFC30000
@@ -4813,22 +4696,10 @@ object Fmp3: TFmp3
       OnExecute = AalwaysontopExecute
     end
   end
-  object GHKRestart: TLMDGlobalHotKey
-    HotKey = 16505
-    OnKeyDown = GHKRestartKeyDown
-    Left = 240
-    Top = 496
-  end
   object ODMedia: TOpenDialog
     Options = [ofAllowMultiSelect, ofPathMustExist, ofFileMustExist, ofEnableSizing, ofForceShowHidden]
     Left = 242
     Top = 320
-  end
-  object GH_Del: TLMDGlobalHotKey
-    HotKey = 24699
-    OnKeyDown = GH_DelKeyDown
-    Left = 335
-    Top = 495
   end
   object TClock: TTimer
     Interval = 500
@@ -4850,12 +4721,6 @@ object Fmp3: TFmp3
     Left = 336
     Top = 320
   end
-  object GH_hud: TLMDGlobalHotKey
-    HotKey = 49224
-    OnKeyDown = GH_hudKeyDown
-    Left = 336
-    Top = 464
-  end
   object TBXPMsearch: TTBXPopupMenu
     Left = 224
     Top = 576
@@ -4863,11 +4728,6 @@ object Fmp3: TFmp3
       Caption = 'Eintr'#228'ge l'#246'schen'
       OnClick = TBXItem8Click
     end
-  end
-  object LMDDDMp3Player: TLMDDirDlg
-    AllowNewDir = True
-    Left = 368
-    Top = 320
   end
   object TBXPMVisualisierung: TTBXPopupMenu
     Left = 264
@@ -4950,15 +4810,16 @@ object Fmp3: TFmp3
   end
   object TBXPMHistory: TTBXPopupMenu
     OnPopup = TBXPMHistoryPopup
-    Left = 408
-    Top = 504
+    Left = 448
+    Top = 104
     object TBXIHistoryPlay: TTBXItem
       Caption = 'Element nur abspielen'
       Hint = 'Spielt das gelw'#228'hle Element ab ohne den Verlauf zu beeinflussen'
       OnClick = TBXIHistoryPlayClick
     end
     object TBXI_Queue_Items: TTBXItem
-      Caption = 'In Verlauf einreihen'
+      Caption = 'Als n'#228'chstes abspielen'
+      Hint = 'Reiht den Titel in den Verlauf ein'
       OnClick = TBXI_Queue_ItemsClick
     end
   end
@@ -4972,7 +4833,8 @@ object Fmp3: TFmp3
     Left = 80
     Top = 456
     object TBXI_Queue_Item_Fav: TTBXItem
-      Caption = 'In Verlauf einreihen'
+      Caption = 'Als n'#228'chstes abspielen'
+      Hint = 'Reiht den Titel in den Verlauf ein'
       OnClick = TBXI_Queue_Item_FavClick
     end
     object TBXItem11: TTBXItem
@@ -4986,12 +4848,6 @@ object Fmp3: TFmp3
     OnTimer = ScreenText_refresherTimer
     Left = 208
     Top = 264
-  end
-  object GH_hud_alt: TLMDGlobalHotKey
-    HotKey = 16499
-    OnKeyDown = GH_hudKeyDown
-    Left = 304
-    Top = 464
   end
   object TBXPMcover: TTBXPopupMenu
     Images = ILSymbolleiste

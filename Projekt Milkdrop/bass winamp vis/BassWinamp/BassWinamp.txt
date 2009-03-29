@@ -1,0 +1,128 @@
+Files that you should have found in the BassWinamp "package"
+=========================================================
+BassWinamp Help.txt	Help file
+BassWinamp.txt		This file
+bass_winamp.dll		The BassWinamp module
+FILE_ID.DIZ		BBS description file
+BIN\
+  WinampInput.exe	Winamp Input Plugins test binary
+c\
+  BCB\
+    PSWPlayer.bpr	Project file
+    BSWExemple.cpp	Main code file
+    PSWPlayer.cpp	Main cpp file
+    BSWExemple.dfm	Main form
+    BSWExemple.h	Main code header file
+    PSWPlayer.res	Main resource file
+  BassWinamp.h		BassWinamp C/C++ header file
+DELPHI\
+  WinampInput\
+    Unit1.dfm		Main form
+    Unit1.pas		Main unit
+    WinampInput.dof	Project options file
+    WinampInput.dpr	Project file
+  BassWinamp.pas	BassWinamp Delphi unit
+VB\
+  BassWinamp.bas	BassWinamp Visual Basic module file
+
+
+NOTE: The ZIP should be decompressed with the directory stucture maintained.
+
+NOTE: To run the sample EXEs, first you'll have to copy BASS.dll and bass_winamp.dll into
+      the same directory as the EXEs.
+
+
+What's the point?
+=================
+BassWinamp is an extention to the BASS audio library, providing a set of functions for
+adding Winamp Input plugins support. This adds more format support for the Bass library.
+
+
+Requirements
+============
+BASS version 2.x
+
+
+Using BassWinamp
+=============
+C/C++, Delphi, and Visual Basic APIs are provided, to use BassWinamp
+with another language you'll first have to convert the header file. Or, as a
+last resort, you could use LoadLibrary and GetProcAddress.
+
+If you are updating your software from a previous BassWinamp version, then
+you should check the "History" section (below), to see which (if any)
+of the functions that you are using have been affected by a change.
+
+For the BassWinamp functions that return strings (char*), VB users should use
+the VBStrFromAnsiPtr function to convert the returned pointer into a VB
+string.
+
+
+Latest Version
+==============
+The latest version of BassWinamp can always be found at the Bass website:
+
+        http://www.un4seen.com/
+
+
+Copyright, Disclaimer, and all that other jazz
+==============================================
+This software is provided "as is", without warranty of ANY KIND,
+either expressed or implied, including but not limited to the
+implied warranties of merchantability and/or fitness for a
+particular purpose. The author shall NOT be held liable for
+ANY damage to you, your computer, or to anyone or anything else,
+that may result from its use, or misuse. Basically, you use it
+at YOUR OWN RISK.
+
+Usage of BassWinamp indicates that you agree to the above conditions.
+
+You may freely distribute the BassWinamp package as long as NO FEE is
+charged and all the files remain INTACT AND UNMODIFIED.
+
+All trademarks and other registered names contained in the BassWinamp
+package are the property of their respective owners.
+
+
+
+History
+=======
+These are the major (and not so major) changes at each version
+stage. There are ofcourse bug fixes and other little improvements
+made along the way too! To make upgrading simpler, all functions
+affected by a change to the BassWinamp interface are listed.
+
+2.2
+---------------
+* Fixed a potential bug with Reading/Writing to the internal buffer
+* Released the source
+* Updated to Bass 2.2
+
+2.1 (Beta)
+---------------
+* Support for the improved "mixtime" sync system (allows custom looping)
+* BASS_WINAMP_GetVersion added (the plugin version)
+* BASS_WINAMP_IsSeekable added (Whether the plugin allows seeking)
+
+1.0 (Beta)
+---------------
+* First public release
+
+
+Credits - API/Sample Contributors
+=================================
+C/C++ - 
+Borland C++ Builder - CM [myjobs@mail.ru]
+Visual Basic - 
+PowerBasic - 
+
+
+Bug reports, Suggestions, Comments, Enquiries, etc...
+=====================================================
+If you have any of the aforementioned please see the BASS forum (at
+the website).
+
+
+More Credits
+============
+* Thanks to Ian Luck for help on converting sample data and much more!

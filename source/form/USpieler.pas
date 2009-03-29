@@ -70,6 +70,7 @@ type
 
     procedure AutoVolumeDecrease;
     procedure AutoVolumeIncrease;
+    function GetPauseState : boolean;
  published
     property OnWeiterschalten: TWeiterschaltenEvent
       read FWeiterschalten write FWeiterschalten;
@@ -145,7 +146,7 @@ begin
   if (Dateiendung='.mp3') or (Dateiendung='.wma') or (Dateiendung='.ogg')
     or (Dateiendung='.wav') or (Dateiendung='.cda') or (Dateiendung='.ac3')
     or (Dateiendung='.mp2') or (Dateiendung='.mpa') or (Dateiendung='.aac')
-    or (Dateiendung='.mp4') or (Dateiendung='.m4a')
+    or (Dateiendung='.mp4') or (Dateiendung='.m4a') or (Dateiendung='.flac')
     then result:=BASS_RENDER;
 
   if (Dateiendung='.exe') or (Dateiendung='.cmd') or (Dateiendung='.bat')
@@ -283,6 +284,13 @@ begin
     end;
   end;
 end;
+
+
+function TSpieler.GetPauseState : boolean;
+begin
+  result:=aktiv.Pause;
+end;
+
 
 procedure TSpieler.SetVolume(Volume:integer);
 begin

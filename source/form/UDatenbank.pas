@@ -8,6 +8,7 @@ uses dialogs, sysutils, strutils, classes, controls, windows, shellapi,
 
 const DatenVersion:integer=8;
       GENRE_COUNT = 147;
+
       
 type
   ID3Genre = (
@@ -111,6 +112,7 @@ type TMp3ListeMeta = record
         history         : array [0..99] of integer;
         historyPosition : integer;
         mode            : integer;
+        SuperSearchString: TStringList;
   end;
 
 type TMp3DatenbankMeta=array of TMp3ListeMeta;
@@ -151,6 +153,9 @@ type
 
     //Verschiebt eine Datei oder ein Verzeichnis in den Papierkorb
     function DeleteFileToRecycleBin(const AFile: string): boolean;
+
+    procedure CreateSuperSearchString(ListenNummer:integer);
+
    public
 
     Mp3Daten    : TMp3Datenbank;
@@ -290,6 +295,15 @@ type
     //Baut aus einer StringListe die History neu auf
     procedure History_RebuiltfromStringList(ListenNummer:integer;
                 ElementNummerListe:TStringlist;HistoryPosition:integer);
+
+    //Kapselt GetEintragfuerSpalte            
+    function GetValue(ListenNummer,ElementNummer,ValueIndex:integer):string;
+
+    //Erzeugt einen Dateinamen für das Playlistverzeichnis
+    procedure CreateFileNameForPlaylist (ListenNummer : integer; PlaylistDir: string);
+
+    //Anzahl der Titel in einer Playliste
+    function GetLengthOfList (ListenNummer:integer):integer;
    end;
 
 
@@ -335,6 +349,7 @@ begin
     Mp3DatenMeta[ListenNummer].AnzeigeSpalten[4]:=8;
     Mp3DatenMeta[ListenNummer].AnzahlSuchPfade:=0;
     Mp3DatenMeta[ListenNummer].mode:=0;
+    Mp3DatenMeta[ListenNummer].SuperSearchString:=TStringList.Create;
 
     for i:=0 to High(Mp3DatenMeta[ListenNummer].history) do
     begin
@@ -346,17 +361,43 @@ end;
 
 
 procedure TDatenbank.ListeSchliessen(ListenNummer:integer; Speichern:boolean=true);
+  var FileName : string;
 begin
   if ListeExists(ListenNummer) then
   begin
     if   Speichern
-    then SavePlaylist(Mp3DatenMeta[ListenNummer].FileName,ListenNummer);
-
+    then
+      begin
+        FileName := Mp3DatenMeta[ListenNummer].FileName;
+        SavePlaylist(Mp3DatenMeta[ListenNummer].FileName,ListenNummer);
+      end;
     SetLength(Mp3Daten[ListenNummer],0);
     Mp3DatenMeta[ListenNummer].offen:=false;
   end;
 end;
 
+
+procedure TDatenbank.CreateFileNameForPlaylist (ListenNummer: integer; PlaylistDir: string);
+var  FileName  : string;
+     i         : integer;
+begin
+  CreateDir(PlaylistDir);
+  i:=0;
+  repeat
+    inc(i);
+    FileName := 'Playliste ('+inttostr(i)+').epl'
+  until not FileExists(PlaylistDir + FileName);
+
+  Mp3DatenMeta[ListenNummer].FileName:=PlaylistDir + FileName;
+end;
+
+
+function TDatenbank.GetLengthOfList (ListenNummer:integer):integer;
+begin
+  if ListeExists(ListenNummer)
+  then Result:=Length(Mp3Daten[ListenNummer])
+  else Result:=0;
+end;
 
 function TDatenbank.GetGListenIndex (ListenNummer,ElementNummer:integer):integer;
   var i,zaehler,ArrayIndex:integer;
@@ -569,6 +610,18 @@ begin
      end;
    end;
 end;
+
+
+function TDatenbank.GetValue(ListenNummer,ElementNummer,ValueIndex:integer):string;
+begin
+  if ListeExists(ListenNummer) then
+  begin
+    Result:=GetEintragfuerSpalte(ValueIndex,ListenNummer,ElementNummerZuArrayIndex(ListenNummer,ElementNummer));
+  end
+  else
+    Result:='';
+end;
+
 
 function TDatenbank.GetEintragfuerSpalte(Auswahl,Quelle,i:integer):string;
 
@@ -1072,10 +1125,10 @@ begin
   if SearchString<>''
   then
    begin
-     if SearchString[1] in [' ',';']
+     if CharInSet(SearchString[1],[' ',';'])
      then
       begin
-       if length(searchstring)>1
+       if length(SearchString)>1
          then
            begin
              SearchString := CopyEx(SearchString,2,-1);
@@ -1087,7 +1140,7 @@ begin
   if SearchString<>''
   then
     begin
-     if SearchString[length(searchstring)] in [' ',';']
+     if CharInSet(SearchString[length(searchstring)],[' ',';'])
      then
        begin
        SearchString := Copy(SearchString,1,length(searchstring)-1);
@@ -1101,7 +1154,7 @@ end;
 
 
 procedure TDatenbank.AND_Search_Item_intern (ListenNummer,ArrayIndex:integer;
-                                           SearchString:string;SearchPos:integer;var match:boolean);
+                                           SearchString:string; SearchPos:integer;var match:boolean);
 var SeperatorPos:integer;
     CurrentSearch:string;
 begin
@@ -1123,16 +1176,24 @@ begin
     then
       if
       ( pos( ( CurrentSearch ) ,
-         ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].Filename ) ) <>0 )
-      or
-       ( pos( ( CurrentSearch ) ,
-         ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].Path ) ) <>0 )
-      or
+       Mp3DatenMeta[ListenNummer].SuperSearchString.Strings[ArrayIndex] ) <>0 )
+      then match:=true else match:=false;
+
+  {
+    if CurrentSearch<>''
+    then
+      if
        ( pos( ( CurrentSearch ) ,
          ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].id3tag.Titel ) ) <>0 )
       or
        ( pos( ( CurrentSearch ) ,
          ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].id3tag.Artist ) ) <>0 )
+      or
+      ( pos( ( CurrentSearch ) ,
+         ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].Filename ) ) <>0 )
+      or
+       ( pos( ( CurrentSearch ) ,
+         ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].Path ) ) <>0 )
       or
        ( pos( ( CurrentSearch ) ,
          ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].id3tag.Album) ) <>0 )
@@ -1146,7 +1207,7 @@ begin
        ( pos( ( CurrentSearch ) ,
          ansilowercase(  Mp3Daten[ListenNummer,ArrayIndex].id3tag.year) ) <>0 )
 
-      then match:=true else match:=false;
+      then match:=true else match:=false;   }
   end;
 end;
 
@@ -1155,13 +1216,15 @@ function TDatenbank.AND_Search_Item(ListenNummer,ElementNummer:integer;
                                     SearchString:string):boolean;
 var  match : boolean;
 begin
+      //ElementNummer ist hier == ArrayIndex!
       //Leerzeichen um Ende zu markieren
       SearchString:=SearchString+' ';
 
       match:=true;
 
       if SearchString <> ' '
-      then AND_Search_Item_intern(ListenNummer,ElementNummer,SearchString,1,match);
+      then
+      AND_Search_Item_intern(ListenNummer,ElementNummer,SearchString,1,match);
 
       Result:=Match;
 end;
@@ -1187,7 +1250,9 @@ begin
   //Durchsuche jedes Element
   for i:=0 to High(Mp3Daten[ListenNummer]) do
   begin
-    if AND_Search_Item(ListenNummer,i,CurrentSearch)
+    //Wenn schon gefunden von anderer OderSuche dann nicht nochmal
+    if not (MP3Daten[ListenNummer,i].anzeige)
+       and AND_Search_Item(ListenNummer,i,CurrentSearch)
     then MP3Daten[ListenNummer,i].anzeige:=true;
   end;
 end;
@@ -1201,18 +1266,20 @@ begin
 
   SearchString:= TrimSearchStringForSearch(SearchString);
 
+  CreateSuperSearchString(ListenNummer);
+
   if SearchString=''
   then
     begin
       //Alles Anzeigen
       for i:=0 to High(Mp3Daten[ListenNummer]) do
-      Mp3Daten[ListenNummer,i].anzeige:=true;
+        Mp3Daten[ListenNummer,i].anzeige:=true;
    end
   else
     begin
       //Nichts Anzeigen um in OderSuche die einzelnen Elemente aktivieren
       for i:=0 to High(Mp3Daten[ListenNummer]) do
-      Mp3Daten[ListenNummer,i].anzeige:=false;
+        Mp3Daten[ListenNummer,i].anzeige:=false;
 
       //OderZeichen um Ende zu markieren
       SearchString:=SearchString+';';
@@ -1221,6 +1288,23 @@ begin
     end;
 end;
 
+procedure TDatenbank.CreateSuperSearchString(ListenNummer:integer);
+  var i:integer;
+begin
+  Mp3DatenMeta[ListenNummer].SuperSearchString.Clear;
+  for i:=0 to High(Mp3Daten[ListenNummer]) do
+    Mp3DatenMeta[ListenNummer].SuperSearchString.Add(
+      ansilowercase(
+        Mp3Daten[ListenNummer,i].id3tag.Titel+' '+
+        Mp3Daten[ListenNummer,i].id3tag.Artist+' '+
+        Mp3Daten[ListenNummer,i].Filename+' '     +
+        Mp3Daten[ListenNummer,i].Path+' '         +
+        Mp3Daten[ListenNummer,i].id3tag.Album+' ' +
+        Mp3Daten[ListenNummer,i].id3tag.Genre+' '+
+        Mp3Daten[ListenNummer,i].id3tag.Comment+' '+
+        Mp3Daten[ListenNummer,i].id3tag.year));
+  //Leerzeichen dazwischen um nicht in "ArmBein" "mB" zu finden
+end;
 
 procedure TDatenbank.LoadPlaylist(FileName:string; ListenNummer:integer);
 
@@ -1327,7 +1411,7 @@ var Datei    : TFileStream;
     Mp3DatenSaetze,i : integer;
 
 
-  procedure SaveString( Dateiiiii:TFileStream; SString:string);
+  procedure SaveString( Datei:TFileStream; SString:string);
   var StringLength : integer;
   begin
     stringlength := Length( SString );
@@ -1564,7 +1648,7 @@ begin
               //fix weil manche id3v2 2.3 utf years '2005//2005' enthalten
               id3tag.year:='';
               for k:=1 to length (id3v2.Year) do
-              if id3v2.year[k] in ['0','1','2','3','4','5','6','7','8','9']
+              if CharInSet(id3v2.year[k],['0','1','2','3','4','5','6','7','8','9'])
                then id3tag.year:=id3tag.year+id3v2.year[k]
                else break;
 
@@ -1834,7 +1918,7 @@ begin
       inc(Mp3datenMeta[ListenNummer].maxNummer);
 
       LeseId3(ListenNummer,Mp3daten[ListenNummer,High(Mp3daten[ListenNummer])].Nummer);
-   end;
+    end;
  end;
 end;
 

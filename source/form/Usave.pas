@@ -191,6 +191,7 @@ try
   ini.WriteBool('Allgemein','SingleAutoPlay',fmp3.TBXCBSearchAutoPlay.Checked);
   ini.WriteBool('Allgemein','CoverSearch',fmp3.TBXCBCoverSearch.Checked);
   ini.WriteBool('Allgemein','HighPriority',fmp3.TBXB_HighPriority.Checked);
+  ini.WriteBool('Allgemein','AutoSavePlaylist',fmp3.TBXCBAutoSave.Checked);
 
   ini.WriteString('Style', 'Wallpaper', fmp3.OpenPD.FileName);
   S_EQ;
@@ -198,7 +199,7 @@ try
   //ini.WriteInteger('Allgemein', 'Clockindex', fmp3.TBXButton3.Tag);
   ini.WriteString('Allgemein', 'OpenD', fmp3.OpenD.InitialDir);
   ini.WriteString('Allgemein', 'SaveD', fmp3.SaveD.InitialDir);
-  ini.WriteString('Allgemein', 'Mp3PlayerDir', fmp3.LMDDDMp3Player.Path);
+//  ini.WriteString('Allgemein', 'Mp3PlayerDir', fmp3.LMDDDMp3Player.Path);
   ini.WriteBool('Allgemein','OSD',fmp3.TBXI_ScreenText.Checked);
   ini.WriteBool('AOT', 'TrayPanel', fmp3.Aalwaysontop.Checked);
 
@@ -224,6 +225,8 @@ try
   ini.WriteBool('Vis', '11', fmp3.TBXIvis11.Checked);
   ini.WriteBool('Vis', '12', fmp3.TBXIvis12.Checked);
 
+  ini.WriteInteger('Shuffle', 'Staerke', fmp3.TBXPB_shuffle.Position);
+
 
 except
   fmp3.Fehler(SAVESETTINGSERROR);
@@ -241,7 +244,7 @@ try
   Listen := TStringList.Create;
   
   fmp3.TBXIShuffle.Checked:=ini.ReadBool('Allgemein','Shuffle',false);
-  Fmp3.AshuffleExecute(fmp3);
+  //Fmp3.AshuffleExecute(fmp3);
   fmp3.WindowState:=TWindowState(ini.ReadInteger('Style','WindowState',0));
   fmp3.SetVolume(ini.ReadFloat('Allgemein', 'Volume', 0.5));
   fmp3.GStyle.markiertesElement:=ini.ReadInteger('Style','TBX-Theme',13);
@@ -259,8 +262,10 @@ try
   fmp3.TBXCBSearchAutoPlay.Checked:=ini.ReadBool('Allgemein','SingleAutoPlay',true);
   fmp3.TBXCBCoverSearch.Checked:=ini.ReadBool('Allgemein','CoverSearch',true);
   fmp3.TBXB_HighPriority.Checked:=ini.ReadBool('Allgemein','HighPriority',false);
+  fmp3.TBXCBAutoSave.Checked:=ini.ReadBool('Allgemein','AutoSavePlaylist',true);
   fmp3.WindowState:=TWindowState(ini.ReadInteger('Style','WindowState',0));
   fmp3.Color := ini.ReadInteger('Style', 'WallpColor', $00808080);
+  fmp3.TBXPB_shuffle.Position := ini.ReadInteger('Shuffle', 'Starke', 100);
   //fmp3.TBXButton3.Tag := ini.ReadInteger('Allgemein', 'Clockindex', 0) - 1;
   //fmp3.TBXButton3Click(fmp3);
 
@@ -269,9 +274,9 @@ try
 
   fmp3.Aalwaysontop.Checked := not ini.ReadBool('AOT', 'TrayPanel', false);
     fmp3.AalwaysontopExecute(fmp3);
-  if DirectoryExists(ini.ReadString('Allgemein', 'Mp3PlayerDir', ''))
+{  if DirectoryExists(ini.ReadString('Allgemein', 'Mp3PlayerDir', ''))
   then
-     fmp3.LMDDDMp3Player.Path:= ini.ReadString('Allgemein', 'Mp3PlayerDir', '');
+     fmp3.LMDDDMp3Player.Path:= ini.ReadString('Allgemein', 'Mp3PlayerDir', '');     }
   if FileExists(extractfilepath(ini.FileName)+LBPLSINI)
   then
   begin
@@ -313,7 +318,7 @@ try
   end;
 
   //Titelanzeige
-  fmp3.TBXCBhud.Checked            :=ini.ReadBool('Style','ScreenOut'   ,true );
+  fmp3.TBXCBhud.Checked            :=ini.ReadBool('Style','ScreenOut'   ,false );
   fmp3.TBXI_ScreenText.Checked     :=ini.ReadBool('Allgemein','OSD'     ,false);
   fmp3.TBXCB_AutoOSD.Checked       :=ini.ReadBool('Allgemein','Auto-OSD',true );
 

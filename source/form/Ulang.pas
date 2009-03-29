@@ -6,10 +6,10 @@ interface
 
 resourcestring
 //Captions
-  TASKBARSEP = ' *** ';
-  ARTISTSEP  = ' - ';
-  SHUFFLE_ON = 'Shuffle [Aus]';
-  SHUFFLE_OFF= 'Shuffle [An]';
+  TASKBARSEP = ' — ';
+  ARTISTSEP  = ' – ';
+  SHUFFLE_ON = 'Shuffle: Aus';
+  SHUFFLE_OFF= 'Shuffle: An';
   PAUSECAPTION = 'Pause';
   EMATTITLE    = 'Emat';
   STOPCAPTION  = 'Stopp';
