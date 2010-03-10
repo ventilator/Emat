@@ -159,6 +159,7 @@ begin
   Aktiv.Renderkern := ZustaendigerRenderKern(extractfileext(filename));
   Aktiv.Pause:= false;
 
+
   case Aktiv.Renderkern of
   0: //BASS
     begin

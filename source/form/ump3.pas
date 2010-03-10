@@ -12,6 +12,14 @@ unit ump3;
    -Image32 1.6
 
   Danke für die Unterstützung von delphi-praxis.net
+
+  Testing
+  2010
+  Delphi 2010
+  ---TB2k 2.0.15 und TBX 2.1 für D7 installiert
+  ---LMD FreeEdition 12.0 (?) für D2009
+  ---CoolTrayIcon 1.0 D2009 mod von Delphi Praxis
+  -Image32 1.8 (?) für D2009
 }
 
 
@@ -44,7 +52,7 @@ uses
 
 
 const
-  Version     = '0.80.16';
+  Version     = '0.80.16-D2900testing';
   FormCaption = '';
   maxVolume   = 100;
   Anzahl_TBXDockablePanel = 14;
