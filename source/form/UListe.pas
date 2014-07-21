@@ -66,6 +66,9 @@ type
     TBXI_DelDir_2: TTBXItem;
     TBXI_DelDir_3: TTBXItem;
     TBXI_DelDir_4: TTBXItem;
+    TBXItem5: TTBXItem;
+    tbxtmRepeat: TTBXItem;
+    procedure TBXItem5Click(Sender: TObject);
     procedure PMlistePopup(Sender: TObject);
     procedure TBXI_DelDir_3Click(Sender: TObject);
     procedure TBX_Del_DirSelect(Sender: TTBCustomItem; Viewer: TTBItemViewer;
@@ -95,6 +98,7 @@ type
     procedure TBXItem1Click(Sender: TObject);
     procedure TBXItem15Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure tbxtmRepeatClick(Sender: TObject);
   private
   { Private-Deklarationen }
     closeflag     : boolean;
@@ -138,6 +142,9 @@ uses ump3, UStatus;
 
 
 procedure TFPlayliste.FormCreate(Sender: TObject);
+var
+  CustomArrowUp: TBitmap;
+  CustomArrowDown: TBitmap;
 begin
   GListe1 := TGliste2.create(fplayliste);
   GListe1.Parent := gbliste;
@@ -157,7 +164,14 @@ begin
   Gliste1.LineMoving :=true;
   //Tag2 bezeichnet eine Playlistenliste (für DragOver.accept)
   Gliste1.Tag2:=1;
+
   SetRaender;
+
+  CustomArrowUp   := TBitmap.Create;
+  CustomArrowDown := TBitmap.Create;
+  fmp3.ILSymbolleiste.GetBitmap(34,CustomArrowDown);
+  fmp3.ILSymbolleiste.GetBitmap(33,CustomArrowUp);
+  Gliste1.SetCustomArrows(CustomArrowDown, CustomArrowUp);
 
   CopyThread := TCopyThread.Create(true);
   CopyThread.FreeOnTerminate:=true;
@@ -170,7 +184,14 @@ end;
 
 procedure TFPlayliste.GlisteDoppelklick(Index :integer);
 begin
-  fmp3.Spiele(ListenNummer,strtoint(Gliste1.liste.Nummer[index]),true)
+  if fmp3.TBX_PartyMode.Checked then
+  begin
+    TBXIQueHistoryClick(self);
+  end
+  else
+  begin
+    fmp3.Spiele(ListenNummer,strtoint(Gliste1.liste.Nummer[index]),true)
+  end;
 end;
 
 
@@ -202,7 +223,14 @@ begin
     Fmp3.Esuche.Text := Copy(Fmp3.Esuche.Text, 0, Length(Fmp3.Esuche.Text) -1);
 
   if (key = vk_return) then
-    Fmp3.Spiele(ListenNummer, fmp3.Aktiv.MarkiertesElement);
+    if fmp3.TBX_PartyMode.Checked then
+      begin
+        TBXIQueHistoryClick(self);
+      end
+      else
+      begin
+        Fmp3.Spiele(ListenNummer, fmp3.Aktiv.MarkiertesElement);
+      end;
 
   if (key = vk_right) then
     fmp3.Spule(fmp3.TBXPBar.Position/fmp3.TBXPBar.max+0.05);
@@ -219,7 +247,10 @@ begin
   if (key = vk_delete) then
     fmp3.DeleteSelectedItems;
 
-  Gliste1.SetFocus;
+  if (key = VK_SPACE) then
+    fmp3.ApauseExecute(self);
+
+  //Gliste1.SetFocus;   keine Ahnung, was das soll
 end;
 
 procedure TFPlayliste.GlisteDragOver ( Sender, Source:Tobject; x,y: integer;
@@ -462,8 +493,15 @@ end;
 
 procedure TFPlayliste.TBXItem7Click(Sender: TObject);
 begin
+  if fmp3.TBX_PartyMode.Checked then
+  begin
+    TBXIQueHistoryClick(self);
+  end
+  else
+  begin
   fmp3.Spiele(Listennummer,
                 strtoint(GListe1.Liste.Nummer[gliste1.MarkiertesElement]));
+  end;
 end;
 
 procedure TFPlayliste.TBXItem2Click(Sender: TObject);
@@ -704,6 +742,12 @@ begin
     end;
 end;
 
+procedure TFPlayliste.tbxtmRepeatClick(Sender: TObject);
+begin
+  //TFmp3.TBX_repeatClick(nil);
+  ShowMessage('Fehlt');
+end;
+
 procedure TFPlayliste.PMlistePopup(Sender: TObject);
 var
   i: integer;
@@ -714,6 +758,11 @@ begin
   begin
     PMListe.Items.Items[i].Enabled := enable;
   end;
+end;
+
+procedure TFPlayliste.TBXItem5Click(Sender: TObject);
+begin
+  fmp3.NachMarkiertemInterpretenSuchen;
 end;
 
 end.

@@ -1,0 +1,107 @@
+8.10.2010
+
+Reportierung auf D 2005 PE
+
+-Ergänzung der Hardwareanforderung : Benötigt Soundkarte/Soundtreiber um Titel abzuspielen
+
+Veränderungen für 0.80.17
+
+-Shuffle wird korrekt gespeichert
+-Kontextmenü: "Nach diesem Interpreten suchen"
+-Sprachliche Anpassungen
+-Link auf G-softwareseite aktualisiert
+-Zugriffsverletzung behoben, die beim Hinzufügen von Ordnern durch Drag und Drop auftritt, die keine Musik oder Playlisten beinhalten
+-Systemweite Hotkeys können geändert werden und Art der Registrierung im System verändert
+-Taskbar Thumbnails für Windows 7 hinzugefügt
+-Fortschrittsanzeige beim Hinzufügen von Titeln unter Windows Vista und 7 repariert (Sich bewegende Lupe entfernt, die unter Vista/7 nicht mehr existiert) und Updateintervall um ein Element verschoben (rundet nun auf volle Zehner)
+-HUD defaultmäßig ausgeschaltet
+-Beim Abspielen eines Titels aus den Favoriten wurde der Titel dem Verlauf nicht hinzugefügt, wenn vorher Titel in den Verlauf eingereiht und noch nicht abgearbeitet worden waren
+-weitere exotische Fehlerchen behoben
+
+
+Veränderungen für 0.80.18
+
+17.08.2010
+
+Portierung auf Delphi 2010 (Danke, Uni Würzburg)
+
+-Aktualisierung des Renderkerns
+-Aktualisierung der Toolbar und des Themesystems
+-Die Playlisten unterstützen nun Unicode. Leider verdoppelt sich dadurch der Speicherbedarf einer Playliste, alte Playlisten sind nicht mehr kompatibel mit dieser Version und müssen neu erstellt werden
+-Metatags der Exe-Datei aktualisiert
+-Visualisierungsunterstützung. U.a. Milkdrop (bekannt aus Winamp)
+-Doppelklick und gleichzeitiges Mausbewegen kann kein unbeabsichtigtes Drag and Drop Ereignis mehr veruraschen
+-Partymodus: Doppelklick auf einen Titel reiht diesen in den Verlauf ein und unterbricht damit nicht die laufende "Playliste" des Abends
+-Leertaste = Pause
+-Hotkeys können direkt getauscht werden - "Anwenden" ist nur noch ein Placeboknopf, die Hotkeys werden beim Verlassen des Edit-Feldes gesetzt
+-Equalizer repariert und Presets aus Winamp importiert. Die Presets können in der Datei 'equalizer\equalizers.xml' editiert werden
+-Themes aktualisiert und weitere hinzugefügt
+-Icons aktualisert (Weiterschalten, Scrollbar)
+-Listenausgabe etwas verschönert. Z.B. wird der Mausübereffekt nicht mehr gezeichnet, wenn die Maus die Playliste verlässt
+-Beim Hinzufügen eines Ordners zu einer Playliste wird die Hinzufügegeschwindigkeit (Titel/Sekunde) berechnet
+-Option zum Wiederholen des aktuellen Titels
+-Emat läd alle Winamp-Intput-PlinputMuster in_*.dll im Ordner Plugins (nicht aus einem Unterordner). Winampplugins werden der bass.dll bevorzugt. So verspricht die in_mad.dll eine bessere MP3-Wiedergabequalität
+-Fehler behoben, der c:\ordner1 als Unterverzeichnis von c:\ordner interpretierte. (Fehlender Backslash am Ende)
+-Tiefpassfilterbereich der Hinzufügegeschwindigkeit vergrößert und Fehlermeldung durch Rechnenfehler auf "zu schnellen" PCs behoben
+-Kontexmenü: Löschen und Einreihen vertauscht
+
+Verfügbare Erweiterungen durch Addons : *.ac3;*.aac;*.m4a;*.mp4;*.flac;*.fla;*.oga;*.ogg;
+Verfügbare Erweiterungen durch Plugins: *.mp3;*.mp2;*.mp1;*.mid;*.midi;*.rmi;*.kar;*.spx;
+Verfügbare Erweiterungen durch Bass   : *.wav;*.mp1;*.mp2;*.mp3;*.ogg;*.aiff*.mo3;*.it;*.xm;*.s3m;*.mtm;*.mod;*.umx;*.cda;*.wma;*.asf;
+
+
+
+Bekannte Probleme:
+-Lieder springen unter Systemlast -> Mp3s werden vom in_mad.dll Plugin dekodiert
+-WMA/FLAC-Stücke werden abgespielt, die Metainformationen aber nicht ausgewertet
+
+Veränderungen für 0.82
+
+21.07.2014
+
+-Backspace und Entf-Taste im Suchfeld verfügbar
+-Besseres Handling von Dateien auf temporär nicht verfügbaren externen Laufwerken
+
+-Fadetiming?
+
+
+"aus verlauf entfernen"
+
+vor dem in liste markieren ein kleines in liste markieren symbol einfügen
+mehrere offene playlisten speichern ja, nein, nein alle, ja alle
+suchinfo besser gestalten, nur wie?
+bei abgeschaltetem osd mit strg+f4 trotzdem anzeigen
+eintrag: "nur dieses lied immer wieder abspielen" im kontextmenü
+wenn liste den focus hat, dann osd ausblenden
+id3tag editierungsfunktion herausheben
+
+-wenn die maus über osd schwebt osd nach oben verschieben
+osd fehler aufgetreten...
+
+
+-beim start ca. 10 datenbanklisteausgaben...(ist ok, lässt sich schwer verhindern)
+
+-supersuchstring
+
+
+-beim ersten start eine leere playliste erzeugen   
+-diesen merkwürdigen nicht beendenlassen fehler finden
+
+
+-beim id3tag ändernen medium auch wieder an position spulen
+-enter im suchfeld löst play aus
+-ergebnis der verwaisen einträge suche ausgeben
+
+-muss noch getestet werden:
+HistoryItemMove
+
+-iteminsert zwischen 2 listen programmieren
+-verhindern dass ein lied 2 mal hintereinander abgespielt wird (martin)
+-spezialsortierung sollte sich nach alter des albums richten
+-breite des taskleisteneintrages für skrollbedürftigkeit herausfinden -> eintrag ist eh immer länger
+-wma-tag speichern können
+-vielleicht prozessorschonenderes progressdraw (und dafür öfter)
+-auf mp3-player kopieren verbessern
+-Doppelte Medien suchen Nach Größe sortieren, Nachbarn vergleichen - gleiche medien finden - bug
+Nach Namen sortieren, Nachbarn vergleichen
+Wenn keine doppelten gefunden, dann meldung ausgeben

@@ -45,7 +45,7 @@ try
 
   for i:=0 to High(fmp3.Datenbank.Mp3DatenMeta) do
     begin
-     if (fmp3.Datenbank.Mp3DatenMeta[i].offen)
+     if (fmp3.Datenbank.ListeExists(i))
       and (fmp3.Datenbank.Mp3DatenMeta[i].FileName<>'')
        then
        begin
@@ -56,11 +56,15 @@ try
                         ,Integer(fmp3.FPlaylisten[i].WindowState));
 
        if fmp3.FPlaylisten[i].WindowState = wsmaximized
-       then maximized_list:=i;
+       then
+        begin
+           maximized_list:=i;
+        end;
 
 
        //Windowstate wird auf Normal gesetzt um Größe speichern zu können
        fmp3.FPlaylisten[i].WindowState := wsNormal;
+
        ini.WriteInteger('OffenePlaylisten','Left'+inttostr(Anzahl),
                         fmp3.FPlaylisten[i].Left);
        ini.WriteInteger('OffenePlaylisten','Top'+inttostr(Anzahl),
@@ -94,7 +98,9 @@ try
   ini.WriteInteger('OffenePlaylisten','MaximizedList',maximized_list);
 
 except
- fmp3.Fehler('Die offene Listen konnten nicht fehlerfrei gespeichert werden.');
+ fmp3.Fehler('Die Position der geöffneten Listen konnte nicht fehlerfrei gespeichert werden.');
+ //Im Fehlerfall offene Listen verwerfen
+ ini.WriteInteger('OffenePlaylisten','Anzahl',0);
 end;
 end;
 
@@ -171,6 +177,7 @@ procedure TSave.S_Einstellungen;
 begin
 try
   ini.WriteBool('Allgemein','Shuffle',fmp3.TBXIShuffle.Checked);
+  ini.WriteBool('Allgemein','Partymode',fmp3.TBX_PartyMode.Checked);
   ini.WriteFloat('Allgemein','Volume', fmp3.GetVolume);
   ini.WriteInteger('Style','TBX-Theme',fmp3.GStyle.MarkiertesElement);
   ini.WriteInteger('Style','WindowState',Integer(Fmp3.WindowState));
@@ -227,6 +234,19 @@ try
 
   ini.WriteInteger('Shuffle', 'Staerke', fmp3.TBXPB_shuffle.Position);
 
+  //Hotkeys
+  //nicht beim Erstem mal laden, da mir die einzelnen Integer unbekannt sind
+  ini.WriteBool('Hotkey','UseCustom',true);
+  //Nach erstem Speichern werden die gespeicherten Werte verwendet
+
+  ini.WriteInteger('Hotkey','Next',fmp3.HK_Next.HotKey);
+  ini.WriteInteger('Hotkey','Back',fmp3.HK_Back.HotKey);
+  ini.WriteInteger('Hotkey','Lauter',fmp3.HK_Lauter.HotKey);
+  ini.WriteInteger('Hotkey','Leiser',fmp3.HK_Leiser.HotKey);
+  ini.WriteInteger('Hotkey','Play',fmp3.HK_Play.HotKey);
+  ini.WriteInteger('Hotkey','Pause',fmp3.HK_Pause.HotKey);
+  ini.WriteInteger('Hotkey','Shuffle',fmp3.HK_Shuffle.HotKey);
+
 
 except
   fmp3.Fehler(SAVESETTINGSERROR);
@@ -243,11 +263,12 @@ begin
 try
   Listen := TStringList.Create;
   
-  fmp3.TBXIShuffle.Checked:=ini.ReadBool('Allgemein','Shuffle',false);
+  fmp3.SetShuffle(ini.ReadBool('Allgemein','Shuffle',false));
+  fmp3.TBX_PartyMode.Checked:=ini.ReadBool('Allgemein','Partymode',false);
   //Fmp3.AshuffleExecute(fmp3);
   fmp3.WindowState:=TWindowState(ini.ReadInteger('Style','WindowState',0));
   fmp3.SetVolume(ini.ReadFloat('Allgemein', 'Volume', 0.5));
-  fmp3.GStyle.markiertesElement:=ini.ReadInteger('Style','TBX-Theme',13);
+  fmp3.GStyle.markiertesElement:=ini.ReadInteger('Style','TBX-Theme',22);
   fmp3.GStyleDoppelClick(ini.ReadInteger('Style','TBX-Theme',0), []);
   fmp3.Left:=ini.ReadInteger('Style','Left',Screen.Width div 2 - fmp3.Width div 2);
   fmp3.Top:=ini.ReadInteger('Style','Top',Screen.Height div 2 - fmp3.Height div 2);
@@ -357,6 +378,21 @@ try
   fmp3.TBXIvis12Click(fmp3.TBXIvis11);
   fmp3.TBXIvis12Click(fmp3.TBXIvis12);
 
+  //Hotkeys
+  //nicht beim Erstem mal laden, da mir die einzelnen Integer unbekannt sind
+  if ini.ReadBool('Hotkey','UseCustom',false) then
+  begin
+  fmp3.HK_Next.HotKey:=ini.ReadInteger('Hotkey','Next',0);
+  fmp3.HK_Back.HotKey:=ini.ReadInteger('Hotkey','Back',0);
+  fmp3.HK_Lauter.HotKey:=ini.ReadInteger('Hotkey','Lauter',0);
+  fmp3.HK_Leiser.HotKey:=ini.ReadInteger('Hotkey','Leiser',0);
+  fmp3.HK_Play.HotKey:=ini.ReadInteger('Hotkey','Play',0);
+  fmp3.HK_Pause.HotKey:=ini.ReadInteger('Hotkey','Pause',0);
+  fmp3.HK_Shuffle.HotKey:=ini.ReadInteger('Hotkey','Shuffle',0);
+  end;
+  //Nach dem Laden Keys im System registrieren
+  fmp3.RegisterHotKeys;
+
 except
    fmp3.Fehler('Die Einstellungen konnten nicht einwandfrei geladen werden.');
 end;
@@ -372,7 +408,7 @@ procedure TSave.L_EQ;               //uk
 var
   i: integer;
 begin
-  for i := 1 to High(fmp3.Spieler.eqwert) do
+  for i := 0 to High(fmp3.Spieler.eqwert) do
     fmp3.Spieler.eqwert[i] := ini.ReadInteger('EQ', 'Wert'+inttostr(i), 0);
   fmp3.Spieler.EQSetWerte;
 end;
@@ -381,7 +417,7 @@ procedure TSave.S_EQ;               //uk
 var
   i: integer;
 begin
-  for i := 1 to High(fmp3.Spieler.eqwert) do
+  for i := 0 to High(fmp3.Spieler.eqwert) do
     ini.WriteInteger('EQ', 'Wert'+inttostr(i), fmp3.Spieler.eqwert[i]);
 end;
 

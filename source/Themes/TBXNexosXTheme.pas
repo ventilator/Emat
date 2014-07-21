@@ -13,7 +13,7 @@ interface
 uses
   Windows, Messages, Graphics, TBXThemes, ImgList;
 
-{$DEFINE ALTERNATIVE_DISABLED_STYLE} // remove the asterisk to change appearance of disabled images
+{$DEFINE ALTERNATIVE_DISABLED_STYLE}
 
 type
   TItemPart = (ipBody, ipText, ipFrame);
@@ -131,6 +131,7 @@ var
     CaptionOutline, DottedGrip, AltButton: boolean;
   SelGradient: integer;
   BaseColor, BaseShade: TColor;
+  H, S, L, H2, S2, L2: Single;
 
 implementation
 
@@ -2067,6 +2068,10 @@ var
 begin
   DC := StockCompatibleBitmap.Canvas.Handle;
 
+  RGBToHSL($00D09020, H, S, L);
+  RGBToHSL(clHighLight, H2, S2, L2);
+  BaseColor:= HSLToRGB(H2, S2, L);
+
   gradCol1 := Blend(BaseColor, clWhite, 80);
   gradCol2 := clWhite;
 
@@ -2766,7 +2771,7 @@ initialization
   AltButton := true;
   DottedGrip := true;
   BarLines := true;
-  BaseColor := $00D09020; // Summer occean
+  //BaseColor := $00D09020; // Summer occean
   //BaseColor:= $0020D090;  // Summer bris
   //BaseColor:= $0020B0D0;
   //BaseColor:= $0000D0E5;

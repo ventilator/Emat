@@ -6,8 +6,9 @@ uses dialogs, sysutils, strutils, classes, controls, windows, shellapi,
       oggvorbis, wmafile, Mp3FileUtils,
       ulang, uincex;
 
-const DatenVersion:integer=8;
+const DatenVersion:integer=9;
       GENRE_COUNT = 147;
+      UPDATEDIVISOR = 10;
 
       
 type
@@ -107,7 +108,7 @@ type TMp3ListeMeta = record
         AnzahlSuchPfade : integer;
         SuchPfade       : array of string;
         maxNummer       : integer;
-        AnzeigeSpalten  : array [0..4] of byte;
+        AnzeigeSpalten  : array [0..4]  of byte;
         SuchText        : string;
         history         : array [0..99] of integer;
         historyPosition : integer;
@@ -116,6 +117,11 @@ type TMp3ListeMeta = record
   end;
 
 type TMp3DatenbankMeta=array of TMp3ListeMeta;
+
+type TZeitmessung = record
+        Geschwindigkeit      : integer;
+        letzterMesszeitpunkt : int64;
+  end;
 
 type
    TDatenbank = class (TObject)
@@ -127,6 +133,8 @@ type
 
      oggtag     : TOggVorbis;
      wmatag     : TWMAfile;
+
+   Zeitmessung : TZeitmessung;
 
 
     function  GetFileSizeEx(const AFileName: String): Int64;
@@ -595,10 +603,12 @@ procedure TDatenbank.Sort(ListenNummer,Kriterium:integer;AtoZ:boolean=true);
 
   var i: integer;
 begin
- if ListeExists(ListenNummer)
+ //Nur sortieren, wenn es was zu sortieren gibt
+ if (ListeExists(ListenNummer)) and (High(Mp3Daten[ListenNummer])>0)
  then
    begin
    QuickSort(ListenNummer,Kriterium,0,High(Mp3Daten[ListenNummer]));
+   //Liste umkehren, falls letztes Item an erster Stelle stehen soll
    if not AtoZ
    then
      begin
@@ -646,6 +656,7 @@ begin
 20  intern: Speicherpfad + Album + Track + Interpret + Titel / Dateiname
 }
   Result:='';
+
 
   case Auswahl of
   0: begin
@@ -910,7 +921,7 @@ var
 
 begin
 
-  if (ADirectory<>'') and (ADirectory[length(ADirectory)]<>'\') then
+  if (ADirectory<>'') and (ADirectory[length(ADirectory)-1]<>'\') then
     ADirectory:=ADirectory+'\';
 
   fmp3.updatetextfstatus('Durchsuche '+adirectory,
@@ -930,7 +941,8 @@ begin
                     //SetLength auf das Array Anwenden zu müssen.
                     //Tausende SetLengths erzeugen viel Speicherlast.
                     FileList.Add(sr.Name);
-                    Dirlist.Add(adirectory);
+                    Dirlist.Add(adirectory); 
+                    //Liste der Dateigrößen
                     sizelist.Add(inttostr(sr.size));
 
                     //AddFileToList(ListenNummer,SR.Size,sr.Name,Adirectory,FastAndUnsaveMode);
@@ -963,13 +975,17 @@ begin
  flag:=true;
  for i:=0 to Mp3DatenMeta[ListenNummer].AnzahlSuchPfade-1 do
   begin
+    //Vorsicht: c:\test
+    //          c:\test2 sind unterschiedlich, werden aber überschrieben
+    //                   wenn kein Trailingslash angefügt wird
+
     //Unterverzeichnisse werden nicht hinzugefügt
-    if (Pos(Mp3DatenMeta[ListenNummer].SuchPfade[i],Verzeichnis)>0)
+    if (Pos(Mp3DatenMeta[ListenNummer].SuchPfade[i]+'\',Verzeichnis+'\')>0)
     then flag:=false;
 
     //Überverzeichnisse überschreiben ihr Unterverzeichnis
-    //und werden ebenfalls nicht hinzugefügt
-    if (Pos(Verzeichnis,Mp3DatenMeta[ListenNummer].SuchPfade[i])>0)
+    //und werden ebenfalls logischerweise nicht hinzugefügt
+    if (Pos(Verzeichnis+'\',Mp3DatenMeta[ListenNummer].SuchPfade[i]+'\')>0)
     then
       begin
         Mp3DatenMeta[ListenNummer].SuchPfade[i]:=Verzeichnis;
@@ -979,9 +995,10 @@ begin
 
  if flag then
   begin
-    inc(Mp3DatenMeta[ListenNummer].AnzahlSuchPfade);
+    //inc(Mp3DatenMeta[ListenNummer].AnzahlSuchPfade);
     SetLength(Mp3DatenMeta[ListenNummer].SuchPfade,High(Mp3DatenMeta[ListenNummer].SuchPfade)+2);
-    Mp3DatenMeta[ListenNummer].SuchPfade[Mp3DatenMeta[ListenNummer].AnzahlSuchPfade-1]:=Verzeichnis;
+    Mp3DatenMeta[ListenNummer].SuchPfade[High(Mp3DatenMeta[ListenNummer].SuchPfade)]:=Verzeichnis;
+    Mp3DatenMeta[ListenNummer].AnzahlSuchPfade:=High(Mp3DatenMeta[ListenNummer].SuchPfade)+1
   end;
 //
 
@@ -997,22 +1014,59 @@ begin
   //Einmaliger SetLength-Aufruf um Speicher zu sparen
   //Array wird um neue Anzahl erweitert
   ArrayLength:=High(Mp3daten[ListenNummer])+1;
+  //Alte Arraylänge (=High +1) + Anzahl der neuen Elemente
   SetLength(Mp3daten[ListenNummer],ArrayLength+filelist.Count);
+  //Achtung: Array wird dadurch länger, falls in der Liste Elemente sind, die keine Medien sind
 
   fmp3.StartFStatus(filelist.Count);
 
+  //Hinzufügegeschwindigkeitsmessung init.
+  Zeitmessung.letzterMesszeitpunkt:=fmp3.Zeitmessung2Stopp;
+  Zeitmessung.Geschwindigkeit:=0;
+  fstatus.LSpeed.Visible:=true;
+  //
+
   for i:=0 to filelist.Count-1 do
   begin
-    if i mod 10 = 0 then
-     fmp3.UpdateFStatus(dirlist.Strings[i]+filelist.Strings[i],i+1);
+    if ((i+1) mod UPDATEDIVISOR) = 0 then
+    begin
+     try
+       fmp3.UpdateFStatus(dirlist.Strings[i]+filelist.Strings[i],i+1);
+
+
+       //Hinzufügegeschwindigkeitsmessung
+       if Zeitmessung.Geschwindigkeit=0
+
+       then Zeitmessung.Geschwindigkeit:= round(
+              UPDATEDIVISOR/( fmp3.Zeitmessung2Stopp - Zeitmessung.letzterMesszeitpunkt)*1000)
+       else
+       //Tiefpass
+       Zeitmessung.Geschwindigkeit:= round(Zeitmessung.Geschwindigkeit * 0.8
+             + UPDATEDIVISOR/( fmp3.Zeitmessung2Stopp - Zeitmessung.letzterMesszeitpunkt)*1000 *0.2);
+
+       Zeitmessung.letzterMesszeitpunkt:=fmp3.Zeitmessung2Stopp;
+
+       fmp3.UpdateFStatusSpeed(Zeitmessung.Geschwindigkeit);
+     except
+       //Bei sehr schnellen Systemen vergeht keine Zeit und eine Division durch 0 tritt auf
+       Fmp3.Log('Exception bei der Hinzufügegeschwindigkeitsberechnung');
+     end;
+     //
+    end;
 
     AddFileToList(ListenNummer, ArrayLength+i, strtoint(sizelist.Strings[i]),
                   filelist.Strings[i], dirlist.Strings[i], EmtyFlag);
   end;
+
+   //Statusupdate, um die Progressbar auf das Ende zu setzen; Verizizierung steht an
+   //und lässt die Bar noch einige Zeit anzeigen
+   fstatus.LSpeed.Visible:=false;
+   fmp3.UpdateFStatus('Vorgang fast abgeschlossen',filelist.Count);
 //
 
- if EmtyFlag then Sort(ListenNummer, 20);
- //RedundanteItemsAussortieren(ListenNummer); nicht nötig weil die nicht entstehen können
+  //Wenn die Liste vorher leer war, dann Spezialsortierung anwenden
+  if (EmtyFlag) then Sort(ListenNummer, 20);
+  //RedundanteItemsAussortieren(ListenNummer); nicht nötig weil die nicht entstehen können
 
 
 end;
@@ -1036,7 +1090,11 @@ begin
     inc(Mp3datenMeta[ListenNummer].maxNummer);
 
     LeseId3(ListenNummer,Mp3daten[ListenNummer,ArrayIndex].Nummer);
+  end else
+  begin
+    if extendedDebugLogInfo then fmp3.Log(Path + Filename+' wurde nicht doppelt der Liste hinzugefügt.');
   end;
+
 end;
 
 
@@ -1125,7 +1183,7 @@ begin
   if SearchString<>''
   then
    begin
-     if CharInSet(SearchString[1],[' ',';'])
+     if SearchString[1] in [' ',';']
      then
       begin
        if length(SearchString)>1
@@ -1140,7 +1198,7 @@ begin
   if SearchString<>''
   then
     begin
-     if CharInSet(SearchString[length(searchstring)],[' ',';'])
+     if SearchString[length(searchstring)] in [' ',';']
      then
        begin
        SearchString := Copy(SearchString,1,length(searchstring)-1);
@@ -1316,10 +1374,10 @@ procedure TDatenbank.LoadPlaylist(FileName:string; ListenNummer:integer);
   var StringLength : integer;
 
   begin
-    Datei.Read( Stringlength, SizeOf(Stringlength) );
+    Datei.ReadBuffer( Stringlength, SizeOf(Stringlength) );
     SetLength( Result, stringlength );
     if (Stringlength > 0) then
-      Datei.Read( Result[1], Stringlength );
+      Datei.ReadBuffer( Result[1], Stringlength * SizeOf(Char) );
   end;
 
 begin
@@ -1329,7 +1387,7 @@ begin
    Datei:=TFileStream.Create(FileName,fmOpenRead or fmShareDenyWrite);
    try
    Datei.Position:=0;
-   Datei.Read(DateiDatenVersion , sizeof(integer) );
+   Datei.ReadBuffer(DateiDatenVersion , sizeof(integer) );
 
     if (DatenVersion=DateiDatenversion)
     then
@@ -1338,22 +1396,22 @@ begin
 
         with Mp3DatenMeta[ListenNummer] do
         begin
-          Datei.Read(offen, SizeOf(offen));
-          Datei.Read(AnzahlSuchpfade, SizeOf(integer));
+          Datei.ReadBuffer(offen, SizeOf(offen));
+          Datei.ReadBuffer(AnzahlSuchpfade, SizeOf(integer));
           SetLength(Suchpfade,AnzahlSuchPfade);
           for i:=0 to AnzahlSuchpfade-1 do
             SuchPfade[i]:=LoadString;
-          Datei.Read(maxNummer, SizeOf(integer));
+          Datei.ReadBuffer(maxNummer, SizeOf(integer));
           for i:=0 to 4 do
-            Datei.Read(AnzeigeSpalten[i], SizeOf(integer));
+            Datei.ReadBuffer(AnzeigeSpalten[i], SizeOf(integer));
           SuchText:=LoadString;
           for i:=0 to 99 do
-            Datei.Read(history[i], SizeOf(integer));
-          Datei.Read(historyPosition, SizeOf(integer));
-          Datei.Read(mode, SizeOf(integer));
+            Datei.ReadBuffer(history[i], SizeOf(integer));
+          Datei.ReadBuffer(historyPosition, SizeOf(integer));
+          Datei.ReadBuffer(mode, SizeOf(integer));
         end;
 
-        Datei.Read( Mp3DatenSaetze , SizeOf(integer) );
+        Datei.ReadBuffer( Mp3DatenSaetze , SizeOf(integer) );
         SetLength(Mp3Daten[ListenNummer],Mp3DatenSaetze);
 
         for i:=0 to Mp3DatenSaetze-1 do
@@ -1366,20 +1424,20 @@ begin
             Year   :=LoadString;
             Comment:=LoadString;
             Genre  :=LoadString;
-            Datei.Read(dauer, SizeOf(integer));
-            Datei.Read(Track, SizeOf(integer));
-            Datei.Read(ausgelesen, SizeOf(ausgelesen));
+            Datei.ReadBuffer(dauer, SizeOf(integer));
+            Datei.ReadBuffer(Track, SizeOf(integer));
+            Datei.ReadBuffer(ausgelesen, SizeOf(ausgelesen));
           end;
           with Mp3Daten[ListenNummer,i] do
           begin
-            Datei.Read(Nummer, SizeOf(Nummer));
+            Datei.ReadBuffer(Nummer, SizeOf(Nummer));
             Filename:=LoadString;
             Path    :=LoadString;
-            Datei.Read(Size, SizeOf(integer));
-            Datei.Read(Anzeige, SizeOf(Anzeige));
+            Datei.ReadBuffer(Size, SizeOf(integer));
+            Datei.ReadBuffer(Anzeige, SizeOf(Anzeige));
             Dauer   :=LoadString;
-            Datei.Read(Spielcounter, SizeOf(integer));
-            Datei.Read(Defekt, SizeOf(Defekt));
+            Datei.ReadBuffer(Spielcounter, SizeOf(integer));
+            Datei.ReadBuffer(Defekt, SizeOf(Defekt));
           end;
         end;
 
@@ -1415,9 +1473,9 @@ var Datei    : TFileStream;
   var StringLength : integer;
   begin
     stringlength := Length( SString );
-    datei.Write( stringlength, SizeOf(stringlength) );
+    datei.WriteBuffer( stringlength, SizeOf(stringlength) );
     if (stringlength > 0) then
-      datei.Write( SString[1], stringlength );
+      datei.WriteBuffer( SString[1], stringlength * SizeOf(Char)  );
   end;
 
 
@@ -1430,8 +1488,8 @@ begin
   try
   Datei.Position:=0;
 
-{    Version 8.0    }
-  Datei.Write( DatenVersion , SizeOf(integer) );
+{    Version 9.0    }
+  Datei.WriteBuffer( DatenVersion , SizeOf(integer) );
 
 { Speichere MP3DatenMeta
 
@@ -1449,19 +1507,19 @@ type TMp3ListeMeta = record
 }
   with Mp3DatenMeta[ListenNummer] do
   begin
-    Datei.Write(offen, SizeOf(offen));
+    Datei.WriteBuffer(offen, SizeOf(offen));
 
-    Datei.Write(AnzahlSuchpfade, SizeOf(integer));
+    Datei.WriteBuffer(AnzahlSuchpfade, SizeOf(integer));
     for i:=0 to AnzahlSuchpfade-1 do
       SaveString(Datei,(SuchPfade[i]));
-    Datei.Write(maxNummer, SizeOf(integer));
+    Datei.WriteBuffer(maxNummer, SizeOf(integer));
     for i:=0 to 4 do
-      Datei.Write(AnzeigeSpalten[i], SizeOf(integer));
+      Datei.WriteBuffer(AnzeigeSpalten[i], SizeOf(integer));
     SaveString(Datei,(SuchText));
     for i:=0 to 99 do
-      Datei.Write(history[i], SizeOf(integer));
-    Datei.Write(historyPosition, SizeOf(integer));
-    Datei.Write(mode, SizeOf(integer));
+      Datei.WriteBuffer(history[i], SizeOf(integer));
+    Datei.WriteBuffer(historyPosition, SizeOf(integer));
+    Datei.WriteBuffer(mode, SizeOf(integer));
   end;
 
 { Speichere MP3Daten
@@ -1491,7 +1549,7 @@ type TMp3Eintrag = record
   end;
 }
   Mp3DatenSaetze:=High(Mp3Daten[ListenNummer])+1;
-  Datei.Write( Mp3DatenSaetze , SizeOf(integer) );
+  Datei.WriteBuffer( Mp3DatenSaetze , SizeOf(integer) );
 
   for i:=0 to Mp3DatenSaetze-1 do
   begin
@@ -1503,20 +1561,20 @@ type TMp3Eintrag = record
       SaveString(Datei,(Year));
       SaveString(Datei,(Comment));
       SaveString(Datei,(Genre));
-      Datei.Write(dauer,sizeof(integer));
-      Datei.Write(Track, SizeOf(integer));
-      Datei.Write(ausgelesen, SizeOf(ausgelesen));
+      Datei.WriteBuffer(dauer,sizeof(integer));
+      Datei.WriteBuffer(Track, SizeOf(integer));
+      Datei.WriteBuffer(ausgelesen, SizeOf(ausgelesen));
     end;
     with Mp3Daten[ListenNummer,i] do
     begin
-      Datei.Write(Nummer, SizeOf(Nummer));
+      Datei.WriteBuffer(Nummer, SizeOf(Nummer));
       SaveString(Datei,(Filename));
       SaveString(Datei,(Path));
-      Datei.Write(Size, SizeOf(integer));
-      Datei.Write(Anzeige, SizeOf(Anzeige));
+      Datei.WriteBuffer(Size, SizeOf(integer));
+      Datei.WriteBuffer(Anzeige, SizeOf(Anzeige));
       SaveString(Datei,(Dauer));
-      Datei.Write(Spielcounter, SizeOf(integer));
-      Datei.Write(Defekt, SizeOf(Defekt));
+      Datei.WriteBuffer(Spielcounter, SizeOf(integer));
+      Datei.WriteBuffer(Defekt, SizeOf(Defekt));
     end;
   end;
 
@@ -1613,6 +1671,13 @@ begin
   //Initialiserung um evtl. GetDauer zu verhindern
   Mp3Daten[ListenNummer,i].id3tag.dauer:=0;
 
+  fmp3.Spieler.GetStreamInfo(filename,Mp3Daten[ListenNummer,i].id3tag);
+
+  Mp3Daten[ListenNummer,i].id3tag.dauer:=Mp3Daten[ListenNummer,i].id3tag.dauer div 1000;
+  Mp3Daten[ListenNummer,i].dauer:=
+                      fmp3.DauerZuString(Mp3Daten[ListenNummer,i].id3tag.dauer);
+
+{
   try
 
   if FileExt='.mp3'
@@ -1648,7 +1713,7 @@ begin
               //fix weil manche id3v2 2.3 utf years '2005//2005' enthalten
               id3tag.year:='';
               for k:=1 to length (id3v2.Year) do
-              if CharInSet(id3v2.year[k],['0','1','2','3','4','5','6','7','8','9'])
+              if id3v2.year[k] in ['0','1','2','3','4','5','6','7','8','9']
                then id3tag.year:=id3tag.year+id3v2.year[k]
                else break;
 
@@ -1744,6 +1809,7 @@ begin
     fmp3.Fehler('Ein schwerwiegender Fehler ist beim Lesen der Metainformationen aufgetreten.'+#13+
                 'Fehlerhafte, standardinkombatible Datei: '+FileName);
   end;
+  }
 end;
 
 
@@ -1868,6 +1934,10 @@ begin
      end;
 
  fmp3.UpdateTextFStatus('Verifiziere die Ergebnisse...');
+
+ //Die ungültigen, leeren Listeneinträge sind für Medien, die schon in der Liste
+ //sind und deswegen nicht eingetragen wurden
+ //Daher müssen sie wieder gelöscht werden
  DeleteInvalidItems(ListenNummer);
 end;
 

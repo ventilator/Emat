@@ -6,7 +6,7 @@ unit gliste2;
 
 Grafische Stringlistenausgabe (also eine Listbox)
 
-Programmiert mit Delphi 7  / BDS 3.0 PE
+Programmiert mit Delphi 7  / BDS 3.0 PE / Delphi 2010
 Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
  sondern meiner Unfähigkeit
 
@@ -86,6 +86,15 @@ Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
 - SetSelected
 0.4.9.1 25.02.2008
 - Zweiter Klick des Doppelklicks markiert nicht mehr
+0.4.9.2 24.08.2010
+- Zweiter Klick des Doppelklicks löst kein DragDropEvent aus
+0.5.0   08.09.2010
+- SetCustomArrows
+- DrawGradientMulitColor für etwas schönere Scrollbarbalken
+0.5.1   23.09.2010
+- Mausüberbalken wird nicht mehr gezeichnet, wenn nicht gemausübert wird
+0.5.2   16.06.2014
+- von außen gesetzte Schriftfarbe wird genutzt anstatt schwarz
 }
 
 
@@ -100,6 +109,8 @@ const
       scrollschrittweite=3;
       rand=5;
       randverschiebung=1; //Damit der Rahmen angezeigt wird
+      //Prozentuale Abweichung vom aktuellen Prozentwert des neuen Spulwertes
+      SPULEN_EMPFINDLICHKEIT=0.02;
 
 type TListenEintraege = record
    {Nummer : integer;
@@ -131,7 +142,8 @@ type
     BeginMouseScroll,DrawDragTarget: boolean;
     bild, Pfeilauf,Pfeilab: tbitmap;
     mouseX, mouseY: integer;
-
+    //Erzeigt schwarze Dreieckspfeile wenn true
+    NoCustomArrow       : boolean;
     scrollbarbreite,scrollbarhoehe : integer;
     FRechtsklick :TRechtsklickevent;
     FDoppelKlick :TDoppelKlickevent;
@@ -152,6 +164,10 @@ type
     procedure ErzeugePfeile;
 
     procedure Schreibe(Spalte, Zeile, k: integer);
+
+    procedure DrawGradientMulitColor(ACanvas: TCanvas; Rect: TRect;
+      Horicontal: Boolean; Colors: array of TColor);
+
 
     { Private-Deklarationen }
   protected
@@ -187,6 +203,11 @@ type
       procedure MouseMove (Shift: TShiftState; X,Y: Integer); override;
       procedure MouseUp( Button: TMouseButton;
                       Shift: TShiftState; X, Y: Integer); override;
+
+
+   //   procedure CMMouseEnter(var Msg: TMessage); message CM_MouseEnter;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MouseLeave;
+
       procedure DragOver(Source: TObject; X, Y: Integer;
                 State: TDragState; var Accept: Boolean); override;
       procedure DragDrop(Source: TObject; X, Y: Integer); override;
@@ -234,6 +255,8 @@ type
       //Markiert ein Element (falls möglich)
       procedure SetSelected(ID:integer);
 
+      //Ersetzt den schwarzen Pfeil
+      procedure SetCustomArrows(Down,Up: TBitmap);
     { Public-Deklarationen }
   published
       property OnRechtsklick: TRechtsklickevent read FRechtsklick write FRechtsklick;
@@ -277,6 +300,7 @@ begin
   DoubleBuffered:=true;
   dblclickflag:=false;
   maustaste:=false;
+  NoCustomArrow:=true;
   BeginMousescroll:=false;
   DrawDragTarget:=false;
   DragTarget:=-1;
@@ -483,17 +507,28 @@ procedure Tgliste2.Draw;
 
 
   procedure DMouseOver;
+
+  var myrect : TRect;
+
   begin
     with bild do begin
     if darfmausueberzeichnen then
     begin
       canvas.Pen.Color:=clmouseover;
       canvas.Brush.Color:=clmouseover;
+
+      myrect.Top    := (mausueberElement-ersterEintrag)*zeilenhoehe+randverschiebung;
+      myrect.Left   := 0;
+      myrect.Right  := width;
+      myrect.bottom := (mausueberElement-ersterEintrag+1)*zeilenhoehe+randverschiebung;
+
+      DrawGradientMulitColor(canvas,myrect,false,[clmouseover,clhintergrund,clmouseover]);
+      {   //alte Methode, die nur ein langweiliges Rechteck zeichnet
       canvas.Rectangle(
           0,
           (mausueberElement-ersterEintrag)*zeilenhoehe+randverschiebung,
           width,
-          (mausueberElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);
+          (mausueberElement-ersterEintrag+1)*zeilenhoehe+randverschiebung);   }
     end;
     end;
   end;
@@ -507,7 +542,7 @@ procedure Tgliste2.Draw;
       if liste.l0.Count-1>=0 then          //wenn Liste nicht leer
       begin
 
-      canvas.Font.Color:=cltext;
+      canvas.Font.Color:=font.Color;          //use font of component
       canvas.Font.Name:=schriftart;
 
       k:=0;
@@ -669,7 +704,8 @@ procedure Tgliste2.Draw;
 
           zeichenhoehe:= height-pfeilauf.Height*2;
           scrollbarhoehe:=round(zeilen/(liste.l0.Count)*zeichenhoehe);
-          if scrollbarhoehe<10 then scrollbarhoehe:=20;
+
+          if scrollbarhoehe<20 then scrollbarhoehe:=20;
 
           dec(zeichenhoehe,scrollbarhoehe);
 
@@ -684,8 +720,8 @@ procedure Tgliste2.Draw;
 
 
   //        DrawGradient(canvas,clscrollbar,clhintergrund,Balken);
-
-          canvas.Rectangle(balken);
+          DrawGradientMulitColor(canvas,Balken,false,[clscrollbar,clhintergrund,clscrollbar]);
+  //        canvas.Rectangle(balken);
 
           //Auf-Ab-Pfeil
           canvas.Draw( width-scrollbarbreite+1 , 1 , Pfeilauf);
@@ -925,7 +961,8 @@ begin
    //wenn auf Liste
    if x<width-scrollbarbreite then
     begin
-     if (button=mbleft) then BeginDrag(false);
+    //dblclickflag verhindert DragDrop nach Doppelklick
+     if (button=mbleft) and (not dblclickflag) then BeginDrag(false);
 
       //Mit Strg einzelne Items markieren
       if (MultiSelect) and (ssCtrl in Shift)
@@ -969,13 +1006,18 @@ begin
              if Assigned(OnSpulen)
              then
               begin
-              OnSpulen(x/(width-scrollbarbreite));
-              SetFortschritt( x/(width-scrollbarbreite) );
+                //Wenn neben dem Fortschrittsbalken
+                if abs((fortschritt*(width-scrollbarbreite))-(x))>3
+                 then
+                 begin
+                    OnSpulen(x/(width-scrollbarbreite));
+                    SetFortschritt( x/(width-scrollbarbreite) );
+                 end;
               end;
            end;
          end;
      dblclickflag:=false;
-     draw;
+
 
 
       if (button=mbright) then
@@ -992,7 +1034,7 @@ begin
    begin   //wenn auf Scrollbar
      SetFirstItembyScroll(y);
      BeginMouseScroll:=true;
-     draw;
+
    end;
 
    mousedown_x:=x;
@@ -1000,9 +1042,11 @@ begin
   else
    begin
     markiertesElement:=-1;
-    draw;
+
    end;
 
+   //Am Ende einmal zeichnen
+   draw;
 end;
 
 
@@ -1040,19 +1084,47 @@ begin
    Draw;
 end;
 
+procedure Tgliste2.CMMouseLeave(var Msg: TMessage);
+begin
+  inherited;
+
+  mausueberElement:=-1;
+  altesMouseover  :=-2;
+  BeginMousescroll:=false;
+  maustaste       :=false;
+  draw;
+end;
+
+
+
 procedure Tgliste2.mousemove (Shift: TShiftState; X,Y: Integer);
 begin
 inherited;
 
   //Nur wenn Maus neben der Scrollbar auf der Liste ist
-  if (x<width-scrollbarbreite) and (not BeginMousescroll) then
+  if  (x<width-scrollbarbreite)  and (not BeginMousescroll) then
    begin
-     mausueberElement:=(y-randverschiebung) div zeilenhoehe + ersterEintrag;
+     mausueberElement:=((y-randverschiebung) div zeilenhoehe) + ersterEintrag;
 
-     if mausueberElement<=liste.l0.Count-1 then
-       begin
+     if (mausueberElement<=liste.l0.Count-1) and (mausueberElement>-1) and
+        (altesMouseover<>mausueberElement) and (mausueberElement<>markiertesElement)
+
+      then
+        begin
           darfmausueberzeichnen:=true;
-
+          draw;
+          altesMouseover:=mausueberElement;
+        end
+      else
+        begin
+          if (mausueberElement=markiertesElement) then
+            begin
+              darfmausueberzeichnen:=false;
+              draw;
+            end;
+        end;
+   end
+            {
           //nur wenn wirklich neues gemausübert wird
           if (altesMouseover<>mausueberElement) and (mausueberElement>-1) then
           begin
@@ -1069,13 +1141,37 @@ inherited;
              flag:=false;
            end;
        end
+   {
+     if mausueberElement<=liste.l0.Count-1 then
+       begin
+          darfmausueberzeichnen:=true;
+
+
+
+          //nur wenn wirklich neues gemausübert wird
+          if (altesMouseover<>mausueberElement) and (mausueberElement>-1) then
+          begin
+            draw;
+            altesMouseover:=mausueberElement;
+            flag:=true;
+          end;
+
+          //nicht wenn über Markiertem
+          if (mausueberElement=markiertesElement) and (flag) then
+           begin
+             mausueberElement:=-1;
+             draw;
+             flag:=false;
+           end;
+       end}
+       {
      else
        begin
          mausueberelement:=-1;
          if darfmausueberzeichnen then draw;
          darfmausueberzeichnen:=false;
        end;
-   end
+   end     }
  else  //wenn ich mich auf der Scrollbar befinde
    begin //auf Scrollbar
     {  if x>width
@@ -1307,6 +1403,9 @@ procedure Tgliste2.ErzeugePfeile;
 var Punkte: array of TPoint;
     Rand: integer;
 begin
+  if NoCustomArrow then
+  begin
+
   setlength(Punkte,3);
   Rand:=3;
 
@@ -1335,7 +1434,7 @@ begin
 (*pfeilab*)
 
   Pfeilab:= TBitmap.Create;
-  Pfeilab.Width :=20;
+  Pfeilab.Width  :=20;
   Pfeilab.Height :=20;
 
   Punkte[0].X:=rand;
@@ -1352,6 +1451,15 @@ begin
   Pfeilab.Canvas.Pen.Color:=clblack;
   Pfeilab.Canvas.Brush.Color:=clblack;
   Pfeilab.Canvas.Polygon(Punkte);
+  end;
+
+end;
+
+procedure Tgliste2.SetCustomArrows(Down,Up : TBitmap);
+begin
+  Pfeilab.Canvas.Draw(0,0,Down);
+  Pfeilauf.Canvas.Draw(0,0,Up);
+  NoCustomArrow := false;
 end;
 
 procedure Tgliste2.SetMainColor(Color: TColor);
@@ -1561,5 +1669,74 @@ if not AtoZ then  //Hier fehlt der Umkehrquicksort !!! (Notbehelf)
  end;
 
 
+//alternativer Gradient, da anderer Schwächen im nicht Vollbild hat
+procedure Tgliste2.DrawGradientMulitColor(ACanvas: TCanvas; Rect: TRect;
+  Horicontal: Boolean; Colors: array of TColor);
+type
+  RGBArray = array[0..2] of Byte;
+var
+  x, y, z, stelle, mx, bis, faColorsh, mass: Integer;
+  Faktor: double;
+  A: RGBArray;
+  B: array of RGBArray;
+  merkw: integer;
+  merks: TPenStyle;
+  merkp: TColor;
+begin
+  mx := High(Colors);
+  if mx > 0 then
+  begin
+    if Horicontal then
+      mass := Rect.Right - Rect.Left
+    else
+      mass := Rect.Bottom - Rect.Top;
+    SetLength(b, mx + 1);
+    for x := 0 to mx do
+    begin
+      Colors[x] := ColorToRGB(Colors[x]);
+      b[x][0] := GetRValue(Colors[x]);
+      b[x][1] := GetGValue(Colors[x]);
+      b[x][2] := GetBValue(Colors[x]);
+    end;
+    merkw := ACanvas.Pen.Width;
+    merks := ACanvas.Pen.Style;
+    merkp := ACanvas.Pen.Color;
+    ACanvas.Pen.Width := 1;
+    ACanvas.Pen.Style := psSolid;
+    faColorsh := Round(mass / mx);
+    for y := 0 to mx - 1 do
+    begin
+      if y = mx - 1 then
+        bis := mass - y * faColorsh - 1
+      else
+        bis := faColorsh;
+      for x := 0 to bis do
+      begin
+        Stelle := x + y * faColorsh;
+        faktor := x / bis;
+        for z := 0 to 3 do
+          a[z] := Trunc(b[y][z] + ((b[y + 1][z] - b[y][z]) * Faktor));
+        ACanvas.Pen.Color := RGB(a[0], a[1], a[2]);
+        if Horicontal then
+        begin
+          ACanvas.MoveTo(Rect.Left + Stelle, Rect.Top);
+          ACanvas.LineTo(Rect.Left + Stelle, Rect.Bottom);
+        end
+        else
+        begin
+          ACanvas.MoveTo(Rect.Left, Rect.Top + Stelle);
+          ACanvas.LineTo(Rect.Right, Rect.Top + Stelle);
+        end;
+      end;
+    end;
+    b := nil;
+    ACanvas.Pen.Width := merkw;
+    ACanvas.Pen.Style := merks;
+    ACanvas.Pen.Color := merkp;
+  end
+  else
+    // Please specify at least two colors
+    raise EMathError.Create('Es müssen mindestens zwei Farben angegeben werden.');
+end;
 
 end.

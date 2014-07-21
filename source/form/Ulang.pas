@@ -62,8 +62,8 @@ resourcestring
   NEWAPPLAUNCH = 'In eine "Applauncher-Liste" können ausführbare Dateien (.exe, .bat, .cmd, ...) hinzugefügt werden. Durch einen Doppelkick auf einen Eintrag wird die Datei ausgeführt.';
 
 //WARNINGS
-  PLSNOTCOMP = 'Die Playliste "%s" ist zu dieser Version von Emat nicht '+
-                 'kompatibel.';
+  PLSNOTCOMP = 'Die Playliste "%s" wurde mit einer anderen Version vom Emat '+
+               'erstellt und ist zu dieser nicht kompatibel.';
   PLSNOTLOAD = 'Die Playliste "%s" ist defekt oder konnte nicht korrekt '+
                  'geladen werden.';
   PLSNOTFOUND  = 'Die Playliste "%s" konnte nicht gefunden werden.';
@@ -75,7 +75,7 @@ resourcestring
   PLSNOTSAVED= 'Die Playliste konnte nicht in "%s" gespeichert werden';
 
 //WEB
-  WEBSITE = 'http://gsoft.sf.net';
+  WEBSITE = 'http://emat.de.gg/';
   UPDATEPAGE = 'http://www.ematupdate.de.gg';
 
 implementation

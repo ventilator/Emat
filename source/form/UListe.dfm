@@ -262,8 +262,6 @@ object FPlayliste: TFPlayliste
     Height = 541
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 698
-    ExplicitHeight = 547
   end
   object TBXAlignmentPanel1: TTBXAlignmentPanel
     Left = 0
@@ -272,8 +270,6 @@ object FPlayliste: TFPlayliste
     Height = 20
     Align = alBottom
     TabOrder = 1
-    ExplicitTop = 596
-    ExplicitWidth = 698
     object TBXStatusBar1: TTBXStatusBar
       Left = 0
       Top = 0
@@ -303,7 +299,6 @@ object FPlayliste: TFPlayliste
           Tag = 0
         end>
       UseSystemFont = False
-      ExplicitWidth = 698
     end
     object TBXAlignmentPanel2: TTBXAlignmentPanel
       Left = 0
@@ -313,7 +308,6 @@ object FPlayliste: TFPlayliste
       Align = alClient
       TabOrder = 1
       Visible = False
-      ExplicitWidth = 698
     end
   end
   object TBXAlignmentPanel3: TTBXAlignmentPanel
@@ -324,11 +318,10 @@ object FPlayliste: TFPlayliste
     Align = alTop
     TabOrder = 2
     Visible = False
-    ExplicitWidth = 698
     object TBXDock1: TTBXDock
       Left = 0
       Top = 0
-      Width = 698
+      Width = 690
       Height = 30
       object TBXToolbar: TTBXToolbar
         Left = 0
@@ -488,7 +481,7 @@ object FPlayliste: TFPlayliste
     object StringGrid: TStringGrid
       Left = 0
       Top = 30
-      Width = 698
+      Width = 690
       Height = 19
       Align = alClient
       Color = clNone
@@ -512,15 +505,24 @@ object FPlayliste: TFPlayliste
     OnPopup = PMlistePopup
     Left = 14
     Top = 61
+    object TBXIQueHistory: TTBXItem
+      Caption = 'Als n'#228'chstes abspielen'
+      Hint = 'Reiht den Titel in den Verlauf ein'
+      OnClick = TBXIQueHistoryClick
+    end
+    object TBXItem5: TTBXItem
+      Caption = 'Nach diesem Interpreten suchen'
+      OnClick = TBXItem5Click
+    end
     object TBXItem4: TTBXItem
       Caption = 'L'#246'schen'
       ImageIndex = 14
       OnClick = TBXItem4Click
     end
-    object TBXIQueHistory: TTBXItem
-      Caption = 'Als n'#228'chstes abspielen'
-      Hint = 'Reiht den Titel in den Verlauf ein'
-      OnClick = TBXIQueHistoryClick
+    object tbxtmRepeat: TTBXItem
+      Caption = 'Aktuellen Titel immer wieder spielen'
+      Visible = False
+      OnClick = tbxtmRepeatClick
     end
     object TBXI_CopyFileNow: TTBXItem
       Caption = 'Auf Mp3-Player kopieren'

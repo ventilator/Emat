@@ -1,0 +1,223 @@
+<equalizers>
+  <equalizer name="(WinAmp) Classical">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-1.11022E-15</band>
+    <band num="1">-1.11022E-15</band>
+    <band num="2">-1.11022E-15</band>
+    <band num="3">-1.11022E-15</band>
+    <band num="4">-1.11022E-15</band>
+    <band num="5">-1.11022E-15</band>
+    <band num="6">-7.2</band>
+    <band num="7">-7.2</band>
+    <band num="8">-7.2</band>
+    <band num="9">-9.6</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Club">
+    <preamp>0</preamp>
+    <band num="0">0</band>
+    <band num="1">0</band>
+    <band num="2">8</band>
+    <band num="3">5.6</band>
+    <band num="4">5.6</band>
+    <band num="5">5.6</band>
+    <band num="6">3.2</band>
+    <band num="7">0</band>
+    <band num="8">0</band>
+    <band num="9">0</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Dance">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">9.6</band>
+    <band num="1">7.2</band>
+    <band num="2">2.4</band>
+    <band num="3">-1.11022E-15</band>
+    <band num="4">-1.11022E-15</band>
+    <band num="5">-5.6</band>
+    <band num="6">-7.2</band>
+    <band num="7">-7.2</band>
+    <band num="8">-1.11022E-15</band>
+    <band num="9">-1.11022E-15</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Full Bass">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-8</band>
+    <band num="1">9.6</band>
+    <band num="2">9.6</band>
+    <band num="3">5.6</band>
+    <band num="4">1.6</band>
+    <band num="5">-4</band>
+    <band num="6">-8</band>
+    <band num="7">-10.4</band>
+    <band num="8">-11.2</band>
+    <band num="9">-11.2</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Full Bass and Treble">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">7.2</band>
+    <band num="1">5.6</band>
+    <band num="2">-1.11022E-15</band>
+    <band num="3">-7.2</band>
+    <band num="4">-4.8</band>
+    <band num="5">1.6</band>
+    <band num="6">8</band>
+    <band num="7">11.2</band>
+    <band num="8">12</band>
+    <band num="9">12</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Full Treble">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-9.6</band>
+    <band num="1">-9.6</band>
+    <band num="2">-9.6</band>
+    <band num="3">-4</band>
+    <band num="4">2.4</band>
+    <band num="5">11.2</band>
+    <band num="6">16</band>
+    <band num="7">16</band>
+    <band num="8">16</band>
+    <band num="9">16.8</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Laptop Speakers and Headphones">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">4.8</band>
+    <band num="1">11.2</band>
+    <band num="2">5.6</band>
+    <band num="3">-3.2</band>
+    <band num="4">-2.4</band>
+    <band num="5">1.6</band>
+    <band num="6">4.8</band>
+    <band num="7">9.6</band>
+    <band num="8">11.9</band>
+    <band num="9">11.9</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Large Hall">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">10.4</band>
+    <band num="1">10.4</band>
+    <band num="2">5.6</band>
+    <band num="3">5.6</band>
+    <band num="4">-1.11022E-15</band>
+    <band num="5">-4.8</band>
+    <band num="6">-4.8</band>
+    <band num="7">-4.8</band>
+    <band num="8">-1.11022E-15</band>
+    <band num="9">-1.11022E-15</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Live">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-4.8</band>
+    <band num="1">-1.11022E-15</band>
+    <band num="2">4</band>
+    <band num="3">5.6</band>
+    <band num="4">5.6</band>
+    <band num="5">5.6</band>
+    <band num="6">4</band>
+    <band num="7">2.4</band>
+    <band num="8">2.4</band>
+    <band num="9">2.4</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Party">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">7.2</band>
+    <band num="1">7.2</band>
+    <band num="2">-1.11022E-15</band>
+    <band num="3">-1.11022E-15</band>
+    <band num="4">-1.11022E-15</band>
+    <band num="5">-1.11022E-15</band>
+    <band num="6">-1.11022E-15</band>
+    <band num="7">-1.11022E-15</band>
+    <band num="8">7.2</band>
+    <band num="9">7.2</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Pop">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-1.6</band>
+    <band num="1">4.8</band>
+    <band num="2">7.2</band>
+    <band num="3">8</band>
+    <band num="4">5.6</band>
+    <band num="5">-1.11022E-15</band>
+    <band num="6">-2.4</band>
+    <band num="7">-2.4</band>
+    <band num="8">-1.6</band>
+    <band num="9">-1.6</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Reggae">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-1.11022E-15</band>
+    <band num="1">-1.11022E-15</band>
+    <band num="2">-1.11022E-15</band>
+    <band num="3">-5.6</band>
+    <band num="4">-1.11022E-15</band>
+    <band num="5">6.4</band>
+    <band num="6">6.4</band>
+    <band num="7">-1.11022E-15</band>
+    <band num="8">-1.11022E-15</band>
+    <band num="9">-1.11022E-15</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Rock">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">8</band>
+    <band num="1">4.8</band>
+    <band num="2">-5.6</band>
+    <band num="3">-8</band>
+    <band num="4">-3.2</band>
+    <band num="5">4</band>
+    <band num="6">8.8</band>
+    <band num="7">11.2</band>
+    <band num="8">11.2</band>
+    <band num="9">11.2</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Ska">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">-2.4</band>
+    <band num="1">-4.8</band>
+    <band num="2">-4</band>
+    <band num="3">-1.11022E-15</band>
+    <band num="4">4</band>
+    <band num="5">5.6</band>
+    <band num="6">8.8</band>
+    <band num="7">9.6</band>
+    <band num="8">11.2</band>
+    <band num="9">9.6</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Soft">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">4.8</band>
+    <band num="1">1.6</band>
+    <band num="2">-1.11022E-15</band>
+    <band num="3">-2.4</band>
+    <band num="4">-1.11022E-15</band>
+    <band num="5">4</band>
+    <band num="6">8</band>
+    <band num="7">9.6</band>
+    <band num="8">11.2</band>
+    <band num="9">12</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Soft Rock">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">4</band>
+    <band num="1">4</band>
+    <band num="2">2.4</band>
+    <band num="3">-1.11022E-15</band>
+    <band num="4">-4</band>
+    <band num="5">-5.6</band>
+    <band num="6">-3.2</band>
+    <band num="7">-1.11022E-15</band>
+    <band num="8">2.4</band>
+    <band num="9">8.8</band>
+  </equalizer>
+  <equalizer name="(WinAmp) Techno">
+    <preamp>-1.11022E-15</preamp>
+    <band num="0">8</band>
+    <band num="1">5.6</band>
+    <band num="2">-1.11022E-15</band>
+    <band num="3">-5.6</band>
+    <band num="4">-4.8</band>
+    <band num="5">-1.11022E-15</band>
+    <band num="6">8</band>
+    <band num="7">9.6</band>
+    <band num="8">9.6</band>
+    <band num="9">8.8</band>
+  </equalizer>
+</equalizers>

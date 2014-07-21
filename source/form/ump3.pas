@@ -3,23 +3,27 @@ unit ump3;
 {
   EMAT - Einfaches Mp3 Ausmist Tool
 
-  (c) 2004-2006 Clemens & David Grünewald
+  (c) 2004-2010 Clemens & David Grünewald
 
-  Compilierbar mit Delphi 2005 PE und den zusätzlichen Komponenten
+  Compilierbar mit Delphi 2010
+  +TB2000 2.2.2 und TBX 2.2 (aus den CVS/SVN Repos) + TBX-Progressbar
+  +LMD FreeEdition für Delphi 2010
+  +CoolTrayIcon
+  +Image32 1.8
+  +Windows 7 Controls for Delphi
+  +alle weiteren Komponenten befinden sich im Ordner "source"
+
+  in_mad Plugin für mp3 (GPL):
+  http://www.underbit.com/products/mad/
+
+  Version <=0.80.17 compilierbar mit Delphi 2005 PE und den zusätzlichen Komponenten
    -TB2k 2.0.15 und TBX 2.1 incl TBXProgressBar und dem Skinmanager
    -LMD FreeEdition 9.0 für D2k5
    -CoolTrayIcon 1.0
    -Image32 1.6
-
+   -Windows 7 Controls for Delphi" (D2006 Version)
+    http://www.gumpi.com/Blog/2009/01/20/Alpha1OfWindows7ControlsForDelphi.aspx
   Danke für die Unterstützung von delphi-praxis.net
-
-  Testing
-  2010
-  Delphi 2010
-  ---TB2k 2.0.15 und TBX 2.1 für D7 installiert
-  ---LMD FreeEdition 12.0 (?) für D2009
-  ---CoolTrayIcon 1.0 D2009 mod von Delphi Praxis
-  -Image32 1.8 (?) für D2009
 }
 
 
@@ -45,14 +49,22 @@ uses
   CoolTrayIcon, GR32_Image, UnitWDBIPCDemoObj,
   bass,
 
-  u_bassplayer,                                                       
+  u_bassplayer,
+
+  vispluginctrl,
+
   udatenbank, usave, uspieler, ulang, uincex, uliste, GListe2, ustatus,
+
+
   LMDOneInstance, LMDBaseEdit, LMDCustomEdit, LMDCustomBrowseEdit,
-  LMDCustomFileEdit, LMDFileOpenEdit, LMDFill, LMDCustomComboBox;
+  LMDCustomFileEdit, LMDFileOpenEdit, LMDFill, LMDCustomComboBox,
+  dwTaskbarComponents, dwTaskbarThumbnails, xmldom, XMLIntf, msxmldom, XMLDoc,
+  Spin;
 
 
 const
-  Version     = '0.80.16-D2900testing';
+  Version     = '0.82';
+  extendedDebugLogInfo = False;
   FormCaption = '';
   maxVolume   = 100;
   Anzahl_TBXDockablePanel = 14;
@@ -60,9 +72,10 @@ const
   VISSETTINGS     = 'Aussehen.ini';
   WALLPAPER       = 'images\hintergrund.jpg';
   DIRNAMEPLAYLIST = 'Playlist\';
+  FILE_EQ_PRESETS = 'equalizer\equalizers.xml';
   GENERALSETTINGS = 'Emat.ini';
   HELPFILE        = 'emat.rtf';
-
+  MAX_MILKDROP_MOVE = 20;
   {
     Gliste.Tag2 Definition
 
@@ -102,7 +115,31 @@ type
      MainColor            : TColor;
      Shuffelrange         : integer;
      SelDirPath           : string;
+     Arbeitsverzeichnis   : string;  //z.B. c:\emat\
+     GradientColorTop,GradientColorBottom : Tcolor;
+
    end;
+
+type
+   THotKeyIDs = record
+      Next    : integer;
+      Back    : integer;
+      Play    : integer;
+      Pause   : integer;
+      Lauter  : integer;
+      Leiser  : integer;
+      Shuffle : integer;
+   end;
+
+ type TEQGains = array[0..MAX_EQ_GAINS] of integer;
+
+type
+    TEQPreset = record
+      EQGains : TEQGains;
+      name    : shortstring;
+   end;
+
+
 
 type
   TFmp3 = class(TForm)
@@ -204,7 +241,6 @@ type
     TBXItem3: TTBXItem;
     TBXLink2: TTBXLink;
     ODMedia: TOpenDialog;
-    TBXCBSysHKey: TTBXCheckBox;
     TBXCBSearchAutoPlay: TTBXCheckBox;
     TBXDockablePanel8: TTBXDockablePanel;
     TClock: TTimer;
@@ -394,6 +430,44 @@ type
     TBXCheckBox2: TTBXCheckBox;
     TBXCBAutoSave: TTBXCheckBox;
     TBXItem24: TTBXItem;
+    HK_Next: THotKey;
+    Label7: TLabel;
+    HK_Back: THotKey;
+    HK_Play: THotKey;
+    HK_Pause: THotKey;
+    HK_Lauter: THotKey;
+    HK_Shuffle: THotKey;
+    HotKey6: THotKey;
+    Label8: TLabel;
+    Label9: TLabel;
+    Label10: TLabel;
+    HK_Leiser: THotKey;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    TBXCBSysHKey: TTBXCheckBox;
+    dwTaskbarThumbnails: TdwTaskbarThumbnails;
+    B_Vis_Config: TTBXButton;
+    TBXI_StartVisPlugin: TTBXItem;
+    TBX_PartyMode: TTBXItem;
+    TMilkdropMover: TTimer;
+    TBXButton6: TTBXButton;
+    MLog: TMemo;
+    TBXItem25: TTBXItem;
+    TBXItem26: TTBXItem;
+    XMLEqualizer: TXMLDocument;
+    cbEQPresets: TComboBoxEx;
+    TBX_repeat: TTBXItem;
+    seTrimStart: TSpinEdit;
+    seTrimStop: TSpinEdit;
+    tbxlgnmntpnl1: TTBXAlignmentPanel;
+    TBXCBTrimActive: TTBXCheckBox;
+    TBXLabel3: TTBXLabel;
+    TBXLabel8: TTBXLabel;
+    tbxtm_themetest: TTBXItem;
+    procedure dwTaskbarThumbnailsThumbnailClick(
+      Sender: TdwTaskbarThumbnailItem);
     procedure TBXItem24Click(Sender: TObject);
     procedure TBXPB_shuffleMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -499,12 +573,9 @@ type
       Shift: TShiftState);
 
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure IEQerMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+
     procedure IEQerMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure IEQerMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
     procedure SpielerTimerTimer(Sender: TObject);
     procedure TBXIBeendenClick(Sender: TObject);
     procedure LMDGHKShuffleKeyDown(Sender: TObject; var Key: Word;
@@ -571,7 +642,28 @@ type
     procedure MarkInList;
     procedure GStyleDoppelClick(Index :integer; Shift: TShiftState);
     procedure GHistory_KeyDown(Key:word;Shift:tshiftstate);
+    procedure B_Vis_ConfigClick(Sender: TObject);
+    procedure TBXI_StartVisPluginClick(Sender: TObject);
+    procedure TBX_PartyModeClick(Sender: TObject);
+    procedure TMilkdropMoverTimer(Sender: TObject);
+    procedure TBXButton6Click(Sender: TObject);
+    procedure HK_PauseChange(Sender: TObject);
+    procedure HK_PauseExit(Sender: TObject);
+    procedure TBXItem25Click(Sender: TObject);
+    procedure TBXItem26Click(Sender: TObject);
+    procedure cbEQPresetsChange(Sender: TObject);
+    procedure EsucheKeyPress(Sender: TObject; var Key: Char);
+    procedure TBX_repeatClick(Sender: TObject);
+    procedure tbxtm_themetestClick(Sender: TObject);
+    procedure EsucheKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EsucheAcceptText(Sender: TObject; var NewText: string;
+      var Accept: Boolean);
+    procedure EsucheKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
+    HotkeyIDs           : THotKeyIDs;
+    //Zählt wie oft versucht wurde, das Milkdropfenster zu verschieben
+    MilkDropMoverCount  : integer;
+
     procedure WMBassPlayerStop(var Message: TMessage); message WM_BASSPLAYERSTOPPED;
     procedure Weiterschalten;
     procedure Zurueckschalten;
@@ -616,6 +708,13 @@ type
     procedure WriteText(TransText: string);
     procedure ClearScreenText;
 
+    //HotKeymessages abfangen
+    procedure WMHotKey(var Msg: TWMHotKey); message WM_HOTKEY;
+    function ChangeSize(Handle: Hwnd; dHeight, dWidth: Integer;
+      ScreenCenter: Boolean): Boolean;
+    procedure LoadEQ_Presets;
+
+
     {
     function KeyboardHookProc(nCode: Integer; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
     function UninstallHook: Boolean; stdcall;
@@ -623,13 +722,18 @@ type
     }
     { Private-Deklarationen }
   public
-    Spieler     : TSpieler;
-    Aktiv       : Taktiv;
-    Datenbank   : TDatenbank;
-    FPlaylisten : array of TFPlayliste;
-    tbxinfo: TTBXItemInfo;
-    Speicherpfad : string;
-    GPlayListen, GHistory, GStyle, GFavorit: TGListe2;
+    Spieler        : TSpieler;
+    Aktiv          : Taktiv;
+    Datenbank      : TDatenbank;
+    FPlaylisten    : array of TFPlayliste;
+    tbxinfo        : TTBXItemInfo;
+    Speicherpfad   : string;
+    GPlayListen, GHistory, GStyle, GFavorit : TGListe2;
+
+    //Speichere die geladenen Presets
+    EQPresets      : array of TEQPreset;
+
+
     procedure SetColor;
     function extractrealfilename(filename: string): string;
     { Public-Deklarationen }
@@ -692,6 +796,21 @@ type
 
     //Ruft einen Orderauswahldialog auf. Achtung: Braucht noch Fehlerbehandlung wenn abbruch gedrückt wird
     function SelDirectory(startverzeichnis:string):string;
+
+    //Setzt den Shuffelstatus
+    procedure SetShuffle(aktiv:boolean);
+
+    procedure NachMarkiertemInterpretenSuchen;
+
+    //Hotkeys (de)registrieren
+    procedure RemoveHotkeys;
+    procedure RegisterHotKeys;
+
+    //Log in Memo ausgeben
+    procedure Log(Text: string);
+
+    //Hinzufügegeschwindigkeit aktualisieren
+    procedure UpdateFStatusSpeed(Speed: integer);
 end;
 
 //function DezToX(dez, bas: Cardinal): String;
@@ -700,14 +819,16 @@ var
   Fmp3        : TFmp3;
   Save        : TSave;
   basshandle  : HWND;
-  SearchRec: TSearchRec; //uk | Cover suchen
-  BmpGradient_Clock: TBitMap;
-  mHandle: THandle;
+  SearchRec           : TSearchRec; //uk | Cover suchen
+  BmpGradient_Clock   : TBitMap;
+  mHandle             : THandle;
+  ematstarttickcount  : integer;  //Startzeitpunkt
+  AllowDatenbankListeAusgeben : Boolean;
 
 implementation
 
 
-uses Ustart, Ulaut;
+uses Ustart, Ulaut, UInfo;
 
 {$R *.dfm}
 
@@ -720,6 +841,25 @@ var
   shuffleMouseDown: boolean = false;
   iconnummer : integer = 1;
   Stoppuhr,Stoppuhr2   : int64;
+  content_Esuche : string = '';
+
+  //solarized color scheme
+  cl_sol_base03 : integer = 0 + 43 shl 8 + 54 shl 16;
+  cl_sol_base02 : integer = 7 + 54 shl 8 + 66 shl 16;
+  cl_sol_base01 : integer = 88 + 110 shl 8 + 117 shl 16;
+  cl_sol_base00 : integer = 101 + 123 shl 8 + 131 shl 16;
+  cl_sol_base0 : integer = 131 + 148 shl 8 + 150 shl 16;
+  cl_sol_base1 : integer = 147 + 161 shl 8 + 161 shl 16;
+  cl_sol_base2 : integer = 238 + 232 shl 8 + 213 shl 16;
+  cl_sol_base3 : integer = 253 + 246 shl 8 + 227 shl 16;
+  cl_sol_yellow : integer = 181 + 137 shl 8 + 0 shl 16;
+  cl_sol_orange : integer = 203 + 75 shl 8 + 22 shl 16;
+  cl_sol_red : integer = 220 + 50 shl 8 + 47 shl 16;
+  cl_sol_magenta : integer = 211 + 54 shl 8 + 130 shl 16;
+  cl_sol_violet : integer = 108 + 113 shl 8 + 196 shl 16;
+  cl_sol_blue : integer = 38 + 139 shl 8 + 210 shl 16;
+  cl_sol_cyan : integer = 42 + 161 shl 8 + 152 shl 16;
+  cl_sol_green : integer = 133 + 153 shl 8 + 0 shl 16;
 
 //  hookhandle, mywindowhandle   : cardinal;
 
@@ -851,7 +991,7 @@ end;
 procedure TFmp3.FormClose(Sender: TObject; var Action: TCloseAction);
 var i:integer;
 begin
-  Hide;
+  //Hide;
 
   //Alle Timer beenden
   Tanimation.Enabled:=false;
@@ -860,7 +1000,7 @@ begin
 
   for i:=0 to High(FPlaylisten) do
   begin
-   if Datenbank.Mp3DatenMeta[i].offen
+   if  Datenbank.ListeExists(i)
    then
    begin
      if Datenbank.Mp3DatenMeta[i].FileName=''
@@ -875,7 +1015,7 @@ begin
             else
              if MessageDlg(SAVEPLS, mtConfirmation, [mbYes, mbNo], 0) = mrYes
              then fmp3.ListeSpeichernUnter(i);
-     end;
+          end;
      ListeSpeichern(i);
     end;
    end;
@@ -883,19 +1023,24 @@ begin
    Save.S_OffenePlaylisten;         //Damit Spielstatus abgespeichert wird
    Stop;
 
+   { //Gespeichert sind sie schon alle
    for i:=0 to High(FPlaylisten) do
    begin
      ListeSchliessenUndSpeichern(i);
    end;
-
+   }
 
   Save.S_Einstellungen;
   Save.CloseIniFile;
 
   if not noTBXsave then TBIniSavePositions(Self,Speicherpfad+VISSETTINGS, '');
 
+  RemoveHotkeys;
+
+  //Wird ja eh alles geschlossen, wenn der Prozess weg ist
+  //Spieler.Stop;
   Spieler.Free;
-  BmpGradient_Clock.Free;
+  //BmpGradient_Clock.Free;
 end;
 
 
@@ -1015,6 +1160,7 @@ function TFmp3.Spiele( ListenNummer, ElementNummer : integer; ClearHistoryStatus
      GListenIndex : integer;
 begin
   Result:=false;
+
   if Datenbank.GetMediumFullFileName( ListenNummer, ElementNummer , Medium)
     then
       begin
@@ -1218,6 +1364,13 @@ begin
   Application.ProcessMessages;
 end;
 
+procedure tfmp3.UpdateFStatusSpeed(Speed: integer);
+begin
+  FStatus.LSpeed.caption:=inttostr(speed)+' Titel/Sekunde';
+  Application.ProcessMessages;
+end;
+
+
 procedure TFmp3.DatenbankListeAusgeben ( ListenNummer:integer;
                    SuchFeldAktualisieren:boolean=true;  //Wegen DragDrop Bug
                    HistoryUndFavoritenNeuBerechnen:boolean=true );  //u.U. zeitintensiv
@@ -1226,7 +1379,15 @@ var i, markiert, ersterEintrag, Files, ArrayIndex : Integer;
     FilesSize : Int64;
     SearchDirs: TStringList;
 begin
+//  if AllowDatenbankListeAusgeben then
+
+  //Damit am Anfang nicht ca 10x die Datenbank abgefragt wird
+  begin
+
+
   Zeitmessungstart;
+
+  Log('DatenbankListeAusgeben( '+inttostr(ListenNummer)+' )');
 
   if Datenbank.ListeExists(ListenNummer)
   then
@@ -1309,48 +1470,49 @@ begin
   Fplaylisten[ ListenNummer ].TBXStatusBar1.Panels.Items[1].Caption := Format(
     CPLSMB, [round(FilesSize/(1024*1024))]);
   Fplaylisten[ ListenNummer ].TBXStatusBar1.Panels.Items[2].Caption :=
-    'Spielzeit: '+DauerZuString(datenbank.GetPlayLengthOfAllFiles(ListenNummer),true);
+    'Gesamtspieldauer: '+DauerZuString(datenbank.GetPlayLengthOfAllFiles(ListenNummer),true);
 
   if HistoryUndFavoritenNeuBerechnen
   then
-  begin
-  //History   //Zeitintensiv
-    GHistory.ListenReset;
-    Datenbank.VerifyHistory(ListenNummer);
-    for i := 0 to High(Datenbank.Mp3DatenMeta[ListenNummer].history) do
     begin
-      if Datenbank.GetArrayIndex(ListenNummer,
-                 Datenbank.Mp3DatenMeta[ListenNummer].history[i], ArrayIndex)
-      then
-        GHistory.Add(Datenbank.Mp3DatenMeta[ListenNummer].history[i],
-          i=Datenbank.Mp3DatenMeta[ListenNummer].historyposition,
-          Datenbank.GetEintragfuerSpalte(0,ListenNummer,
-            Datenbank.ElementNummerZuArrayIndex(ListenNummer,
-            Datenbank.Mp3DatenMeta[ListenNummer].history[i])),
-          '','','','');
-    end;
-    GHistory.Draw;
-  //
-
-  //Favoriten
-    GFavorit.ListenReset;
-    Datenbank.GetFavoritItems(ListenNummer,100,GFavorit.liste.l1,
-                                               GFavorit.liste.nummer,
-                                               GFavorit.liste.l0 );
-    for i:=0 to GFavorit.liste.l1.Count-1 do
+    //History   //Zeitintensiv
+      GHistory.ListenReset;
+      Datenbank.VerifyHistory(ListenNummer);
+      for i := 0 to High(Datenbank.Mp3DatenMeta[ListenNummer].history) do
       begin
-        GFavorit.liste.l2.Add('');
-        GFavorit.liste.l3.Add('');
-        GFavorit.liste.l4.Add('');
-        GFavorit.liste.markiert.Add('false');
+        if Datenbank.GetArrayIndex(ListenNummer,
+                   Datenbank.Mp3DatenMeta[ListenNummer].history[i], ArrayIndex)
+        then
+          GHistory.Add(Datenbank.Mp3DatenMeta[ListenNummer].history[i],
+            i=Datenbank.Mp3DatenMeta[ListenNummer].historyposition,
+            Datenbank.GetEintragfuerSpalte(0,ListenNummer,
+              Datenbank.ElementNummerZuArrayIndex(ListenNummer,
+              Datenbank.Mp3DatenMeta[ListenNummer].history[i])),
+            '','','','');
       end;
+      GHistory.Draw;
+    //
 
-    GFavorit.Draw;
+    //Favoriten
+      GFavorit.ListenReset;
+      Datenbank.GetFavoritItems(ListenNummer,100,GFavorit.liste.l1,
+                                                 GFavorit.liste.nummer,
+                                                 GFavorit.liste.l0 );
+      for i:=0 to GFavorit.liste.l1.Count-1 do
+        begin
+          GFavorit.liste.l2.Add('');
+          GFavorit.liste.l3.Add('');
+          GFavorit.liste.l4.Add('');
+          GFavorit.liste.markiert.Add('false');
+        end;
 
-    if ListenNummer=Aktiv.SpielendeListe then
-    GFavorit.SetSelected(Aktiv.SpielendesElement);
-  //
-  end;
+      GFavorit.Draw;
+
+      if ListenNummer=Aktiv.SpielendeListe then
+      GFavorit.SetSelected(Aktiv.SpielendesElement);
+
+    //
+    end;
 
   //SearchDir Hint aktualisieren
   SearchDirs:=TStringList.Create;
@@ -1360,9 +1522,10 @@ begin
   SetCover(Aktiv.MarkiertesElementDir);
 
   FPLaylisten[ListenNummer].TBXStatusBar1.Panels[3].Caption:=
-  (inttostr(zeitmessungstopp)+' ms Ausgabe');
+  ('Dauer der Abfrage: '+inttostr(zeitmessungstopp)+' ms');
 
   end;
+  end; //von CreateDone
 end;
 
 
@@ -1377,6 +1540,23 @@ begin
   end;
 end;
 
+
+procedure TFmp3.cbEQPresetsChange(Sender: TObject);
+var
+  I: Integer;
+begin
+  if (Sender as TComboBoxEx).ItemIndex>=0 then
+  begin
+
+  for i := 0 to MAX_EQ_GAINS  do
+    begin
+      spieler.eqwert[i]:=EQPresets[(Sender as TComboBoxEx).ItemIndex].EQGains[i];
+    end;
+  Spieler.EQSetWerte;
+  EQDraw;
+
+  end;
+end;
 
 procedure Tfmp3.ZeichneFortschritt(prozent: real; total:integer);
 begin
@@ -1447,6 +1627,7 @@ begin
         then fmp3.ListeSpeichernUnter(ListenNummer);
       Datenbank.ListeSchliessen(ListenNummer,false);//Wurde schon gespeichert oder auch nicht
       GHistory.ListenReset;
+      GFavorit.ListenReset;
     end
   else
    Datenbank.ListeSchliessen(ListenNummer,true);
@@ -1457,12 +1638,14 @@ procedure TFmp3.ListeSpeichern(ListenNummer:integer);
 begin
  if Datenbank.ListeExists(ListenNummer)
  then
+  begin
   if Datenbank.Mp3DatenMeta[ListenNummer].FileName=''
   then
       ListeSpeichernUnter(ListenNummer)
   else
       Datenbank.SavePlaylist(Datenbank.Mp3DatenMeta[ListenNummer].FileName,
                                 ListenNummer);
+ end;
 end;
 
 
@@ -1523,8 +1706,12 @@ end;
 
 
 procedure TFmp3.SpielerTimerTimer(Sender: TObject);
-var temp1:real;
-    temp2:integer;
+var RelativePosition             :real;
+
+
+    Gesamtdauer,AktuellePosition :integer;
+    NochZuSpielen                :integer;
+    TrimStart,TrimStop           :Integer;
 begin
  { try
     if Spieler.Getlength>1
@@ -1535,26 +1722,51 @@ begin
     then Weiterschalten;
 
     except //showmessage('[Fehler: SpielerTimer]');     }
-    temp1:=0;
-    temp2:=0;
 
-    if Spieler.Getlength>1
+    try
+
+    Gesamtdauer      :=Spieler.Getlength;
+
+    if Gesamtdauer>1
     then
       begin
-         try
-           temp1:=Spieler.Getposition/Spieler.Getlength
-         except showmessage('[Fehler: SpielerTimer->temp1]')  end;
+         AktuellePosition :=round(Spieler.GetPosition);
+         RelativePosition :=  AktuellePosition/Gesamtdauer;
 
-         try
-           temp2:=round(Spieler.GetPosition);
-         except showmessage('[Fehler: SpielerTimer->temp2]')  end;
+         ZeichneFortschritt(RelativePosition,AktuellePosition);
 
+         //Wenn ich die Titel beschneiden möchte
+         if TBXCBTrimActive.Checked then
+         begin
+           try
+           TrimStart:=Abs(fmp3.seTrimStart.Value);
+           TrimStop :=Abs(fmp3.seTrimStop.Value);
+           except
+           seTrimStart.Value:=0;
+           seTrimStop.Value:=0;
+           TrimStart:=0;
+           TrimStop :=0;
+           end;
 
-         ZeichneFortschritt(temp1,temp2);
+           NochZuSpielen :=  Gesamtdauer - AktuellePosition;
+           if NochZuSpielen < TrimStop
+           then Weiterschalten;
+
+           if AktuellePosition < TrimStart
+           then Fmp3.Spule(TrimStart/Gesamtdauer);
+
+         end;
+
       end;
 
+    except
+      fmp3.Log('Zugriffsverletzung im SpielerTimer. SpielerTimer deaktiviert');
+      SpielerTimer.Enabled:=False;
+    end;
+//Sichheitsmaßname zum Weiterschalten
+{
     if (Spieler.FKBassPlayer.Bassplayer.getstatus=0)
-    then Weiterschalten;
+    then Weiterschalten;               }
 
  //   except //showmessage('[Fehler: SpielerTimer]');
  // end;
@@ -1582,45 +1794,55 @@ begin
   if Datenbank.ListeExists(Aktiv.SpielendeListe)
     then
     begin
+      //Wenn aktuelles Lieder immer wieder wiederholt werden soll
+      if (TBX_Repeat.Checked) and (aktiv.SpielendesElement>-1) then
+        begin
+          Spiele(aktiv.SpielendeListe,aktiv.SpielendesElement);
+        end
+     else
+     begin
+     //Wenn keines geplant ist, suche nächstes oder zufälliges Element 
      if (not Datenbank.GetNextElementNummer(Aktiv.SpielendeListe,zuspielendes))
      then
      if (FPlaylisten[aktiv.SpielendeListe].Gliste1.liste.l0.count = 0)
       then stop
       else
-      begin
-
-        if TBxIShuffle.Checked
-        then
         begin
-            untereSchranke:=FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement
-                            - Aktiv.Shuffelrange div 2;
-            if untereSchranke<0 then untereSchranke:=0;
 
-            obereSchranke:=FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement
-                            + Aktiv.Shuffelrange div 2;
-            if obereSchranke>FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1
-            then obereSchranke:=FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1;
+          if TBxIShuffle.Checked
+          then
+            begin
+                untereSchranke:=FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement
+                                - Aktiv.Shuffelrange div 2;
+                if untereSchranke<0 then untereSchranke:=0;
 
-            zuspielendes := untereSchranke + random(obereSchranke - untereSchranke);
+                obereSchranke:=FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement
+                                + Aktiv.Shuffelrange div 2;
+                if obereSchranke>FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1
+                then obereSchranke:=FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1;
 
+                zuspielendes := untereSchranke + random(obereSchranke - untereSchranke);
+
+            end
+          else
+           begin
+             if FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement=
+                      (FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1)
+               then zuspielendes:=0
+               else zuspielendes:=FPlaylisten[aktiv.SpielendeListe].Gliste1.
+                                                      fortschrittlichesElement + 1;
+           end;
+
+
+        Spiele( Aktiv.SpielendeListe,strtoint(FPlaylisten[aktiv.SpielendeListe].
+                                              Gliste1.liste.nummer[zuspielendes]) );
         end
-        else
-         begin
-           if FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement=
-                    (FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1)
-             then zuspielendes:=0
-             else zuspielendes:=FPlaylisten[aktiv.SpielendeListe].Gliste1.
-                                                    fortschrittlichesElement + 1;
-         end;
-
-
-      Spiele( Aktiv.SpielendeListe,strtoint(FPlaylisten[aktiv.SpielendeListe].
-                                            Gliste1.liste.nummer[zuspielendes]) );
-      end
-      else //GetNextElementNummer
+      else
       begin
+        //Spiele das eingereihte ab
         Spiele( Aktiv.SpielendeListe, zuspielendes );
       end;
+    end;
     end;
 end;
 
@@ -1633,7 +1855,7 @@ begin
   Datenbank.Search(ListenNummer,Text);
 
   FPlaylisten[Aktiv.Liste].TBXStatusBar1.Panels[4].Caption
-    :=inttostr(ZeitmessungStopp)+' ms Suchzeit';
+    :='Dauer der Suche: '+inttostr(ZeitmessungStopp)+' ms';
 
   DatenbankListeAusgeben(ListenNummer,true,false);
 
@@ -1664,13 +1886,6 @@ begin
 end;
 
 //////////Graphische EQ-Ausgabe/////////////////////////////////////////////////
-procedure TFmp3.IEQerMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  EQtaste:=false;
-  Spieler.EQSetWerte;
-  EQDraw;
-end;
 
 //Graphische EQ-Ausgabe/////////////////////////////////////////////////////////
 procedure TFmp3.IEQMouseDown(Sender: TObject; Button: TMouseButton;
@@ -1695,25 +1910,27 @@ end;
 procedure TFmp3.IEQMouseMove(Sender: TObject; Shift: TShiftState; X,
           Y: Integer);
   var
-    schrittweite,
-    aktiverRand1, aktiverRand2, aktivesZentrum, neuerEQwert: integer;
+    schrittweite,i, neuerEQwert: integer;
 begin
   if EQtaste
     then
       begin
         schrittweite:=ieq.width div 11;
-        aktiverRand1:=((schrittweite div 2)-4);
-        aktiverRand2:=((schrittweite div 2)+4);
-        aktivesZentrum:= (x mod schrittweite)-schrittweite div 2;
 
-        if (aktivesZentrum>=aktiverRand1) and (aktivesZentrum<=aktiverRand2)
+
+        //Nummer des Balkens
+        i := (x-(schrittweite div 2)) div schrittweite;
+
+        //wenn auf Balken
+        if (x>=i*schrittweite+(schrittweite div 2)+2) and (x<=(i+1)*schrittweite+(schrittweite div 2)-2)
           then
             begin
               neuerEQwert:=round((30*y/ieq.height-15)*-1);
               if neuerEQwert>15 then neuerEQwert:=15;
               if neuerEQwert<-15 then neuerEQwert:=-15;
-              if ((x div schrittweite+1)>=1) and ((x div schrittweite+1)<=10)
-              then Spieler.eqwert[x div schrittweite+1]:=neuerEQwert;
+
+              if (i>=0) and (i<=9)
+              then Spieler.eqwert[i]:=neuerEQwert;
               EQdraw;
             end;
         end;
@@ -1723,58 +1940,123 @@ procedure TFmp3.IEQerMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   EQtaste:=true;
+  IEQMouseMove(fmp3,shift,x,y);
 end;
 
-procedure TFmp3.IEQerMouseMove(Sender: TObject; Shift: TShiftState; X,
-          Y: Integer);
-  var
-    schrittweite,
-    aktiverRand1, aktiverRand2, aktivesZentrum, neuerEQwert: integer;
-begin
-  if EQtaste
-    then
-      begin
-        schrittweite:=ieq.width div 11;
-        aktiverRand1:=((schrittweite div 2)-4);
-        aktiverRand2:=((schrittweite div 2)+4);
-        aktivesZentrum:= (x mod schrittweite)-schrittweite div 2;
-
-        if (aktivesZentrum>=aktiverRand1) and (aktivesZentrum<=aktiverRand2)
-          then
-            begin
-              neuerEQwert:=round((30*y/ieq.height-15)*-1);
-              if  neuerEQwert>15 then  neuerEQwert:=15;     //Bugpreventing
-              if   neuerEQwert<-15 then  neuerEQwert:=-15;  //
-              Spieler.eqwert[x div schrittweite+1]:=neuerEQwert;
-              EQdraw;
-            end;
-        end;
-end;
 
 procedure TFmp3.EQDraw;
 var schrittweite,i : integer;
     puffer         : TBitmap;
+    bar            : TRect;
+
+procedure DrawGradient2(ACanvas: TCanvas; Rect: TRect;
+  Horicontal: Boolean; Colors: array of TColor);
+type
+  RGBArray = array[0..2] of Byte;
+var
+  x, y, z, stelle, mx, bis, faColorsh, mass: Integer;
+  Faktor: double;
+  A: RGBArray;
+  B: array of RGBArray;
+  merkw: integer;
+  merks: TPenStyle;
+  merkp: TColor;
+begin
+  mx := High(Colors);
+  if mx > 0 then
+  begin
+    if Horicontal then
+      mass := Rect.Right - Rect.Left
+    else
+      mass := Rect.Bottom - Rect.Top;
+    SetLength(b, mx + 1);
+    for x := 0 to mx do
+    begin
+      Colors[x] := ColorToRGB(Colors[x]);
+      b[x][0] := GetRValue(Colors[x]);
+      b[x][1] := GetGValue(Colors[x]);
+      b[x][2] := GetBValue(Colors[x]);
+    end;
+    merkw := ACanvas.Pen.Width;
+    merks := ACanvas.Pen.Style;
+    merkp := ACanvas.Pen.Color;
+    ACanvas.Pen.Width := 1;
+    ACanvas.Pen.Style := psSolid;
+    faColorsh := Round(mass / mx);
+    for y := 0 to mx - 1 do
+    begin
+      if y = mx - 1 then
+        bis := mass - y * faColorsh - 1
+      else
+        bis := faColorsh;
+      for x := 0 to bis do
+      begin
+        Stelle := x + y * faColorsh;
+        faktor := x / bis;
+        for z := 0 to 3 do
+          a[z] := Trunc(b[y][z] + ((b[y + 1][z] - b[y][z]) * Faktor));
+        ACanvas.Pen.Color := RGB(a[0], a[1], a[2]);
+        if Horicontal then
+        begin
+          ACanvas.MoveTo(Rect.Left + Stelle, Rect.Top);
+          ACanvas.LineTo(Rect.Left + Stelle, Rect.Bottom);
+        end
+        else
+        begin
+          ACanvas.MoveTo(Rect.Left, Rect.Top + Stelle);
+          ACanvas.LineTo(Rect.Right, Rect.Top + Stelle);
+        end;
+      end;
+    end;
+    b := nil;
+    ACanvas.Pen.Width := merkw;
+    ACanvas.Pen.Style := merks;
+    ACanvas.Pen.Color := merkp;
+  end
+  else
+    // Please specify at least two colors
+    raise EMathError.Create('Es müssen mindestens zwei Farben angegeben werden.');
+end;
+
 begin
   puffer:=TBitmap.Create;
   puffer.Width:=IEQ.Width;
   puffer.Height:=IEQ.Height;
 
-  puffer.Canvas.Brush.Color:=CurrentTheme.GetItemImageBackground(tbxinfo);
-  puffer.Canvas.Pen.Color:=clBlack;
+
+
+  puffer.Canvas.Brush.Color := aktiv.GradientColorBottom;
+  puffer.Canvas.Pen.Color   := aktiv.GradientColorBottom;
   puffer.Canvas.Rectangle(0,0,puffer.width,puffer.height);
+
+  puffer.Canvas.TextOut(10,10,'Maustaste drücken,');
+  puffer.Canvas.TextOut(10,22,'seitlich ziehen');
+  puffer.Canvas.TextOut(10,34,'und loslassen');
+
   puffer.Canvas.Brush.Color:=CurrentTheme.GetItemTextColor(tbxinfo);
   schrittweite:=puffer.width div 11;
-  for i:=0 to 9 do
+  for i:=0 to MAX_EQ_GAINS do
   begin
-  puffer.Canvas.Rectangle(i*schrittweite+schrittweite div 2,
-                       puffer.height-round (((spieler.eqwert[i+1]+15))/30*
-                       puffer.height),(i+1)*schrittweite-3+schrittweite div 2,
-                       puffer.height);
-  end;
-  
-IEQ.Canvas.Draw(0,0,puffer);
+    bar.Left:=i*schrittweite+(schrittweite div 2)+2;
+    bar.Top :=puffer.height-round (((spieler.eqwert[i]+15)/30)*
+                         puffer.height);
+    bar.Right:=(i+1)*schrittweite+(schrittweite div 2)-2;
+    bar.Bottom:=puffer.height;
 
-puffer.Free;
+    //Benutze Gradient2, weil eins eine Bug bei nicht Vollflächen hat
+    DrawGradient2(puffer.Canvas,bar,false,[aktiv.GradientColorTop,aktiv.GradientColorBottom]);
+    { //Zeichnet einfarbiges Rechteck
+    puffer.Canvas.Rectangle(i*schrittweite+(schrittweite div 2)+2,
+                         puffer.height-round (((spieler.eqwert[i]+15)/30)*
+                         puffer.height),(i+1)*schrittweite+(schrittweite div 2)-2,
+                         puffer.height);                                                  }
+    puffer.canvas.brush.style:=bsClear;
+    puffer.Canvas.TextOut((i+1)*schrittweite-6,puffer.Height-18,inttostr(spieler.eqwert[i]));
+  end;
+
+  IEQ.Canvas.Draw(0,0,puffer);
+
+  puffer.Free;
 end;
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2082,6 +2364,9 @@ begin
     tbxinfo.ImageShown := false;
     tbxinfo.Selected := true;
 
+    aktiv.GradientColorTop    := CurrentTheme.GetItemTextColor(tbxinfo);
+    aktiv.GradientColorBottom := CurrentTheme.GetItemImageBackground(tbxinfo);
+
     for i := 0 to High(FPlaylisten) do
     begin
       if Datenbank.ListeExists(i)
@@ -2092,6 +2377,7 @@ begin
         FPlaylisten[i].StringGrid.FixedColor := CurrentTheme.GetItemImageBackground(tbxinfo);
 
         FPlaylisten[i].Gliste1.SetMainColor(CurrentTheme.GetItemtextColor(tbxinfo));
+        FPlaylisten[i].Gliste1.Font.Color := Fmp3.Font.Color;
         FPlaylisten[i].Gliste1.clmarkiert := clWhite;
         FPlaylisten[i].Gliste1.clmouseover := CurrentTheme.GetItemTextColor(tbxinfo);
         FPlaylisten[i].StringGrid.Color := CurrentTheme.GetItemTextColor(tbxinfo);
@@ -2278,6 +2564,9 @@ begin
     try
 
       Save.L_Einstellungen;
+
+      AllowDatenbankListeAusgeben:=True; //Macht aber eh erst ab hier Sinn und wird später auch noch gebraucht, daher in Dantenbanklisteausgeben nicht ausgewertet
+
       Save.L_OffenePlaylisten;
       SetColor;
 
@@ -2309,27 +2598,56 @@ begin
    //     fmp3.ListeAnfuegenOrdner;
       end;
 
-    CreateDone := true;
+      //Visualisierung laden
+  try
+    VisControlForm.FormShow(fmp3);
+  except
+    Fehler('Die Visualisierungen konnten nicht geladen werden');
+  end;
 
+    //EQ laden
+    LoadEQ_Presets;
+
+    CreateDone := true;
+    AllowDatenbankListeAusgeben:=True;
   end;
 end;
 
 
+
+
+
 procedure TFMp3.ParameterOpen(var Parameter:TStringlist);
 var newlist : boolean;
-    i    : integer;
+    i,count    : integer;
 begin
-
+//Count zählt die geöffneten Playlisten
+  count:=0;
   for i:=0 to parameter.Count-1 do
   begin
-    //Playlisten
+    //Playlisten öffnen
     if ExtractFileExt(Parameter[i])=PlayListExt
-    then ListeLaden(Parameter[i]);
+    then
+      begin
+      ListeLaden(Parameter[i]);
+      inc(count);
+      end;
   end;
 
-  newlist:=MessageDlg('Sollen die Titel der aktuellen Playliste hinzugefügt werden?'+#13+#10+
-    'Bei "Nein" wird eine neue Playliste erstellt.', mtConfirmation, [mbYes, mbNo], 0)=mryes;
-    
+  //wenn es nicht nur Playlisten sind
+  if count<parameter.Count then
+
+  begin
+ // newlist:=MessageDlg('Sollen die Titel der aktuellen Playliste hinzugefügt werden?'+#13+#10+
+  //  'Bei "Nein" wird eine neue Playliste erstellt.', mtConfirmation, [mbYes, mbNo], 0)=mryes;
+
+
+
+  newlist:=MyMessageDialog('Möchten Sie Titel der aktive Playliste hinzufügen oder eine neue Playliste erstellen?',
+           mtConfirmation, mbOKCancel,['Hinzufügen', 'Erstellen']) = mrOk;
+
+
+
   for i:=0 to parameter.Count-1 do
   begin
 
@@ -2366,6 +2684,8 @@ begin
   else
     //Aus unbekanntem Grund werden beim DragDrop leere, ungültige Einträge erzeugt
     Datenbank.DeleteInvalidItems(aktiv.liste);
+
+  end;
 end;
 
 procedure TFmp3.WriteText(TransText: string);
@@ -2698,15 +3018,21 @@ procedure TFmp3.FormCreate(Sender: TObject);
 var
   Styles: TStringList;
   i: integer;
+  CustomArrowUp, CustomArrowDown    : TBitmap;
 begin
 try
   CreateDone := false;
+  AllowDatenbankListeAusgeben:=False;
+
+  ematstarttickcount:=Gettickcount;
 
   Randomize;
 
   fmp3.caption:=FORMTITLE+Version+FormCaption;
   Application.Hint := FORMTITLE+Version;
   Application.Title:=EMATTITLE;
+
+  Aktiv.Arbeitsverzeichnis := extractfilepath( application.ExeName );
 
   Aktiv.Liste            :=-1;
   Aktiv.SpielendeListe   :=-1;
@@ -2745,7 +3071,7 @@ try
 
 //  Fmp3.DoubleBuffered:=true;
 
-  OpenD.Filter:='Emat-Playliste / Applauncher (*'+PlaylistExt+')|*'+PlaylistExt;
+  OpenD.Filter:='Emat-Playliste (*'+PlaylistExt+')|*'+PlaylistExt;
   SaveD.Filter:=OpenD.Filter;
   SaveD.DefaultExt:=PlaylistExt;
 
@@ -2801,10 +3127,20 @@ try
   GFavorit.LineMoving := true;
   GFavorit.Tag2       := 3;
 
+  CustomArrowUp   := TBitmap.Create;
+  CustomArrowDown := TBitmap.Create;
+  ILSymbolleiste.GetBitmap(34,CustomArrowDown);
+  ILSymbolleiste.GetBitmap(33,CustomArrowUp);
+  GFavorit.SetCustomArrows(CustomArrowDown, CustomArrowUp);
+  GHistory.SetCustomArrows(CustomArrowDown, CustomArrowUp);
+  GPlaylisten.SetCustomArrows(CustomArrowDown, CustomArrowUp);
 
   Application.OnActivate:= fmp3.AppAktivate;
   Application.OnDeactivate:=fmp3.AppDeaktivate;
   Application.OnMinimize:=fmp3.AppDeaktivate;
+
+
+
 
 //  LMDDDMp3Player.CaptionTitle:=SELDIR;
 
@@ -2883,10 +3219,13 @@ procedure TFmp3.ResetEQ;           //uk
 var
   i: integer;
 begin
-  for i := 1 to High(fmp3.Spieler.eqwert) do
+  cbEQPresets.text:='EQ-Presets';
+
+  for i := 0 to High(fmp3.Spieler.eqwert) do
     fmp3.Spieler.eqwert[i] := 0;
   Spieler.EQSetWerte;
   EQDraw;
+
 end;
 
 procedure TFmp3.AnewlistExecute(Sender: TObject);
@@ -2950,22 +3289,24 @@ end;
 
 procedure TFmp3.AshuffleExecute(Sender: TObject);
 begin
-  if Ashuffle.Checked
-    then
-      begin
-        Ashuffle.Checked := false;
-        //Ashuffle.Caption := SHUFFLE_ON;
-
-        ScreenText(SHUFFLE_ON);
-      end
-    else
-      begin
-        Ashuffle.Checked := true;
-        //Ashuffle.Caption := SHUFFLE_OFF;
-
-        ScreenText(SHUFFLE_OFF);
-      end;
+  SetShuffle(not Ashuffle.Checked);
 end;
+
+procedure TFmp3.SetShuffle(aktiv:boolean);
+begin
+  if aktiv then
+  begin
+    Ashuffle.Checked := true;
+    ScreenText(SHUFFLE_ON);
+  end
+  else
+    begin
+      ScreenText(SHUFFLE_OFF);
+      Ashuffle.Checked := false;
+    end;
+end;
+
+
 
 procedure TFmp3.ADelFromHDDExecute(Sender: TObject);
 begin
@@ -3199,6 +3540,14 @@ begin
     PH5.Color:=(GetColor( H mod 16 mod 8 mod 4 mod 2));    *)
 end;
 
+procedure TFmp3.TMilkdropMoverTimer(Sender: TObject);
+begin
+  ChangeSize(spieler.BassPlayer1.GetVisWindowHandle,780,580,true);
+  inc(MilkDropMoverCount);
+  if MilkDropMoverCount>MAX_MILKDROP_MOVE then
+    TMilkdropMover.Enabled:=false;
+end;
+
 procedure TFmp3.SetVolume(prozent: real);
 begin
   if prozent > 0.99 then prozent := 1;
@@ -3378,6 +3727,12 @@ begin
     end;
 end;
 
+procedure TFmp3.tbxtm_themetestClick(Sender: TObject);
+begin
+  fmp3.Font.Color := cl_sol_base00;
+  //fmp3.TBXToolbar1.Font.Color := fmp3.Font.Color
+end;
+
 procedure TFmp3.SaveDFolderChange(Sender: TObject);
 begin
    OpenD.InitialDir:=SaveD.InitialDir;
@@ -3462,6 +3817,12 @@ begin
   ResetEQ;
 end;
 
+procedure TFmp3.TBXButton6Click(Sender: TObject);
+begin
+  RemoveHotkeys;
+  RegisterHotKeys;
+end;
+
 procedure TFmp3.EtitelMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -3516,7 +3877,7 @@ begin
    then
 begin
 try
-   ListenNummer:=fmp3.Aktiv.Liste; //schwammig
+   ListenNummer:=fmp3.aktiv.Liste; //schwammig
 
    if fmp3.Datenbank.ListeExists(ListenNummer)
    then
@@ -3553,7 +3914,7 @@ try
    end;
 except
  begin
-  showmessage('[Fehler]');
+  showmessage('[Fehler beim erneuten Auslesen des ID3-Tags]');
  end;
 end;
 end;
@@ -3604,6 +3965,11 @@ begin
 end;
 
 procedure TFmp3.TBXItem4Click(Sender: TObject);
+begin
+  NachMarkiertemInterpretenSuchen;
+end;
+
+procedure Tfmp3.NachMarkiertemInterpretenSuchen;
 var
   id3tag: Tid3tag;
   ArrayIndex: integer;
@@ -3727,6 +4093,12 @@ begin
   then ListeLaden( GPlaylisten.Liste.l0[ GPlaylisten.markiertesElement ] )
 end;
 
+procedure TFmp3.EsucheAcceptText(Sender: TObject; var NewText: string;
+  var Accept: Boolean);
+begin
+  //Log(NewText + ' was accepted');
+end;
+
 procedure TFmp3.EsucheChange(Sender: TObject; const Text: string);
 begin
   if (CreateDone) and (Datenbank.ListeExists(Aktiv.Liste))
@@ -3734,6 +4106,42 @@ begin
     begin
      Suche(Aktiv.Liste, text);
     end;
+  //log(esuche.Text);
+end;
+
+procedure TFmp3.EsucheKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   //fix for not recognized backspace press
+   if (Key=VK_BACK) or (Key=VK_DELETE) then
+   begin
+    Log('backspace was pressed (keydown): ' + Esuche.Text);
+    content_Esuche := Esuche.Text;
+    //EsucheChange(Sender, Esuche.Text);
+   end;
+end;
+
+procedure TFmp3.EsucheKeyPress(Sender: TObject; var Key: Char);
+begin
+ // log(key);
+ // log( ':'+Esuche.Text+':' );
+ // EsucheChange(Sender,Esuche.Text)
+
+end;
+
+procedure TFmp3.EsucheKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+    //fix for not recognized backspace press
+   if (Key=VK_BACK) or (Key=VK_DELETE) then
+   begin
+    Log('backspace was pressed (keyup): ' + Esuche.Text);
+    if content_Esuche = Esuche.Text then
+      begin
+       EsucheChange(Sender, '');
+       Log('I will assume, that probably the whole text was deleted.');
+      end;
+
+   end;
 end;
 
 procedure TFmp3.TBXItem8Click(Sender: TObject);
@@ -3793,9 +4201,10 @@ begin
   if Datenbank.ListeExists(Aktiv.Liste)
   then
     begin
-      Spiele(Aktiv.Liste,strtoint(GHistory.liste.Nummer[index]),false,true);
       Datenbank.Mp3DatenMeta[Aktiv.Liste].historyposition:=index;
-      DatenbankListeAusgeben(aktiv.liste);    //Könnte eingespart werden
+      Spiele(Aktiv.Liste,strtoint(GHistory.liste.Nummer[index]),false,true);
+      //DatenbankListeAusgeben wird von Spiele aufgerufen
+      //DatenbankListeAusgeben(aktiv.liste);    //Könnte eingespart werden
     end;
 end;
 
@@ -3876,6 +4285,16 @@ begin
 end;
 
 
+procedure TFmp3.HK_PauseChange(Sender: TObject);
+begin
+  RemoveHotkeys;
+end;
+
+procedure TFmp3.HK_PauseExit(Sender: TObject);
+begin
+  RegisterHotkeys;
+end;
+
 procedure TFmp3.GHistory_KeyDown(Key:word;Shift:tshiftstate);
 begin
 
@@ -3912,9 +4331,18 @@ begin
   if Datenbank.ListeExists(Aktiv.Liste)
   then
     begin
-      ElementNummer := strtoint(GFavorit.liste.Nummer[index]);
-      Spiele(Aktiv.Liste,ElementNummer,false,false);
-      GFavorit.SetSelected(ElementNummer);
+    ElementNummer := strtoint(GFavorit.liste.Nummer[index]);
+      if TBX_PartyMode.Checked then
+      begin
+        fmp3.Datenbank.History_QueueItem(Aktiv.Liste,ElementNummer);
+        DatenbankListeAusgeben(aktiv.Liste);
+      end
+      else
+      begin
+        Spiele(Aktiv.Liste,ElementNummer,true);
+        GFavorit.SetSelected(ElementNummer);
+      end;
+
     end;
 end;
 
@@ -3923,6 +4351,15 @@ begin
   if Index < 0 then Index := 0;
   TBXSetTheme(GStyle.Liste.l0[Index]);
   SetColor;
+end;
+
+procedure Tfmp3.Log(Text:string);
+var time: cardinal;
+begin
+  time:= Gettickcount - ematstarttickcount;
+
+  MLog.Lines.Add(Format('[ %d ] ',[time])+Text)
+
 end;
 
 
@@ -4389,6 +4826,396 @@ begin
     Datenbank.Search(Aktiv.Liste,ESuche.Text);
     end;
 end;
+
+
+procedure TFmp3.TBXItem25Click(Sender: TObject);
+{
+var id3info: Tid3tag;
+    plyrics : pwidechar;
+    Ilyrics : integer;
+    slyrics : string;
+begin
+  id3info:=datenbank.GetMediumId3Tag(aktiv.SpielendeListe,aktiv.SpielendesElement);
+  {
+  plyrics := nil;
+  ilyrics := 0;
+  spieler.BassPlayer1.GetLyrics(id3info.Artist,id3info.Titel,false,plyrics,Ilyrics);
+  GetMem(plyrics,ilyrics+1);
+  spieler.BassPlayer1.GetLyrics(id3info.Artist,id3info.Titel,false,plyrics,ilyrics);
+
+  showmessage(string(plyrics));
+
+  FreeMem(plyrics);
+  }
+var
+ //  buf : array[0..255] of char;
+ //  URL : string;
+   Title_, Artist_ : string;
+  UseCixURL: Boolean;
+  ShownMB: Boolean;
+  b_ViewLyrics: Boolean;
+
+     URL_CixHome : pAnsiChar;
+   URL_LyricsHome : pAnsiChar;
+  MBWinHandle: HWND;
+
+ procedure ParseMetaData(MetaData : string; var Artist, Title : string);
+ var
+   p1, p2 : integer;
+   tmpStr, s1, s2 : string;
+
+ begin
+   Artist := '';
+   Title := '';
+   tmpStr := trim(MetaData);
+
+   if tmpStr = '' then
+      exit;
+
+ //  Seperate string : text1 - text2  => s1 = text1, s2 = text2
+   p1 := pos(' - ', tmpStr);
+   if p1 > 0 then
+   begin
+      s1 := copy(tmpStr, 1, p1 - 1);
+      s2 := copy(tmpStr, p1 + 3, length(tmpStr) - p1 - 2);
+   end else
+   begin
+      s1 := '';
+      s2 := tmpStr;
+   end;
+
+   if s1 <> '' then
+   begin
+ // Remove the string between '[' and ']'  (ex. : ...[text1]text2  => text2 )
+     p1 := pos('[', s1);
+     p2 := pos(']', s1);
+     if (p1 > 0) and (p2 > p1) then
+        s1 := copy(s1, p2 + 1, length(s1) - p2);
+   end;
+
+   Artist := trim(s1);
+   Title := trim(s2);
+ end;
+
+begin
+     URL_CixHome := 'http://www.cix.co.kr/kr/lyrics_plugin_index.html';
+   URL_LyricsHome := 'http://www.lyricsplugin.com/winamp03/plugin/?title=';
+
+
+
+// Mini Browser and Drawer Window should be ready before running Winamp GPP.
+   if (spieler.BassPlayer1.MBWinHandle = 0) then
+      exit;
+
+   MBWinHandle := spieler.BassPlayer1.MBWinHandle;
+
+  // Enable Magnetic effect
+  // BassPlayer1.MagneticWindowAdd(Self.Handle, 0, MagneticWndProc);
+
+ //  b_ViewLyrics := true;
+
+ // Show Mini Brower at the right side of Main form, with the same height of Main Form
+   if b_ViewLyrics then
+   begin
+      spieler.BassPlayer1.ShowMBForm(Self.Left + Self.Width, Self.Top, 380, Self.Height);
+      ShownMB := true;
+   end;
+
+  // If you want to start all the Winamp GPPs at start up, use following code.
+ {  i := BassPlayer1.RunAllGPPModules;
+   if i > 0 then
+   begin
+      StatusViewForm.InfoMemo.Lines.Add('  ');
+      StatusViewForm.InfoMemo.Lines.Add(inttoStr(i) + ' Winamp GPP loaded');
+      for i := 1 to BassPlayer1.NumberLoadedGPP do
+      begin
+         GPPInfo := BassPlayer1.GetLoadedGPPInfo(i, false);
+         StatusViewForm.InfoMemo.Lines.Add(string(GPPInfo.Description));
+      end;
+   end; }
+
+ // We need not to load gen_kmpcix.dll or gen_lyrics.dll to display lyrics.
+ // This program lets Mini Browser to search a specified URL directly at getting
+ //  new title information.
+ // The URLs to get the lyrics are obtained with the functions in unit Util_Kmpcix.
+
+   if GetOEMCP = 949 then   // OEM code page is Korean Language ?
+      UseCixURL := true
+  ;{ else
+      if FileExists(GetProgDir + 'Plugins\Gen_LeosLyrics.dll') then
+         spieler.BassPlayer1.RunGPPModule(GetProgDir + 'Plugins\Gen_LeosLyrics.dll');}
+
+   if UseCixURL then
+      spieler.BassPlayer1.LetMBNavigate(URL_CixHome)
+   else
+      spieler.BassPlayer1.LetMBNavigate(URL_LyricsHome);
+
+
+
+
+
+   if false then
+   begin
+   // ** process metadata gotton from net radio **
+   // BassPlayer1.StreamInfo.Title has Meta data from net radio
+      ParseMetaData(spieler.BassPlayer1.StreamInfo.Title, Artist_, Title_);
+    end else begin
+      Title_ := spieler.BassPlayer1.StreamInfo.Title;
+      Artist_ := spieler.BassPlayer1.StreamInfo.Artist;
+   end;
+
+  //if b_ViewLyrics then
+      spieler.BassPlayer1.LetMBNavigate2(Artist_, Title_, true);
+
+
+
+{
+ slyrics:='abcdefghijk';
+ ilyrics:=12;
+ plyrics:=pointer(pchar(slyrics));
+
+ id3info.Artist:='Rammstein';
+ id3info.Titel :='Feuer Frei';
+ {
+ spieler.BassPlayer1.GetLyrics(id3info.Artist,id3info.Titel,false,plyrics,Ilyrics);
+ GetMem(plyrics,ilyrics+1);
+ spieler.BassPlayer1.GetLyrics(id3info.Artist,id3info.Titel,false,plyrics,ilyrics);
+ showmessage(string(plyrics));   }
+
+ //spieler.BassPlayer1.ShowMBForm(10,10,200,200);
+// spieler.BassPlayer1.LetMBNavigate2(id3info.Artist,id3info.Titel,true);
+end;
+
+procedure TFmp3.TBXItem26Click(Sender: TObject);
+var filename:string;
+begin
+  //datenbank.GetMediumFullFileName(aktiv.Liste,aktiv.SpielendesElement,filename);
+  //spieler.BassPlayer1.FileInfoBox(filename);
+
+  LoadEQ_Presets;
+end;
+
+procedure TFmp3.TBXI_StartVisPluginClick(Sender: TObject);
+var old_top  : integer;
+begin
+
+  VisControlForm.btnStartClick(fmp3);
+
+
+
+  //Timer kann Fenster rumschieben, ist aber nicht mehr nötig
+  //Counter zählt die Verschiebeversuche, erst nach ein paar Sekunden reagiert das Fenster
+  MilkDropMoverCount:=0;
+  //TMilkdropMover.Enabled := True;
+
+  //ChangeSize(spieler.BassPlayer1.VisWindowHandle,600,600,true);
+  //ChangeSize(VisControlForm.CurVisWindowAttr.VisHandle,100,100,true);
+
+end;
+
+
+function tfmp3.ChangeSize(Handle: Hwnd; dHeight, dWidth: Integer; ScreenCenter: Boolean): Boolean;
+var
+  P: TRect;
+begin
+  Result := False;
+  try
+  GetWindowRect(Handle, P); {Der TRect var die Positions daten des Fenster übergeben}
+  if ScreenCenter then
+  MoveWindow(Handle, (Screen.Width-dWidth) div 2, (Screen.Height-dHeight) div 2, dHeight, dWidth, True)
+  else
+  MoveWindow(Handle, P.Left, P.Top, dHeight, dWidth, True);
+  except
+  Result := False;
+  end;
+  Result := True;
+end;
+
+
+procedure TFmp3.TBX_PartyModeClick(Sender: TObject);
+begin
+  TBX_PartyMode.Checked:= not TBX_PartyMode.Checked;
+end;
+
+procedure TFmp3.TBX_repeatClick(Sender: TObject);
+begin
+  if   TBX_repeat.Checked
+  then TBX_repeat.ImageIndex:=36
+  else TBX_repeat.ImageIndex:=37;
+end;
+
+procedure TFMp3.WMHotKey(var Msg: TWMHotKey);
+begin
+  if Msg.HotKey = HotkeyIDs.Next    then ANextExecute(fmp3);
+  if Msg.HotKey = HotkeyIDs.Back    then Zurueckschalten;
+  if Msg.HotKey = HotkeyIDs.Play    then AplayExecute(fmp3);
+  if Msg.HotKey = HotkeyIDs.Pause   then Pause;
+  if Msg.HotKey = HotkeyIDs.Shuffle then AshuffleExecute(fmp3);
+  if Msg.HotKey = HotkeyIDs.Lauter  then IncVolume;
+  if Msg.HotKey = HotkeyIDs.Leiser  then DecVolume;
+
+end;
+
+
+
+// Hotkey registrieren
+procedure TFmp3.RegisterHotKeys;
+
+// Transform TShortCut to use for RegisterHotKey
+// TShortCut für RegisterHotKey umwandeln
+procedure ShortCutToHotKey(HotKey: TShortCut; var Key : Word; var Modifiers: Uint);
+var
+  Shift: TShiftState;
+begin
+  ShortCutToKey(HotKey, Key, Shift);
+  Modifiers := 0;
+  if (ssShift in Shift) then
+  Modifiers := Modifiers or MOD_SHIFT;
+  if (ssAlt in Shift) then
+  Modifiers := Modifiers or MOD_ALT;
+  if (ssCtrl in Shift) then
+  Modifiers := Modifiers or MOD_CONTROL;
+end;
+
+procedure RegisterSingeHotkey(Hotkey:THotkey;var HotkeyID:integer);
+var
+  Key : Word;
+  Modifiers: UINT;
+begin
+  ShortCutToHotKey(Hotkey.HotKey, Key, Modifiers);
+  HotkeyID := GlobalAddAtom(pchar('MyHotKey_'+inttostr(Hotkey.HotKey)));
+  RegisterHotKey(Handle, HotkeyID, Modifiers, Key);
+end;
+
+begin
+  if TBXCBSysHKey.Checked then
+  begin
+  RegisterSingeHotkey(HK_Next,HotkeyIDs.Next);
+  RegisterSingeHotkey(HK_Back,HotkeyIDs.Back);
+  RegisterSingeHotkey(HK_Lauter,HotkeyIDs.Lauter);
+  RegisterSingeHotkey(HK_Leiser,HotkeyIDs.Leiser);
+  RegisterSingeHotkey(HK_Shuffle,HotkeyIDs.Shuffle);
+  RegisterSingeHotkey(HK_Play,HotkeyIDs.Play);
+  RegisterSingeHotkey(HK_Pause,HotkeyIDs.Pause);
+  end;
+end;
+
+
+// Hotkey entfernen
+procedure Tfmp3.RemoveHotkeys;
+
+procedure RemoveHotkey(HotkeyID:integer);
+begin
+  UnRegisterHotKey(Handle, HotkeyID);
+  GlobalDeleteAtom(HotkeyID);
+end;
+
+begin
+  RemoveHotkey(HotkeyIDs.Next);
+  RemoveHotkey(HotkeyIDs.Back);
+  RemoveHotkey(HotkeyIDs.Play);
+  RemoveHotkey(HotkeyIDs.Pause);
+  RemoveHotkey(HotkeyIDs.Lauter);
+  RemoveHotkey(HotkeyIDs.Leiser);
+  RemoveHotkey(HotkeyIDs.Shuffle);
+end;
+
+
+procedure TFmp3.B_Vis_ConfigClick(Sender: TObject);
+begin
+  Spieler.VisConfig;
+end;
+
+procedure TFmp3.dwTaskbarThumbnailsThumbnailClick(
+  Sender: TdwTaskbarThumbnailItem);
+begin
+  case Sender.Index of
+  4:  ANextExecute(fmp3);
+  0:  APrevExecute(fmp3);
+  3:  AplayExecute(fmp3);
+  2:  APauseExecute(fmp3);
+  1:  AstopExecute(fmp3);
+  5:  DecVolume;
+  6:  IncVolume;
+  end;
+
+end;
+
+
+procedure TFmp3.LoadEQ_Presets;
+var
+  CountPresets: integer;
+  i: Integer;
+  j: Integer;
+  EQGain: Double;
+  myFormat : TFormatSettings;
+begin
+try
+  if fileexists(aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS) then
+  begin
+
+  XMLEqualizer.FileName:=aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS;
+  XMLEqualizer.Active:=true;
+
+  fmp3.Log('Anzahl EQ Presets '+inttostr(XMLEqualizer.ChildNodes['equalizers'].ChildNodes.count));
+
+  myFormat.DecimalSeparator:='.';
+
+  CountPresets:=XMLEqualizer.ChildNodes['equalizers'].ChildNodes.count;
+
+  SetLength(EQPresets,CountPresets);
+
+  for i := 0 to CountPresets - 1 do
+  begin
+    EQPresets[i].name:=XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].Attributes['name'];
+
+    //Wortanfang (Winamp) weglöschen
+    if '(WinAmp) '=Copy(EQPresets[i].name,0,Length('(WinAmp) ') )
+     then EQPresets[i].name:=Copy(EQPresets[i].name,Length('(WinAmp) '),Length(EQPresets[i].name));
+
+    cbEQPresets.Items.Add(EQPresets[i].name);
+
+     //Preamp wird ignoriert, nur die einzelnen Reglerstellungen ausgelesen
+    for j := 1 to XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].ChildNodes.Count-1  do
+      begin
+        if j<=(MAX_EQ_GAINS+1) then
+
+   // for j := 1 to MAX_EQ_GAINS +1 do
+
+        begin
+
+        //log(XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].ChildNodes[j].Text);
+
+        EQGain:=strtofloat(XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].ChildNodes[j].text,myFormat);
+
+        if EQGain> 15 then EQGain:=15;
+        if EQGain<-15 then EQGain:=-15;
+
+
+        EQPresets[i].EQGains[j-1]:=round(EQGain);
+
+        //log(inttostr(round(EQGain)));
+        end;
+      end;
+
+
+    //log(EQPresets[i].name);
+
+  end;
+
+
+  //XMLEqualizer.ChildNodes['equalizers'].ChildNodes.Count
+  end
+  else
+  begin
+    fmp3.log('Equalizer-Presets wurden nicht gefunden: '+aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS);
+  end;
+except
+  fmp3.Fehler('Fehler beim Laden der Equalizer-Presets. Datei beschädigt?');
+end;
+end;
+
+
 
 initialization //uk | Um zu verhindern, dass Emat mehrmals gestartet wird,
                //aber es trozdem möglich ist, wenn Delphi läuft, um auch während

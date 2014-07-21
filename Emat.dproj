@@ -53,7 +53,6 @@
 			<DCCReference Include="source\komponent\rmkGradient.pas"/>
 			<DCCReference Include="source\komponent\TBXDock2003.pas"/>
 			<DCCReference Include="source\komponent\TBXProgressBar.pas"/>
-			<DCCReference Include="source\id3\OggVorbis.pas"/>
 			<DCCReference Include="source\id3\WAVfile.pas"/>
 			<DCCReference Include="source\id3\WMAfile.pas"/>
 			<DCCReference Include="source\render\Bass.pas"/>
@@ -81,36 +80,52 @@
 			<DCCReference Include="source\form\Ustart.pas">
 				<Form>Fstart</Form>
 			</DCCReference>
-			<DCCReference Include="source\Themes\rmkThemes.pas"/>
-			<DCCReference Include="source\Themes\TBXAthenTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXDreamTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXEosTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXMirandaTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXMonaiTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXMonaiXPTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXNexos2Theme.pas"/>
-			<DCCReference Include="source\Themes\TBXNexos3Theme.pas"/>
-			<DCCReference Include="source\Themes\TBXNexos4Theme.pas"/>
-			<DCCReference Include="source\Themes\TBXNexos5Theme.pas"/>
-			<DCCReference Include="source\Themes\TBXNexosXTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXOffice11AdaptiveTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXOfficeCTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXOfficeKTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXReliferTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXRomaTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXSentimoXTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXTristan2Theme.pas"/>
-			<DCCReference Include="source\Themes\TBXTristanTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXWhidbeyTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXXitoTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXZezioTheme.pas"/>
-			<DCCReference Include="source\Themes\TBXOffice2003Theme.pas"/>
 			<DCCReference Include="source\form\UStatus.pas">
 				<Form>FStatus</Form>
 			</DCCReference>
 			<DCCReference Include="source\id3\Mp3FileUtils.pas"/>
 			<DCCReference Include="source\hook\UnitWDBIPCObjects.pas"/>
 			<DCCReference Include="source\hook\UnitWDBIPCDemoObj.pas"/>
+			<DCCReference Include="source\TBASSPlayer\BASSPlayer.pas"/>
+			<DCCReference Include="source\TBASSPlayer\Demo\VisPluginCtrl.pas">
+				<Form>VisControlForm</Form>
+			</DCCReference>
+			<DCCReference Include="source\Themes\TBXZezioTheme.pas"/>
+			<DCCReference Include="source\Themes\rmkThemes.pas"/>
+			<DCCReference Include="source\Themes\TBXAluminumTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXAthenTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXDamsokaTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXDefaultTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXDreamTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXEchoTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXEos9Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXEosTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXMirandaTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXMonaiTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXMonaiXPTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXNewOfficeAdaptiveTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXNewOfficeTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXNexos2Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXNexos3Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXNexos4Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXNexos5Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXNexosXTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXOffice11AdaptiveTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXOffice11XPTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXOffice2003Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXSolarizedLightTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXOfficeKTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXOfficeXPTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXProfessionalTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXReliferTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXRomaTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXSentimoXTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXStripesTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXTristan2Theme.pas"/>
+			<DCCReference Include="source\Themes\TBXTristanTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXWhidbeyTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXXitoTheme.pas"/>
+			<DCCReference Include="source\Themes\TBXOfficeCTheme.pas"/>
 			<None Include="changelog.html"/>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
@@ -155,10 +170,10 @@
 					</VersionInfo>
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName">G-Software</VersionInfoKeys>
-						<VersionInfoKeys Name="FileDescription">Emat - Der_Audioplayer</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">Emat - http://emat.de.gg</VersionInfoKeys>
 						<VersionInfoKeys Name="FileVersion">0.80.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName">Einfaches Mp3 Ausmist Tool</VersionInfoKeys>
-						<VersionInfoKeys Name="LegalCopyright">Ãƒâ€šÃ‚Â© 2004-2006 G-Software</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">© 2004-2010 G-Software</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>
 						<VersionInfoKeys Name="OriginalFilename">Emat.exe</VersionInfoKeys>
 						<VersionInfoKeys Name="ProductName">Emat</VersionInfoKeys>

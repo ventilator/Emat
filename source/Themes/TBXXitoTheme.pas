@@ -10,6 +10,8 @@ unit TBXXitoTheme;
 // 18.10.2003 - Roy Magne Klever roy.magne@os.ino.no
 //              First version...
 //              ©2003 Roy Magne Klever
+// 25.05.2009 - Roy Magne Klever rmklever@gmail.com
+//              Final version...
 
 interface
 
@@ -594,7 +596,8 @@ begin
         FillGradient(Canvas, R, $00f0f0f0, clWhite, TGTopBottom)
       else
         FillGradient(Canvas, R, $00f0f0f0, clWhite, TGLeftRight);
-    end else
+    end
+    else
     begin
       Brush := CreateSolidBrush(ColorToRGB(AColor));
       IntersectRect(R, ARect, AClipRect);
@@ -713,13 +716,15 @@ begin
         begin
           if BtnPressed then
           begin
-            FillRectEx(Canvas.Handle, R, $00c0c0c0);
+            //FillRectEx(Canvas.Handle, R, $00c0c0c0);
+            FillGradient(Canvas, R, $00d0d0d0, $00c0c0c0, TGTopBottom);
             Pen.Color := $00909090;
             DrawLineEx(Canvas.Handle, R.Left - 1, R.Top, R.Left - 1, R.Bottom, $00909090);
           end else
           begin
-            FillRectEx(Canvas.Handle, R, $00e0e0e0);
-            Pen.Color := $00909090;
+            //FillRectEx(Canvas.Handle, R, $00e0e0e0);
+            FillGradient(Canvas, R, $00e0e0e0, $00f0f0f0, TGTopBottom);
+            Pen.Color := $00808080;
             DrawLineEx(Canvas.Handle, R.Left - 1, R.Top, R.Left - 1, R.Bottom, $00909090);
           end;
         end else
@@ -750,13 +755,15 @@ begin
       begin
         if BtnPressed or BtnHot or Embedded then
         begin
+          DrawLineEx(Canvas.Handle, R.Left - 1, R.Top, R.Left - 1, R.Bottom, $00909090);
           // BR = Button Rectangle
           if BtnPressed then
             GradientFill(Canvas, BR, clWhite, clSilver, TGTopBottom)
           else
             if BtnHot then
             begin
-              FillRectEx(Canvas.Handle, BR, $00d0d0d0);
+              //FillRectEx(Canvas.Handle, BR, $00d0d0d0);
+              FillGradient(Canvas, R, $00e0e0e0, $00f0f0f0, TGTopBottom);
               Pen.Color := $00808080;
             end;
         end
@@ -905,18 +912,19 @@ begin
       RR := 1; RL := 1;
     end;
 
+    //Embedded:= False;
     if Embedded and not ShowHover then
     begin
+      {
       if Enabled then
       begin
         InflateRect(R, -1, -1);
         FillRectEx(Canvas.Handle, R, ToolBarColor);
         InflateRect(R, 1, 1);
-        Pen.Color := Blend(clHighLight, clWindow, 20);
-      end
-      else
-        Pen.Color := Blend(clHighLight, clWindow, 15);
+        Pen.Color := clWindow;  //Blend(clHighLight, clWindow, 20);
+      end else Pen.Color := Blend(clHighLight, clWindow, 15);
       RoundFrame(Canvas, R, RL, RR);
+      }
     end;
 
     if ((ViewType and TVT_MENUBAR) = TVT_MENUBAR) then
@@ -924,12 +932,10 @@ begin
       if ((Pushed or Selected) and Enabled) or ShowHover then
         if Pushed then
         begin
-
           Pen.Color := $00d0d0d0;
           RoundFrame(Canvas, R, 1, 1);
-
           InflateRect(R, -1, -1);
-          FillRectEx(Canvas.Handle, R, $00d0d0d0);
+          FillGradient(Canvas, R, $00e0e0e0, $00d0d0d0, TGTopBottom);
           Pen.Color := $00808080;
           InflateRect(R, 1, 1);
           RoundFrame(Canvas, R, 1, 1);
@@ -944,22 +950,21 @@ begin
     if (Pushed or Selected) and Enabled then
     begin
       InflateRect(R, -1, -1);
-
       if not Pushed and (HoverKind = hkNone) then
       begin
-        FillRectEx(Canvas.Handle, R, $00d8d8d8);
-        Pen.Color := $00b8b8b8;
+        FillGradient(Canvas, R, clWhite, $00f0f0f0, TGTopBottom);
+        Pen.Color:= $00d0d0d0;
         MoveTo(R.Left, R.Bottom-2); LineTo(R.Left, R.Top); LineTo(R.Right, R.Top);
-        Pen.Color := $00f8f8f8;
+        Pen.Color := $00989898;
         InflateRect(R, 1, 1);
         RoundFrame(Canvas, R, RL, RR);
       end else
       begin
         InflateRect(R, 1, 1);
-        Pen.Color := $00d0d0d0;
+        Pen.Color:= $00d0d0d0;
         RoundFrame(Canvas, R, 1, 1);
         InflateRect(R, -1, -1);
-        FillRectEx(Canvas.Handle, R, $00c0c0c0);
+        FillGradient(Canvas, R, $00e0e0e0, $00c0c0c0, TGTopBottom); //rmk $00e0e0e0 was $00d0d0d0
         Pen.Color := $00909090;
         InflateRect(R, 1, 1);
         RoundFrame(Canvas, R, RL, RR);
@@ -971,7 +976,7 @@ begin
         RoundFrame(Canvas, R, 1, 1);
 
         InflateRect(R, -1, -1);
-        FillRectEx(Canvas.Handle, R, $00d0d0d0);
+        FillGradient(Canvas, R, $00f0f0f0, $00e0e0e0, TGTopBottom);
         Pen.Color := $00808080;
         InflateRect(R, 1, 1);
         RoundFrame(Canvas, R, RL, RR);
@@ -982,14 +987,12 @@ begin
       begin
         Pen.Color := $00e0e0e0;
         RoundFrame(Canvas, R, 1, 1);
-
         InflateRect(R, -1, -1);
-        FillRectEx(Canvas.Handle, R, $00e0e0e0);
+        FillGradient(Canvas, R, $00e0e0e0, $00f0f0f0, TGTopBottom);
         InflateRect(R, 1, 1);
         Pen.Color := GetBtnColor(ItemInfo, ipFrame);
         RoundFrame(Canvas, R, RL, RR);
       end;
-
     if ComboPart = cpSplitRight then PaintDropDownArrow(Canvas, R, ItemInfo);
   end;
 end;
@@ -1163,7 +1166,7 @@ begin
       ((ItemOptions and IO_DESIGNING) <> 0) then
     begin
       InflateRect(R, -1, -1);
-      FillRectEx(Canvas.Handle, R, $00d0d0d0);
+      FillGradient(Canvas, R, $00eaeaea, $00f8f8f8, TGTopBottom);
       if Pushed then
         Canvas.Pen.Color := $00909090
       else
@@ -1346,7 +1349,7 @@ var
         if Enabled then
         begin
           InflateRect(R, -1, -1);
-          FillRectEx(Canvas.Handle, R, ToolBarColor);
+          FillGradient(Canvas, R, clWhite, $00f0f0f0, TGTopBottom);
           InflateRect(R, 1, 1);
           Pen.Color := Blend(clHighLight, clWindow, 20);
         end
@@ -1359,18 +1362,15 @@ var
       begin
         if not Pushed and (HoverKind = hkNone) then
         begin
-          FillRectEx(Canvas.Handle, R, $00d8d8d8);
-          Pen.Color := $00b8b8b8;
+          FillGradient(Canvas, R, $00f8f8f8, $00f0f0f0, TGTopBottom);
+          Pen.Color := $00909090;
           MoveTo(R.Left, R.Bottom-2); LineTo(R.Left, R.Top); LineTo(R.Right, R.Top);
-          Pen.Color := $00c4c4c4;
           MoveTo(R.Left, R.Bottom-1); LineTo(R.Right-1, R.Bottom-1); LineTo(R.Right-1, R.Top);
-
-          Pen.Color := clWhite;
+          Pen.Color := $00d0d0d0;
           InflateRect(R, 1, 1);
-          RoundFrame(Canvas, R, 2, 2);
         end else
         begin
-          FillRectEx(Canvas.Handle, R, $00d0d0d0);
+          FillGradient(Canvas, R, $00f0f0f0, $00e0e0e0, TGTopBottom);
           Pen.Color := $00909090;
           InflateRect(R, 1, 1);
           RoundFrame(Canvas, R, 2, 2);
@@ -1556,6 +1556,7 @@ var
   I: Integer;
   BtnVisible, Horz: Boolean;
   BtnItemState: TBtnItemState;
+  Brush: HBrush;
 begin
   with Canvas do
   begin
@@ -1564,8 +1565,8 @@ begin
       or ((ToolbarInfo.ViewType and TVT_MENUBAR) = TVT_MENUBAR)
       then
     begin
-
-      with R do begin
+      with R do
+      begin
         if (R.Right > R.Bottom) then
         begin
           R2 := r;
@@ -1613,7 +1614,10 @@ begin
       end;
       InflateRect(R, -2, -2);
     end else
+    begin
+      FillGradient(Canvas, R, $00fafafa, clWhite, TGTopBottom);
       InflateRect(R, -2, -2);
+    end;
 
     if not ToolbarInfo.AllowDrag then Exit;
 
@@ -2318,6 +2322,7 @@ procedure TTBXXitoTheme.PaintStatusBar(Canvas: TCanvas; R: TRect; Part: Integer)
 var
   Hi, Lo: TColor;
   D, Sz, i: Integer;
+  Color, Lo1, Hi1, Lo2, Hi2, Lo3, Hi3, Hi4: TColor;
 
   procedure DiagLine(C: TColor);
   begin
@@ -2341,6 +2346,66 @@ begin
         end;
       SBP_GRIPPER:
         begin
+          Color := $00f0f0f0;
+          Hi1 := GetNearestColor(Handle, MixColors(Color, clBtnShadow, 64));
+          Lo1 := GetNearestColor(Handle, MixColors(Color, clBtnShadow, 48));
+          Hi2 := GetNearestColor(Handle, MixColors(Color, clBtnShadow, 32));
+          Lo2 := GetNearestColor(Handle, MixColors(Color, clBtnShadow, 16));
+          Hi3 := GetNearestColor(Handle, MixColors(Color, clBtnHighlight, 128));
+          Lo3 := GetNearestColor(Handle, MixColors(Color, clBtnHighlight, 96));
+          Hi4 := GetNearestColor(Handle, MixColors(Color, clBtnHighlight, 72));
+
+          with R do
+          begin
+            Pixels[Right - 12, Bottom - 4] := Lo2;
+            Pixels[Right - 12, Bottom - 3] := Hi2;
+            Pixels[Right - 11, Bottom - 4] := Lo1;
+            Pixels[Right - 11, Bottom - 3] := Hi1;
+            Pixels[Right - 11, Bottom - 2] := Hi4;
+            Pixels[Right - 10, Bottom - 2] := Hi3;
+            Pixels[Right - 10, Bottom - 3] := Lo3;
+
+            Pixels[Right - 8, Bottom - 4] := Lo2;
+            Pixels[Right - 8, Bottom - 3] := Hi2;
+            Pixels[Right - 7, Bottom - 4] := Lo1;
+            Pixels[Right - 7, Bottom - 3] := Hi1;
+            Pixels[Right - 7, Bottom - 2] := Hi4;
+            Pixels[Right - 6, Bottom - 2] := Hi3;
+            Pixels[Right - 6, Bottom - 3] := Lo3;
+
+            Pixels[Right - 4, Bottom - 4] := Lo2;
+            Pixels[Right - 4, Bottom - 3] := Hi2;
+            Pixels[Right - 3, Bottom - 4] := Lo1;
+            Pixels[Right - 3, Bottom - 3] := Hi1;
+            Pixels[Right - 3, Bottom - 2] := Hi4;
+            Pixels[Right - 2, Bottom - 2] := Hi3;
+            Pixels[Right - 2, Bottom - 3] := Lo3;
+
+            Pixels[Right - 8, Bottom - 8] := Lo2;
+            Pixels[Right - 8, Bottom - 7] := Hi2;
+            Pixels[Right - 7, Bottom - 8] := Lo1;
+            Pixels[Right - 7, Bottom - 7] := Hi1;
+            Pixels[Right - 7, Bottom - 6] := Hi4;
+            Pixels[Right - 6, Bottom - 6] := Hi3;
+            Pixels[Right - 6, Bottom - 7] := Lo3;
+
+            Pixels[Right - 4, Bottom - 8] := Lo2;
+            Pixels[Right - 4, Bottom - 7] := Hi2;
+            Pixels[Right - 3, Bottom - 8] := Lo1;
+            Pixels[Right - 3, Bottom - 7] := Hi1;
+            Pixels[Right - 3, Bottom - 6] := Hi4;
+            Pixels[Right - 2, Bottom - 6] := Hi3;
+            Pixels[Right - 2, Bottom - 7] := Lo3;
+
+            Pixels[Right - 4, Bottom - 12] := Lo2;
+            Pixels[Right - 4, Bottom - 11] := Hi2;
+            Pixels[Right - 3, Bottom - 12] := Lo1;
+            Pixels[Right - 3, Bottom - 11] := Hi1;
+            Pixels[Right - 3, Bottom - 10] := Hi4;
+            Pixels[Right - 2, Bottom - 10] := Hi3;
+            Pixels[Right - 2, Bottom - 11] := Lo3;
+          end;
+          {
           Sz := Min(R.Right - R.Left, R.Bottom - R.Top);
           Lo := NearestMixedColor(clBtnFace, clBtnHighlight, 64);
           Hi := NearestMixedColor(clBtnFace, clBtnShadow, 64);
@@ -2367,6 +2432,7 @@ begin
               Inc(D, 1);
             end;
           end;
+          }
         end;
     end;
 end;

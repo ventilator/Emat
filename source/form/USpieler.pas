@@ -2,15 +2,22 @@ unit USpieler;
 
 interface
 
-uses  sysutils, ExtCtrls, dialogs, ShellAPI, forms, messages,
+uses  sysutils, ExtCtrls, dialogs, ShellAPI, forms, messages, classes, 
 
-      fkbassplayer, bass, u_bassplayer, GR32;
+      fkbassplayer, bass, u_bassplayer, GR32,
+
+      //Bassplayer 2.10
+      bassplayer, vispluginctrl, PluginCtrl,
+
+      udatenbank;
 
 const
   MAXVISMODE  =   8;
   BASS_RENDER =   0;
   MAX_VOLUME  = 255;
   AUTO_VOLUME_SPEED_MS = 12;
+  MAX_ERROR_COUNT = 30;      //Anzahl der Titel, nachdem die Wiedergabe im wiederholten Fehlerfall gestoppt wird
+  MAX_EQ_GAINS = 9;
 type
   TWeiterschaltenEvent = procedure of object;
 
@@ -25,8 +32,10 @@ type
     Pause         : boolean;
     BassVisOutput : byte;
     BassInfo      : TBassInfo;
+    SupportedExtensions : TStringlist;   
     Volume        : integer;
     OldVolume     : integer; //fürs AutoVolumeIn/Decrease
+    ErrorCount    : integer; //Zählt erfolglose Abspielversuche
    end;
 
 type
@@ -41,12 +50,14 @@ type
     procedure SpielenEnde(Sender:TObject);
     function GetBassPlayLength(Filename: string): integer;
 
+
+
  //   procedure WMBassPlayerStop(var Message: TMessage); message WM_BASSPLAYERSTOPPED;
  //   die message erreicht den owner, und der ist fmp3 bzw. dessen handle, was der
  //   spieler nicht hat.
  public
-    FKBassPlayer  : TFKBassPlayer;
-    eqwert      : array [1..10] of integer;
+    BassPlayer1  : TBassPlayer;
+    eqwert       : array [0..MAX_EQ_GAINS] of integer;
     constructor Create (AktivateVis:boolean=true);
     function ZustaendigerRenderKern(Dateiendung:string):integer;
     function Spiele(FileName: string): boolean;
@@ -71,6 +82,9 @@ type
     procedure AutoVolumeDecrease;
     procedure AutoVolumeIncrease;
     function GetPauseState : boolean;
+    procedure VisConfig;
+    procedure GetStreamInfo(FileName: string; var myID3: TID3Tag);
+
  published
     property OnWeiterschalten: TWeiterschaltenEvent
       read FWeiterschalten write FWeiterschalten;
@@ -86,23 +100,217 @@ var
       Aktiv         : TAktiv;
       Abspielfehler : boolean;
 
+
 constructor TSpieler.Create (AktivateVis:boolean=true);
+var
+  myBassAddonlist: TBassAddonlist;
+  myBassAddonInfo: TBassAddonInfo;
+  I: Integer;
+  PluginEntryNumber: integer;
+
+  //Für Addonsuche
+  ADirectory: string;
+  AMask: String;
+  ARekursiv: Boolean;
+  SR: TSearchRec;
+
   begin
+    //inherited Create;   nötig? nicht nötig?
+
     Aktiv.Pause := false;
+    Aktiv.ErrorCount:=0;
 
     fmp3.I32_Vis.Bitmap.SetSize(400,400);
 
-    FKBassPlayer := TFKBassPlayer.Create(fmp3.Handle,
-                                       ExtractFilePath(Application.Exename),
-                                       @fmp3.I32_Vis.Bitmap,
-                                       Color32(fmp3.I32_Vis.Color),
-                                       AktivateVis);
-  end;
+    Bassplayer1:=TBassplayer.Create(fmp3);
+    Bassplayer1.PluginFirst:=true;
+    Bassplayer1.SingleChannel:=True;
+
+    //Lade Plugins            1
+    try       
+
+       if BassPlayer1.PlayerReady then
+       begin
+       // Load bass_ac3.dll to support Dolby Digital AC-3 stream.
+        if FileExists(GetProgDir + 'Plugins\bass\bass_ac3.dll')
+        then
+           begin
+             myBassAddonInfo:=BassPlayer1.BASSAddonLoad(GetProgDir + 'Plugins\bass\bass_ac3.dll');
+             Fmp3.Log(myBassAddonInfo.Name+' Addon geladen.')             
+           end
+        else
+           fmp3.Log('bass_ac3.dll nicht gefunden');
+
+        // Load bass_aac.dll to support AAC, AAC+ stream.
+         if FileExists(GetProgDir + 'Plugins\bass\bass_aac.dll')
+         then
+           begin
+             myBassAddonInfo:=BassPlayer1.BASSAddonLoad(GetProgDir + 'Plugins\bass\bass_aac.dll');
+             Fmp3.Log(myBassAddonInfo.Name+' Addon geladen.')             
+           end
+         else
+            fmp3.Log('bass_aac.dll nicht gefunden');
+
+        //LoadFlac
+         if FileExists(GetProgDir + 'Plugins\bass\bassflac.dll')
+         then
+           begin
+            myBassAddonInfo:=BassPlayer1.BASSAddonLoad(GetProgDir + 'Plugins\bass\bassflac.dll');
+            Fmp3.Log(myBassAddonInfo.Name+' Addon geladen.')
+           end
+         else
+            fmp3.Log('bassflac.dll nicht gefunden');
+
+        //Loadfx
+         if FileExists(GetProgDir + 'Plugins\bass\bass_fx.dll')
+           then
+           begin
+             myBassAddonInfo:=BassPlayer1.BASSAddonLoad(GetProgDir + 'Plugins\bass\bass_fx.dll');
+             Fmp3.Log(myBassAddonInfo.Name+' Addon geladen.')
+           end
+           else fmp3.Log('bass_fx.dll nicht gefunden');
+
+
+         if BassPlayer1.CanUsePlugin
+         then
+           begin
+
+              ADirectory :=GetProgDir + 'Plugins\';
+              AMask      :='in_*.dll';
+              ARekursiv  := false;
+
+              if (ADirectory<>'') and (ADirectory[length(ADirectory)-1]<>'\')
+              then ADirectory:=ADirectory+'\';
+
+              if (FindFirst(ADirectory+AMask,faAnyFile-faDirectory,SR)=0)
+              then
+               begin
+                repeat
+                  if (SR.Name<>'.') and (SR.Name<>'..') and (SR.Attr<>faDirectory) then
+                          begin
+                            //fmp3.log(sr.Name);
+
+                            PluginEntryNumber:=-1;
+
+                            //PluginEntryNumber:=LoadWinampPlugin(GetProgDir + 'Plugins\winamp\in_mp3.dll');
+                            //Plugins müssen im Plugins-Ordner liegen
+                            PluginEntryNumber:=LoadWinampPlugin(sr.Name);
+                            Fmp3.Log(sr.Name+'gefunden und geladen unter Referenz: '+inttostr(PluginEntryNumber));
+                          end
+                            //
+
+
+                until FindNext(SR)<>0;
+                sysutils.FindClose(SR);
+              end;
+              { Plugins in unterordnern läd der Bassplayer eh nicht
+              if ARekursiv then
+                if (FindFirst(ADirectory+'*.*',faDirectory,SR)=0) then
+                begin
+                  repeat
+                    if (SR.Name<>'.') and (SR.Name<>'..') then
+
+                  until FindNext(SR)<>0;
+                  sysutils.FindClose(SR);
+                end;
+               }
+
+              {statische Methode, durch Ordnerdursuchen ersetzt
+             PluginEntryNumber:=-1;
+
+             if FileExists(GetProgDir + 'Plugins\in_mp3.dll')
+              then
+              begin
+                //PluginEntryNumber:=LoadWinampPlugin(GetProgDir + 'Plugins\winamp\in_mp3.dll');
+                //Plugins müssen im Plugins-Ordner liegen
+                PluginEntryNumber:=LoadWinampPlugin('in_mad.dll');
+                Fmp3.Log('in_mp3.dll geladen unter Nummer: '+inttostr(PluginEntryNumber));
+              end
+              else fmp3.Log('in_mp3.dll nicht gefunden');
+
+             PluginEntryNumber:=-1;
+
+             if FileExists(GetProgDir + 'Plugins\in_midi.dll')
+              then
+              begin
+                //Plugins müssen im Plugins-Ordner liegen
+                PluginEntryNumber:=LoadWinampPlugin('in_midi.dll');
+                Fmp3.Log('in_midi.dll geladen unter Nummer: '+inttostr(PluginEntryNumber));
+              end
+              else fmp3.Log('in_midi.dll nicht gefunden');
+              }
+             //Benutze lieber das Winampplugin
+             BassPlayer1.PluginFirst:=true;
+           end
+           else
+           begin
+             fmp3.Log('Bassplayer kann keine Winampplugins laden.');
+           end;
+      end;
+
+    except
+      Fmp3.Fehler('Entschuldigung, beim Laden der Bass-Addons ist ein Fehler aufgetreten.');
+    end;
+    
+   {
+  //Log  
+  myBassAddonList:=Bassplayer1.GetBASSAddonList;
+  for I := 0 to High(myBassAddonList) do
+    begin //Läuft in eine Zugriffsverletzung       
+      //fmp3.log('Bassaddon "'+myBassAddonList[i].Name+'" geladen. Version: '+ inttostr(myBassAddonList[i].Version) );
+    end;    }
+
+    //Log
+    if Bassplayer1.BASSWMAReady
+    then fmp3.Log('WMA Plugin geladen')
+    else fmp3.Log('WMA Plugin nicht geladen');
+
+    if Bassplayer1.BASSAACReady
+    then fmp3.Log('AAC Plugin geladen')
+    else fmp3.Log('AAC Plugin nicht geladen');
+
+    if Bassplayer1.BASSCDReady
+    then fmp3.Log('CDR Plugin geladen')
+    else fmp3.Log('CDR Plugin nicht geladen');
+
+    if Bassplayer1.BASSMIDIReady
+    then fmp3.Log('MIDI Plugin geladen')
+    else fmp3.Log('MIDI Plugin nicht geladen');
+
+    fmp3.Log('Verfügbare Erweiterungen durch Addons: '+Bassplayer1.BASSAddonExts);
+    fmp3.Log('Verfügbare Erweiterungen durch Plugins: '+Bassplayer1.PluginFileExts);
+    fmp3.Log('Verfügbare Erweiterungen durch Bass: '+Bassplayer1.NativeFileExts);
+    fmp3.Log('Version des Basssystems: '+Bassplayer1.BuildDateStr);
+    //Log Ende
+
+    //Erstelle Liste der Fileextensions (*.Endung)
+    Aktiv.SupportedExtensions:=TStringlist.Create;
+    Aktiv.SupportedExtensions.Delimiter:=';';     
+    Aktiv.SupportedExtensions.DelimitedText:=Aktiv.SupportedExtensions.Text+';'+Bassplayer1.BASSAddonExts;
+    Aktiv.SupportedExtensions.DelimitedText:=Aktiv.SupportedExtensions.Text+';'+Bassplayer1.PluginFileExts;
+    Aktiv.SupportedExtensions.DelimitedText:=Aktiv.SupportedExtensions.Text+';'+Bassplayer1.NativeFileExts;
+    //Fmp3.Log(Aktiv.SupportedExtensions.Text);
+    
+
+    EQInit;
+
+    //Event zuweisen
+    Bassplayer1.OnPlayEnd:=SpielenEnde;
+
+    //Gegen Skipping Issues
+    //http://www.un4seen.com/forum/?topic=9436.msg83546#msg83546
+    Bassplayer1.SingleChannel:=True;
+end;
+
 
 destructor TSpieler.Destroy;
 begin
-   FKBassplayer.Free;
+   //Do not call Destroy of Bassplayer, free does this for you
+   Bassplayer1.Free;
+   inherited Destroy;
 end;
+
+
 
 
 procedure TSpieler.SpectrumResize;
@@ -125,22 +333,38 @@ end;}
 
 procedure TSpieler.SetBassVisPause;
 begin
-  FKBassplayer.VisPause;
+  //FKBassplayer.VisPause;
 end;
 
 
 procedure TSpieler.SetBassVisResume;
 begin
-  FKBassplayer.VisResume;
+  //FKBassplayer.VisResume;
 end;
 
 
 function TSpieler.ZustaendigerRenderKern(Dateiendung:string):integer;
+var index: Integer;
 begin
   result:=-1;
 
-  Dateiendung := ansilowercase(Dateiendung); //uk
+  Dateiendung := '*'+ansilowercase(Dateiendung);  
+  index := Aktiv.SupportedExtensions.IndexOf(Dateiendung);
+                             
+  if index>-1 then result:=BASS_RENDER;
 
+  if extendedDebugLogInfo then
+  begin
+    Fmp3.Log(Dateiendung +' Renderkern: '+ IntToStr(result)+' Pos: '+inttostr(index));  
+    fmp3.Log(Aktiv.SupportedExtensions.text);
+  end;
+  
+{
+Verfügbare Erweiterungen durch Addons: *.ac3;*.aac;*.m4a;*.mp4;*.flac;*.fla;*.oga;*.ogg;
+Verfügbare Erweiterungen durch Plugins: keine
+Verfügbare Erweiterungen durch Bass: *.wav;*.mp1;*.mp2;*.mp3;*.ogg;*.aiff*.mo3;*.it;*.xm;*.s3m;*.mtm;*.mod;*.umx;*.cda;*.wma;*.asf;
+}
+ { 
   //Kann kein Set verwenden wegen ".";
 
   if (Dateiendung='.mp3') or (Dateiendung='.wma') or (Dateiendung='.ogg')
@@ -150,39 +374,65 @@ begin
     then result:=BASS_RENDER;
 
   if (Dateiendung='.exe') or (Dateiendung='.cmd') or (Dateiendung='.bat')
-    then result:=2;  //obsolet
+    then result:=2;  //obsolet      }
 end;
 
 function TSpieler.Spiele ( FileName: string ):boolean;
+
 begin
   Result:=false;
   Aktiv.Renderkern := ZustaendigerRenderKern(extractfileext(filename));
   Aktiv.Pause:= false;
 
-
   case Aktiv.Renderkern of
   0: //BASS
     begin
-       FKBassplayer.PlayFile( FileName );
-       Result:=true;
+       if not Bassplayer1.PlayerReady then
+       begin
+         fmp3.stop;
+         fmp3.log('Bassplayer ist nicht bereit');
+         fmp3.fehler('Leider konnte der Titel nicht abgespielt werden.'+#13+#10+
+               'Überprüfen Sie bitte, ob der Datenträger oder die Soundkarte verfügbar ist.')
+       end;
+
+       if FileExists(FileName) then
+       begin
+         Result:=Bassplayer1.Open(FileName);
+       end
+       else
+       begin
+         Result := False;
+         fmp3.Log(FileName + ' could not be found and hence was not played.');
+       end;
+       if Result
+       then
+         begin
+           Bassplayer1.Play;
+           aktiv.errorcount:=0;
+           fmp3.log('Benutze Winamp-Plugin zum Dekodieren: '+booltostr(bassplayer1.DecodingByPlugin,True));
+         end
+       else
+         begin
+           if aktiv.ErrorCount>MAX_ERROR_COUNT then
+             begin
+               fmp3.Stop;
+               MessageDlg('Leider konnten die letzten '+inttostr(MAX_ERROR_COUNT)+
+               ' Titel (u.a. '+FileName+') nicht abgespielt werden und daher wird die Wiedergabe gestoppt.'+#13+#10+
+               'Überprüfen Sie bitte, ob der Datenträger oder die Soundkarte verfügbar ist.', mtError, [mbOK], 0);
+               abort;
+             end;
+           inc(aktiv.errorcount);
+         end;
+       //Result:=true;
     end;
   1: //Bass_FX
      begin
-        BASS_StreamFree(Aktiv.BassInfo.Channel);
 
-        Aktiv.BassInfo.Channel:=
-         BASS_StreamCreateFile(false, pChar(Filename), 0, 0, 0);
-
-        if Aktiv.BassInfo.Channel <> 0
-        then BASS_ChannelPlay(Aktiv.BassInfo.Channel, true);
-
-        Result:=true;
      end;
 
   2: //Applauncher
      begin
-       ShellExecute(Application.Handle,'open',pchar(FileName),'',pchar(extractfilepath(FileName)),1);
-       Result:=true;
+
      end;
   end;
 end;
@@ -192,7 +442,7 @@ begin
   case Aktiv.Renderkern of
   0: //BASS
     begin
-      FKBassPlayer.Stop;
+      Bassplayer1.Stop;
     end;
   3: //BassDllDynamic
      begin
@@ -260,12 +510,12 @@ begin
       if Aktiv.Pause
       then
       begin
-       FKBassplayer.Resume; 
+       Bassplayer1.Pause(false);
        Aktiv.Pause := not Aktiv.Pause;
       end
       else
       begin
-       FKBassplayer.Pause;
+       Bassplayer1.Pause(true);
        Aktiv.Pause := not Aktiv.Pause;
       end;
     end;
@@ -301,12 +551,13 @@ begin
      if volume<0   then  volume:=0;
      if volume>MAX_VOLUME then volume:=MAX_VOLUME;
 
-     FKBassplayer.Volume := Volume;
+     Bassplayer1.Volume:=volume;
+
      aktiv.Volume := Volume;
     end;
-  3: //BassDllDynamic
+  3:
      begin
- //     fmp3.BassDll.Volume:= Volume;
+
      end;
   end;
 
@@ -326,7 +577,9 @@ begin
   0: //BASS
     begin
       try
-        Result := GetBassPlayLength(Filename) div 1000;
+        //Result:=Bassplayer1.PlayLength;
+        //Result := GetBassPlayLength(Filename) div 1000;
+        Result:=1;
       except
         fmp3.Fehler('Die Länge des Mediums '+FileName+
                     ' konnte nicht zuverlässig ermittelt werden');
@@ -338,19 +591,36 @@ end;
 ///////////////////////////////////EQ///////////////////////////////////////////
 procedure TSpieler.EQInit;
 var i:integer;
+    myEqBands:TEQBands;
 begin
-  for i:=1 to 10 do
+  myEqBands:=Bassplayer1.EQBands;
+
+  fmp3.log('EQ Bänder: '+inttostr(myEQBands.Bands));
+
+  Bassplayer1.SoundEffects:=Bassplayer1.SoundEffects+[Equalizer];
+
+  for i:=0 to 9 do
   eqwert[i]:=0;
 
   EQSetWerte;
-//  Bassplayer.SoundEffects:=[Equalizer];
+//  Bassplayer1.SoundEffects:=[Equalizer];
 end;
 
 procedure TSpieler.EQSetWerte;
 var i: integer;
+    success     : boolean;
 begin
-for i:=1 to 10 do
-// Bassplayer.SetAEQGain(i,eqwert[i]);
+success:=true;
+if not Bassplayer1.DX8EffectReady
+then fmp3.Fehler('Equalizer benötigt mind. DirectX 8');
+
+
+for i:=0 to MAX_EQ_GAINS do
+  if not Bassplayer1.SetAEQGain(i,eqwert[i])
+  then success:=false;// else showmessage('hurrawy');
+
+//if not success then fmp3.Fehler('EQ Werte konnten nicht gesetzt werden');
+
 end;
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -365,7 +635,7 @@ begin
   case Aktiv.Renderkern of
   0: //BASS
     begin
-      Result:=FKBassplayer.GetPosition;
+      Result:=Bassplayer1.Position / 1000;
     end;
   3: //BassDllDynamic
      begin
@@ -379,7 +649,8 @@ begin
   case Aktiv.Renderkern of
   0: //BASS
     begin
-      FKBassplayer.SetPosition(position);
+      //Bassplayer1 erwartet Position in ms
+      Bassplayer1.Position:=position*1000;
     end;
   3: //BassDllDynamic
     begin
@@ -394,14 +665,11 @@ begin
   case Aktiv.Renderkern of
   0: //BASS
     begin
-     Result:=round(FKBassplayer.GetLength);
-    end;
-  3: //BassDllDynamic
-    begin
-//      Result:=fmp3.BassDll.Position;
+     //Wandelt ankommende Millisekunden in Sekunden um
+     Result:=round(Bassplayer1.PlayLength / 1000);
     end;
   end;
-  if Result=0 then Result:=1; //Verhindert evtl. Div. durch Null 
+  if Result=0 then Result:=1; //Verhindert evtl. Div. durch Null (Warum?)
 end;
 
 
@@ -409,8 +677,8 @@ function TSpieler.GetBassPlayLength(Filename: string) : integer;
 var
    basspl    : TBassplayer;
 begin
-   result:=0;
-
+   result:=-42;
+    {
    basspl:=TBassplayer.Create(fmp3.Handle);
 
    basspl.setFileToPlay(filename);
@@ -418,12 +686,59 @@ begin
    result:=round(basspl.length)*1000;
 
    basspl.freewithoutbassfree:=true;
-   basspl.free;
+   basspl.free;   }
+end;
+
+
+procedure TSpieler.VisConfig;
+begin
+  //Bassplayer1.ShowVisWindow;
+  VisControlForm.Show;
+end;
+
+
+procedure TSpieler.GetStreamInfo(FileName: string; var myID3:TID3Tag);
+
+var myStreamInfo:TStreamInfo;
+    mySupportedBy:TSupportedBy;
+
+
+begin
+  Bassplayer1.GetStreamInfo(FileName,myStreamInfo,mySupportedBy);
+
+  myid3.Titel   :=myStreamInfo.Title;
+  myid3.Artist  :=myStreamInfo.Artist;
+  myid3.Album   :=myStreamInfo.Album;
+  myid3.Year    :=myStreamInfo.Year;
+  myid3.Genre   :=myStreamInfo.Genre;
+  myid3.Comment :=myStreamInfo.Comment;
+  myid3.Track   :=myStreamInfo.Track;
+  myid3.dauer   :=myStreamInfo.Duration;
+
+
+
+  myid3.ausgelesen:=true;
+  
+  if extendedDebugLogInfo 
+  then
+    begin
+      if WinampPlugin = mySupportedBy then
+      fmp3.Log('Decodiert von Winamp');
+
+      if Both = mySupportedBy then
+      fmp3.Log('Decodiert von beiden');
+
+      if BASSNative = mySupportedBy then
+      fmp3.Log('Decodiert von BASSNative');
+
+      if none = mySupportedBy then
+      fmp3.Log('Decodiert von niemandem');
+    end;
 end;
 
 
 procedure TSpieler.SetBassVisMode(Mode: byte; Aktivate:boolean);
-begin
+begin        {
   case Mode of
      0: FKBassPlayer.doColorCycle     := Aktivate;
      1: FKBassPlayer.showVolumeVis    := Aktivate;
@@ -437,7 +752,7 @@ begin
      9: FKBassPlayer.doGlareBlur      := Aktivate;
     10: FKBassPlayer.doZoomBlur       := Aktivate;
     11: FKBassPlayer.doVanish         := Aktivate;
-  end;
+  end;  }
 end;
 
 

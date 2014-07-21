@@ -6,16 +6,16 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, LMDControl, LMDBaseControl,
   LMDBaseGraphicControl, LMDBaseLabel, LMDCustomLabel, LMDLabel, TB2Dock,
-  TBXDkPanels, TBXProgressBar, ComCtrls;
+  TBXDkPanels, TBXProgressBar, ComCtrls, StdCtrls;
 
 type
   TFStatus = class(TForm)
     LTitel: TLMDLabel;
     LName: TLMDLabel;
-    Animate1: TAnimate;
     TBXPB: TTBXProgressBar;
     TBXMultiDock1: TTBXMultiDock;
     TBXDockablePanel1: TTBXDockablePanel;
+    LSpeed: TLabel;
   private
     { Private-Deklarationen }
   public

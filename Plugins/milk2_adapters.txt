@@ -1,0 +1,13 @@
+Winamp version = 0x0000
+Plugin long name = "MilkDrop 2.0c", version=200, subversion=3
+Enumeration of Display Adapters:
+1. Driver=vmx_fb.dll
+    Description=VMware SVGA II
+    DeviceName=\\.\DISPLAY1
+    DriverVersion=0x00000023 (720902)
+    VendorId=5549
+    DeviceId=1029
+    SubSysId=0x040515AD
+    Revision=0
+    WHQLLevel=0
+    GUID=D7B71B4D 4745 11CF 3E 76 05 24 A9 C2 C6 35

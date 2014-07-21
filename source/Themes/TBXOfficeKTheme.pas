@@ -19,7 +19,7 @@ uses
 {*$DEFINE SMALL_CLOSE_BUTTON}// remove the asterisk for smaller close button size
 
 type
-  TGradDir = (tGLeftRight, tGTopBottom);
+  //TGradDir = (tGLeftRight, tGTopBottom);
   TItemPart = (ipBody, ipText, ipFrame);
   TBtnItemState = (bisNormal, bisDisabled, bisSelected, bisPressed, bisHot,
     bisDisabledHot, bisSelectedHot, bisPopupParent);
@@ -132,7 +132,8 @@ implementation
 
 {.$R tbx_glyphs.res}
 
-uses TBXUtils, TB2Common, TB2Item, Classes, Controls, Commctrl, Forms;
+uses
+  TBXUtils, TB2Common, TB2Item, Classes, Controls, Commctrl, Forms, rmkThemes;
 
 var
   StockImgList: TImageList;
@@ -306,51 +307,6 @@ begin
   end;
 end;
 
-procedure FillGradient(const DC: HDC; const ARect: TRect;
-  const StartColor, EndColor: TColor;
-  const Direction: TGradDir);
-var
-  rc1, rc2, gc1, gc2,
-    bc1, bc2, Counter, GSize: Integer;
-  Brush: HBrush;
-begin
-  rc1 := GetRValue(ColorToRGB(StartColor));
-  gc1 := GetGValue(ColorToRGB(StartColor));
-  bc1 := GetBValue(ColorToRGB(StartColor));
-  rc2 := GetRValue(ColorToRGB(EndColor));
-  gc2 := GetGValue(ColorToRGB(EndColor));
-  bc2 := GetBValue(ColorToRGB(EndColor));
-
-  if Direction = tGTopBottom then
-  begin
-    GSize := (ARect.Bottom - ARect.Top) - 1;
-    for Counter := 0 to GSize do
-    begin
-      Brush := CreateSolidBrush(
-        RGB(Byte(rc1 + (((rc2 - rc1) * (Counter)) div GSize)),
-        Byte(gc1 + (((gc2 - gc1) * (Counter)) div GSize)),
-        Byte(bc1 + (((bc2 - bc1) * (Counter)) div GSize))));
-      Windows.FillRect(DC, Rect(ARect.Left, ARect.Top, ARect.Right, ARect.Bottom
-        - Counter), Brush);
-      DeleteObject(Brush);
-    end;
-  end
-  else
-  begin
-    GSize := (ARect.Right - ARect.Left) - 1;
-    for Counter := 0 to GSize do
-    begin
-      Brush := CreateSolidBrush(
-        RGB(Byte(rc1 + (((rc2 - rc1) * (Counter)) div GSize)),
-        Byte(gc1 + (((gc2 - gc1) * (Counter)) div GSize)),
-        Byte(bc1 + (((bc2 - bc1) * (Counter)) div GSize))));
-      Windows.FillRect(DC, Rect(ARect.Left, ARect.Top, ARect.Right - Counter,
-        ARect.Bottom), Brush);
-      DeleteObject(Brush);
-    end;
-  end;
-end;
-
 procedure DrawButtonBitmap(Canvas: TCanvas; R: TRect; Color: TColor);
 const
 {$IFNDEF SMALL_CLOSE_BUTTON}
@@ -515,11 +471,11 @@ begin
 
       if IsHoriz then
       begin
-        FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGTopBottom);
+        GradientFill(Canvas.Handle, R, gradCol2, gradCol1, TGTopBottom);
       end
       else
       begin
-        FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight);
+        GradientFill(Canvas.Handle, R, gradCol2, gradCol1, TGLeftRight);
       end;
     end
     else
@@ -534,11 +490,11 @@ begin
         and ((AViewType and PVT_TOOLBOX) <> PVT_TOOLBOX) then
       begin
         R.Right := R.Right - 2;
-        //FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight);
+        //GradientFill(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight);
         R.Right := R.Left + 24;
           {this value is hardcoded but should be ItemInfo.PopupMargin}
-        //FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight);
-        FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGTopBottom);
+        //GradientFill(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight);
+        GradientFill(Canvas.Handle, R, gradCol2, gradCol1, TGTopBottom);
       end;
     end;
   end;
@@ -673,9 +629,9 @@ begin
         if BtnPressed or BtnHot or Embedded then
         begin
           // rmkA BR = Button Rectangle
-          FillGradient(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody),
-            gradCol2, TGTopBottom);
-          //FillGradient(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody), TGTopBottom);
+          GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody),
+            TGTopBottom);
+          //GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody), TGTopBottom);
           FrameRectEx(Canvas.Handle, BR, GetBtnColor(ItemInfo, ipFrame), True);
         end
         else if (ItemInfo.ViewType and VT_TOOLBAR) = VT_TOOLBAR then
@@ -709,7 +665,7 @@ begin
       begin
         if BtnPressed or BtnHot or Embedded then
         begin // rmkA
-          //FillGradient(Canvas.Handle, BR, GetBtnColor(ItemInfo, ipBody), gradCol2, TGTopBottom);
+          //GradientFill(Canvas.Handle, BR, GetBtnColor(ItemInfo, ipBody), gradCol2, TGTopBottom);
           FrameRectEx(Canvas.Handle, BR, GetBtnColor(ItemInfo, ipFrame), True);
         end
         else if (ItemInfo.ViewType and VT_TOOLBAR) = VT_TOOLBAR then
@@ -837,11 +793,11 @@ begin
         or ((ViewType and VT_POPUP) = VT_POPUP)) then
       begin
         if IsVertical then
-          FillGradient(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody),
-            gradCol2, TGLeftRight)
+          GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody),
+            TGLeftRight)
         else
-          FillGradient(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody),
-            gradCol2, TGTopBottom);
+          GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody),
+            TGTopBottom);
       end
       else
       begin
@@ -850,17 +806,17 @@ begin
         begin
           if Pushed then
             if IsVertical then
-              FillGradient(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo,
-                ipBody), TGLeftRight)
+              GradientFill(Canvas.Handle, R, GetBtnColor(ItemInfo,
+                ipBody), gradCol2, TGLeftRight)
             else
-              FillGradient(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo,
-                ipBody), TGTopBottom)
+              GradientFill(Canvas.Handle, R, GetBtnColor(ItemInfo,
+                ipBody), gradCol2, TGTopBottom)
           else if IsVertical then
-            FillGradient(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody),
-              gradCol2, TGLeftRight)
+            GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody),
+              TGLeftRight)
           else
-            FillGradient(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody),
-              gradCol2, TGTopBottom);
+            GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody),
+              TGTopBottom);
         end
         else
           FillRectEx(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody));
@@ -988,7 +944,7 @@ begin
         Dec(R.Right, GetSystemMetrics(SM_CYSMCAPTION) - 1);
 
       Brush.Color := CaptionColor;
-      FillGradient(Canvas.Handle, R, gradCol2, gradCol1, TGTopBottom);
+      GradientFill(Canvas.Handle, R, gradCol1, gradCol2, TGTopBottom);
       InflateRect(R, -2, 0);
       Font.Assign(SmCaptionFont);
       Font.Color := CaptionText;
@@ -1008,7 +964,7 @@ begin
       DrawLineEx(Canvas.Handle, R.Left - 1, R.Bottom, R.Right, R.Bottom,
         BodyColor);
       Brush.Color := CaptionColor;
-      FillGradient(Canvas.Handle, R, gradCol2, gradCol1, TGTopBottom);
+      GradientFill(Canvas.Handle, R, gradCol1, gradCol2, TGTopBottom);
       with R do
       begin
         X := (Left + Right - StockImgList.Width + 1) div 2;
@@ -1033,7 +989,7 @@ begin
   with ItemInfo do
     if Enabled and (HoverKind <> hkNone) then
       //rmk Info: this is the painting of menu item selected...
-      FillGradient(Canvas.Handle, R, GetPartColor(ItemInfo, ipBody), gradCol2,
+      GradientFill(Canvas.Handle, R, gradCol2, GetPartColor(ItemInfo, ipBody),
         TGTopBottom);
   FrameRectEx(Canvas.Handle, R, GetPartColor(ItemInfo, ipFrame), True);
 end;
@@ -1217,7 +1173,7 @@ begin
       R.Left := R.Left + 1;
       R.Right := R.Left + ItemInfo.PopupMargin - 2;
       FrameRectEx(Canvas.Handle, R, GetBtnColor(ItemInfo, ipFrame), True);
-      FillGradient(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody), gradCol2,
+      GradientFill(Canvas.Handle, R, gradCol2, GetBtnColor(ItemInfo, ipBody),
         TGTopBottom);
     end;
   end;
@@ -1377,10 +1333,10 @@ begin
       begin
         if (R.Right > R.Bottom) then
         begin
-          FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGTopBottom);
+          GradientFill(Canvas.Handle, R, gradCol2, gradCol1, TGTopBottom);
           R2 := R;
           R2.Left := R2.Right - 1;
-          FillGradient(Canvas.Handle, R2, GradBL, clBtnFace, TGTopBottom);
+          GradientFill(Canvas.Handle, R2, clBtnFace, GradBL, TGTopBottom);
 
           Pen.Color := gradBL;
           MoveTo(Left + 1, Bottom - 1);
@@ -1398,10 +1354,10 @@ begin
         end
         else
         begin
-          FillGradient(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight);
+          GradientFill(Canvas.Handle, R, gradCol2, gradCol1, TGLeftRight);
           R2 := R;
           R2.Top := R2.Bottom - 1;
-          FillGradient(Canvas.Handle, R2, GradBL, gradCol1, TGLeftRight);
+          GradientFill(Canvas.Handle, R2, gradCol1, GradBL, TGLeftRight);
 
           Pen.Color := gradBL;
           ;
@@ -1624,7 +1580,7 @@ begin
       DrawLineEx(Canvas.Handle, R.Left, R.Bottom, R.Right, R.Bottom, C);
       HeaderColor := clBtnFace;
       R.Bottom := R.Bottom + 1;
-      FillGradient(Canvas.Handle, R, gradCol2, gradCol1, TGTopBottom); // rmkB
+      GradientFill(Canvas.Handle, R, gradCol1, gradCol2, TGTopBottom); // rmkB
       R.Bottom := R.Bottom - 1;
     end
     else
@@ -1633,7 +1589,7 @@ begin
       DrawLineEx(Canvas.Handle, R.Right, R.Top, R.Right, R.Bottom, C);
       HeaderColor := clBtnFace;
       R.Right := R.Right + 1;
-      FillGradient(Canvas.Handle, R, gradCol2, gradCol1, TGLeftRight); // rmkB
+      GradientFill(Canvas.Handle, R, gradCol1, gradCol2, TGLeftRight); // rmkB
       R.Right := R.Right - 1;
     end;
 

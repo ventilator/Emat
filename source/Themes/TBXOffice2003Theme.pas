@@ -1,35 +1,25 @@
 unit TBXOffice2003Theme;
-//!!!!!!!!!!!!!!!  PaintCheckMark-> RoundRectEx ??? ausgeklammert!
-
 
 // TBX Package
 // Copyright 2001-2004 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// Office2003 theme
-// Copyright (c) Yury Plashenkov (Sep. 2005) <mailto:plashenkov@mail.ru>
-//
-// Version for TBX version 2.1
+// Office2003 Theme for TBX version 2.1
+// Copyright (c) Yury Plashenkov (Feb. 2008) <mailto:support@indasoftware.com>
 
 interface
 
 {$I TB2Ver.inc}
 {$I TBX.inc}
 
-// PngComponents is a set of components that allows you to include in your
-// application semitransparent PNG images
-// I advise you to get it from http://www.thany.org/
-// After installing, use TPngImageList (from PngComponents package) instead of
-// "classic" TImageList
+{$DEFINE ADAPT_TO_MS_LUNA_SCHEME}      // auto adaptation to current windows color scheme
+                                       // when switched off, use ColorScheme property to set up color scheme manually
 
-// Comment next string if you use Toolbar2000 version different from 2.1.6
-{$DEFINE TB2K_VER216} 
+{$DEFINE MODERN_STATUSBAR}             // modern status bar look
+{*$DEFINE GRADIENT_DOCK}               // turn on gradient docks
+{*$DEFINE DOCKPANEL_GRADIENT_CAPTION}  // gradient captions on dockpanels
 
-// Uncomment next string if you want to see highlighted icons
-//{$DEFINE HIGHLIGHTTOOLBARICONS}
-
-// Uncomment next string to turn on gradient captions on dockpanels
-{$DEFINE DOCKPANELGRADIENTCAPTION}
+{*$DEFINE HIGHLIGHT_TOOLBAR_ICONS}     // use highlighted toolbar icons
 
 uses
   Windows, Messages, Graphics, Classes, TBXThemes, ImgList, TBXUxThemes;
@@ -46,9 +36,16 @@ type
   TTBXOffice2003Theme = class(TTBXTheme)
   private
     FOnSetupColorCache: TNotifyEvent;
+    {$IFNDEF ADAPT_TO_MS_LUNA_SCHEME}
+    FColorScheme: TOffice2003Scheme;
+    procedure SetColorScheme(const Value: TOffice2003Scheme);
+    {$ENDIF}
     procedure TBXSysCommand(var Message: TMessage); message TBX_SYSCOMMAND;
   protected
     DockColor: TColor;
+    {$IFDEF GRADIENT_DOCK}
+    DockColor2: TColor;
+    {$ENDIF}
 
     ToolbarColor1: TColor;
     ToolbarColor2: TColor;
@@ -72,17 +69,23 @@ type
     BtnItemColors: array[TBtnItemState, ipText..ipFrame] of TColor;
     BtnBodyColors: array[TBtnItemState, Boolean] of TColor;
 
+    StatusBarColor1: TColor;
+    StatusBarColor2: TColor;
     StatusPanelFrameColor: TColor;
-    FMDIAreaColor: TColor;
+    
+    MDIColor: TColor;
+    IrregularGradientValue: Integer;
 
     procedure SetupColorCache; virtual;
   protected
+    { Internal Methods }
     function GetPartColor(const ItemInfo: TTBXItemInfo; ItemPart: TItemPart): TColor;
     function GetBtnColor(const ItemInfo: TTBXItemInfo; ItemPart: TItemPart; GradColor2: Boolean = False): TColor;
   public
     constructor Create(const AName: string); override;
     destructor Destroy; override;
 
+    { Metrics access }
     function  GetBooleanMetrics(Index: Integer): Boolean; override;
     function  GetIntegerMetrics(Index: Integer): Integer; override;
     procedure GetMargins(MarginID: Integer; out Margins: TTBXMargins); override;
@@ -95,6 +98,7 @@ type
     function  GetViewColor(AViewType: Integer): TColor; override;
     procedure GetViewMargins(ViewType: Integer; out Margins: TTBXMargins); override;
 
+    { Painting routines }
     procedure PaintBackgnd(Canvas: TCanvas; const ADockRect, ARect, AClipRect: TRect; AColor: TColor; Transparent: Boolean; AViewType: Integer); override;
     procedure PaintButton(Canvas: TCanvas; const ARect: TRect; const ItemInfo: TTBXItemInfo); override;
     procedure PaintCaption(Canvas: TCanvas; const ARect: TRect; const ItemInfo: TTBXItemInfo; const ACaption: string; AFormat: Cardinal; Rotated: Boolean); override;
@@ -118,15 +122,18 @@ type
     procedure PaintFrameControl(Canvas: TCanvas; R: TRect; Kind, State: Integer; Params: Pointer); override;
     procedure PaintStatusBar(Canvas: TCanvas; R: TRect; Part: Integer); override;
 
-    property MDIAreaColor: TColor read FMDIAreaColor;
-    
+    {$IFNDEF ADAPT_TO_MS_LUNA_SCHEME}
+    property ColorScheme: TOffice2003Scheme read FColorScheme write SetColorScheme;
+    {$ENDIF}
+    property MDIWorkspaceColor: TColor read MDIColor;
     property OnSetupColorCache: TNotifyEvent read FOnSetupColorCache write FOnSetupColorCache;
   end;
 
 function GetOffice2003Scheme: TOffice2003Scheme;
-procedure PaintGradient(DC: HDC; const ARect: TRect; Color1, Color2: TColor);
-procedure PaintIrregularGradient(DC: HDC; const ARect: TRect; Color1, Color2: TColor; Horz: Boolean);
-function GetMDIWorkspaceColor: TColor;
+procedure PaintGradient(DC: HDC; const ARect: TRect; Color1, Color2: TColor;
+  const Horz: Boolean);
+procedure PaintIrregularGradient(DC: HDC; const ARect: TRect;
+  Color1, Color2: TColor; const Horz: Boolean; const IrregularValue: Integer);
 
 implementation
 
@@ -146,7 +153,9 @@ begin
     GetMem(pszColorBuff,     2 * MaxChars);
     GetMem(pszSizeBuf,       2 * MaxChars);
     try
-      if not Failed(GetCurrentThemeName(pszThemeFileName, MaxChars, pszColorBuff, MaxChars, pszSizeBuf, MaxChars)) then
+      if not Failed(GetCurrentThemeName(pszThemeFileName, MaxChars,
+        pszColorBuff, MaxChars, pszSizeBuf, MaxChars)) then
+      begin
         if UpperCase(ExtractFileName(pszThemeFileName)) = 'LUNA.MSSTYLES' then
         begin
           S := UpperCase(pszColorBuff);
@@ -157,6 +166,7 @@ begin
           else if S = 'HOMESTEAD' then
             Result := osGreen;
         end;
+      end;
     finally
       FreeMem(pszSizeBuf);
       FreeMem(pszColorBuff);
@@ -165,53 +175,12 @@ begin
   end;
 end;
 
-procedure PaintGradient(DC: HDC; const ARect: TRect; Color1, Color2: TColor);
+procedure PaintGradient(DC: HDC; const ARect: TRect; Color1, Color2: TColor;
+  const Horz: Boolean);
 var
   r1, g1, b1, r2, g2, b2: Byte;
   I, Size: Integer;
-  hbr: HBRUSH;
-  lprc: TRect;
-begin
-  Color1 := ColorToRGB(Color1);
-  Color2 := ColorToRGB(Color2);
-  if Color1 = Color2 then
-    FillRectEx(DC, ARect, Color1)
-  else
-  begin
-    Size := ARect.Bottom - ARect.Top;
-    if Size <= 0 then Exit;
-
-    r1 := GetRValue(Color1);
-    g1 := GetGValue(Color1);
-    b1 := GetBValue(Color1);
-    r2 := GetRValue(Color2);
-    g2 := GetGValue(Color2);
-    b2 := GetBValue(Color2);
-
-    lprc := ARect;
-    lprc.Bottom := lprc.Top + 1;
-
-    Dec(Size);
-    for I := 0 to Size do
-    begin
-      hbr := CreateSolidBrush(RGB((r2 - r1) * I div Size + r1, (g2 - g1) * I div Size + g1, (b2 - b1) * I div Size + b1));
-      FillRect(DC, lprc, hbr);
-      DeleteObject(hbr);
-      OffsetRect(lprc, 0, 1);
-    end;
-  end;
-end;
-
-var
-  IrregularGradientValue: Integer;
-
-procedure PaintIrregularGradient(DC: HDC; const ARect: TRect; Color1, Color2: TColor; Horz: Boolean);
-var
-  r1, g1, b1, r2, g2, b2: Integer;
-  rm1, gm1, bm1, rm2, gm2, bm2: Integer;
-  lprc: TRect;
-  I, Size, Middle: Integer;
-  hbr: HBRUSH;
+  TempRect: TRect;
 begin
   Color1 := ColorToRGB(Color1);
   Color2 := ColorToRGB(Color2);
@@ -228,41 +197,88 @@ begin
     g2 := GetGValue(Color2);
     b2 := GetBValue(Color2);
 
-    lprc := ARect;
+    TempRect := ARect;
 
     if Horz then
     begin
       Size := ARect.Right - ARect.Left;
-      lprc.Right := lprc.Left + 1;
+      TempRect.Right := TempRect.Left + 1;
     end
     else
     begin
       Size := ARect.Bottom - ARect.Top;
-      lprc.Bottom := lprc.Top + 1;
+      TempRect.Bottom := TempRect.Top + 1;
+    end;
+
+    Dec(Size);
+    if Size = 0 then Exit;
+    
+    for I := 0 to Size do
+    begin
+      FillRectEx(DC, TempRect, RGB((r2 - r1) * I div Size + r1,
+        (g2 - g1) * I div Size + g1, (b2 - b1) * I div Size + b1));
+      OffsetRect(TempRect, Ord(Horz), Ord(not Horz));
+    end;
+  end;
+end;
+
+procedure PaintIrregularGradient(DC: HDC; const ARect: TRect;
+  Color1, Color2: TColor; const Horz: Boolean; const IrregularValue: Integer);
+var
+  r1, g1, b1, r2, g2, b2: Integer;
+  rm1, gm1, bm1, rm2, gm2, bm2: Integer;
+  TempRect: TRect;
+  I, Size, Middle: Integer;
+begin
+  Color1 := ColorToRGB(Color1);
+  Color2 := ColorToRGB(Color2);
+  if Color1 = Color2 then
+    FillRectEx(DC, ARect, Color1)
+  else
+  begin
+    if IsRectEmpty(ARect) then Exit;
+
+    r1 := GetRValue(Color1);
+    g1 := GetGValue(Color1);
+    b1 := GetBValue(Color1);
+    r2 := GetRValue(Color2);
+    g2 := GetGValue(Color2);
+    b2 := GetBValue(Color2);
+
+    TempRect := ARect;
+
+    if Horz then
+    begin
+      Size := ARect.Right - ARect.Left;
+      TempRect.Right := TempRect.Left + 1;
+    end
+    else
+    begin
+      Size := ARect.Bottom - ARect.Top;
+      TempRect.Bottom := TempRect.Top + 1;
     end;
 
     Middle := Size div 2;
 
-    rm1 := (r2 - r1) * IrregularGradientValue div 40 + r1;
-    gm1 := (g2 - g1) * IrregularGradientValue div 40 + g1;
-    bm1 := (b2 - b1) * IrregularGradientValue div 40 + b1;
+    rm1 := (r2 - r1) * IrregularValue div 40 + r1;
+    gm1 := (g2 - g1) * IrregularValue div 40 + g1;
+    bm1 := (b2 - b1) * IrregularValue div 40 + b1;
     rm2 := (rm1 - r1) * Size div Middle + r1;
     gm2 := (gm1 - g1) * Size div Middle + g1;
     bm2 := (bm1 - b1) * Size div Middle + b1;
 
     Dec(Size);
+    if Size = 0 then Exit;
+    
     for I := 0 to Middle - 1 do
     begin
-      hbr := CreateSolidBrush(RGB((rm2 - r1) * I div Size + r1, (gm2 - g1) * I div Size + g1, (bm2 - b1) * I div Size + b1));
-      FillRect(DC, lprc, hbr);
-      DeleteObject(hbr);
-      OffsetRect(lprc, Ord(Horz), Ord(not Horz));
+      FillRectEx(DC, TempRect, RGB((rm2 - r1) * I div Size + r1,
+        (gm2 - g1) * I div Size + g1, (bm2 - b1) * I div Size + b1));
+      OffsetRect(TempRect, Ord(Horz), Ord(not Horz));
     end;
 
-    hbr := CreateSolidBrush(RGB(rm1, gm1, bm1));
-    FillRect(DC, lprc, hbr);
-    DeleteObject(hbr);
-    OffsetRect(lprc, Ord(Horz), Ord(not Horz));
+    FillRectEx(DC, TempRect, RGB(rm1, gm1, bm1));
+    OffsetRect(TempRect, Ord(Horz), Ord(not Horz));
 
     rm1 := rm1 * 2 - r2;
     gm1 := gm1 * 2 - g2;
@@ -270,19 +286,11 @@ begin
 
     for I := Middle + 1 to Size do
     begin
-      hbr := CreateSolidBrush(RGB((r2 - rm1) * I div Size + rm1, (g2 - gm1) * I div Size + gm1, (b2 - bm1) * I div Size + bm1));
-      FillRect(DC, lprc, hbr);
-      DeleteObject(hbr);
-      OffsetRect(lprc, Ord(Horz), Ord(not Horz));
+      FillRectEx(DC, TempRect, RGB((r2 - rm1) * I div Size + rm1,
+        (g2 - gm1) * I div Size + gm1, (b2 - bm1) * I div Size + bm1));
+      OffsetRect(TempRect, Ord(Horz), Ord(not Horz));
     end;
   end;
-end;
-
-function GetMDIWorkspaceColor: TColor;
-const
-  MDIColors: array[TOffice2003Scheme] of TColor = ($AE9990, $B39A9B, $7BA097, clBtnShadow);
-begin
-  Result := MDIColors[GetOffice2003Scheme];
 end;
 
 var
@@ -304,16 +312,15 @@ end;
 
 function TTBXOffice2003Theme.GetBooleanMetrics(Index: Integer): Boolean;
 begin
-  case Index of
-    TMB_OFFICEXPPOPUPALIGNMENT: Result := True;
-    TMB_EDITMENUFULLSELECT:     Result := True;
-    TMB_EDITHEIGHTEVEN:         Result := False;
-    TMB_SOLIDTOOLBARNCAREA:     Result := False;
-    TMB_SOLIDTOOLBARCLIENTAREA: Result := True;
-    TMB_PAINTDOCKBACKGROUND:    Result := True;
-  else
-    Result := False;
-  end;
+  Result := Index in [
+    TMB_OFFICEXPPOPUPALIGNMENT,
+    TMB_EDITMENUFULLSELECT,
+    {$IFNDEF GRADIENT_DOCK}
+    TMB_SOLIDTOOLBARNCAREA,
+    {$ENDIF}
+    TMB_SOLIDTOOLBARCLIENTAREA,
+    TMB_PAINTDOCKBACKGROUND
+  ];
 end;
 
 function TTBXOffice2003Theme.GetIntegerMetrics(Index: Integer): Integer;
@@ -359,11 +366,12 @@ begin
   else if (AViewType and VT_DOCKPANEL) = VT_DOCKPANEL then Result := DockPanelColor;
 end;
 
-function TTBXOffice2003Theme.GetBtnColor(const ItemInfo: TTBXItemInfo; ItemPart: TItemPart; GradColor2: Boolean = False): TColor;
+function TTBXOffice2003Theme.GetBtnColor(const ItemInfo: TTBXItemInfo;
+  ItemPart: TItemPart; GradColor2: Boolean = False): TColor;
 const
-  BFlags1: array [Boolean] of TBtnItemState = (bisDisabled, bisDisabledHot);
-  BFlags2: array [Boolean] of TBtnItemState = (bisSelected, bisSelectedHot);
-  BFlags3: array [Boolean] of TBtnItemState = (bisNormal, bisHot);
+  BFlags1: array[Boolean] of TBtnItemState = (bisDisabled, bisDisabledHot);
+  BFlags2: array[Boolean] of TBtnItemState = (bisSelected, bisSelectedHot);
+  BFlags3: array[Boolean] of TBtnItemState = (bisNormal, bisHot);
 var
   B: TBtnItemState;
   Embedded: Boolean;
@@ -388,13 +396,14 @@ begin
   end;
 end;
 
-function TTBXOffice2003Theme.GetPartColor(const ItemInfo: TTBXItemInfo; ItemPart: TItemPart): TColor;
+function TTBXOffice2003Theme.GetPartColor(const ItemInfo: TTBXItemInfo;
+  ItemPart: TItemPart): TColor;
 const
-  MFlags1: array [Boolean] of TMenuItemState = (misDisabled, misDisabledHot);
-  MFlags2: array [Boolean] of TMenuItemState = (misNormal, misHot);
-  BFlags1: array [Boolean] of TBtnItemState = (bisDisabled, bisDisabledHot);
-  BFlags2: array [Boolean] of TBtnItemState = (bisSelected, bisSelectedHot);
-  BFlags3: array [Boolean] of TBtnItemState = (bisNormal, bisHot);
+  MFlags1: array[Boolean] of TMenuItemState = (misDisabled, misDisabledHot);
+  MFlags2: array[Boolean] of TMenuItemState = (misNormal, misHot);
+  BFlags1: array[Boolean] of TBtnItemState = (bisDisabled, bisDisabledHot);
+  BFlags2: array[Boolean] of TBtnItemState = (bisSelected, bisSelectedHot);
+  BFlags3: array[Boolean] of TBtnItemState = (bisNormal, bisHot);
 var
   IsMenuItem, Embedded: Boolean;
   M: TMenuItemState;
@@ -402,10 +411,10 @@ var
 begin
   with ItemInfo do
   begin
-    IsMenuItem := ((ViewType and PVT_POPUPMENU) = PVT_POPUPMENU) and
-      ((ItemOptions and IO_TOOLBARSTYLE) = 0);
-    Embedded := ((ViewType and VT_TOOLBAR) = VT_TOOLBAR) and
-      ((ViewType and TVT_EMBEDDED) = TVT_EMBEDDED);
+    IsMenuItem := (ViewType and PVT_POPUPMENU = PVT_POPUPMENU) and
+      (ItemOptions and IO_TOOLBARSTYLE = 0);
+    Embedded := (ViewType and VT_TOOLBAR = VT_TOOLBAR) and
+      (ViewType and TVT_EMBEDDED = TVT_EMBEDDED);
     if IsMenuItem then
     begin
       if not Enabled then M := MFlags1[HoverKind = hkKeyboardHover]
@@ -451,8 +460,8 @@ end;
 
 procedure TTBXOffice2003Theme.GetViewBorder(ViewType: Integer; out Border: TPoint);
 const
-  XMetrics: array [Boolean] of Integer = (SM_CXDLGFRAME, SM_CXFRAME);
-  YMetrics: array [Boolean] of Integer = (SM_CYDLGFRAME, SM_CYFRAME);
+  XMetrics: array[Boolean] of Integer = (SM_CXDLGFRAME, SM_CXFRAME);
+  YMetrics: array[Boolean] of Integer = (SM_CYDLGFRAME, SM_CYFRAME);
 var
   Resizable: Boolean;
 
@@ -501,11 +510,13 @@ begin
           LeftWidth := 2; RightWidth := 2;
           TopHeight := 2; BottomHeight := 2;
         end;
+
       MID_MENUITEM:
         begin
           LeftWidth := 1; RightWidth := 1;
           TopHeight := 3; BottomHeight := 3;
         end;
+        
       MID_STATUSPANE:
         begin
           LeftWidth := 1; RightWidth := 3;
@@ -519,28 +530,34 @@ begin
     end;
 end;
 
-procedure TTBXOffice2003Theme.PaintBackgnd(Canvas: TCanvas; const ADockRect, ARect, AClipRect: TRect;
-  AColor: TColor; Transparent: Boolean; AViewType: Integer);
-var
-  DC: HDC;
-  R: TRect;
-  Horz: Boolean;
+procedure TTBXOffice2003Theme.PaintBackgnd(Canvas: TCanvas;
+  const ADockRect, ARect, AClipRect: TRect; AColor: TColor;
+  Transparent: Boolean; AViewType: Integer);
 begin
-  DC := Canvas.Handle;
-  if not Transparent then
+  if AViewType and TVT_EMBEDDED <> TVT_EMBEDDED then
   begin
-    IntersectRect(R, ARect, AClipRect);
-    if ((AViewType and TVT_NORMALTOOLBAR = TVT_NORMALTOOLBAR) or (AViewType and TVT_TOOLWINDOW = TVT_TOOLWINDOW)) and not (AViewType and TVT_EMBEDDED = TVT_EMBEDDED) then
+    if (AViewType and TVT_NORMALTOOLBAR = TVT_NORMALTOOLBAR) or
+      (AViewType and TVT_TOOLWINDOW = TVT_TOOLWINDOW) then
     begin
-      if IsRectEmpty(ADockRect) then
-        Horz := (ARect.Right > ARect.Bottom)
-      else
-        Horz := Abs(R.Right - R.Left) > Abs(R.Bottom - R.Top);
-      PaintIrregularGradient(Canvas.Handle, R, ToolbarColor1, ToolbarColor2, not Horz);
+      PaintIrregularGradient(Canvas.Handle, ARect, ToolbarColor1, ToolbarColor2,
+        ARect.Right <= ARect.Bottom, IrregularGradientValue);
+      Exit;
     end
-    else
-      FillRectEx(DC, R, AColor);
+    {$IFDEF GRADIENT_DOCK}
+    else if (AViewType and TVT_MENUBAR = TVT_MENUBAR) and
+      (AViewType and TVT_FLOATING <> TVT_FLOATING) then
+    begin
+      if ARect.Right > ARect.Bottom then
+        PaintDock(Canvas, ARect, ADockRect, DP_TOP)
+      else
+        PaintIrregularGradient(Canvas.Handle, ARect, ToolbarColor1,
+          ToolbarColor2, True, IrregularGradientValue);
+      Exit;
+    end;
+    {$ENDIF}
   end;
+
+  if not Transparent then FillRectEx(Canvas.Handle, ARect, AColor);
 end;
 
 procedure TTBXOffice2003Theme.PaintCaption(Canvas: TCanvas;
@@ -554,13 +571,16 @@ begin
     R := ARect;
     Brush.Style := bsClear;
     if Font.Color = clNone then Font.Color := GetPartColor(ItemInfo, ipText);
-    if not Rotated then Windows.DrawText(Handle, PChar(ACaption), Length(ACaption), R, AFormat)
-    else DrawRotatedText(Handle, ACaption, R, AFormat);
+    if not Rotated then
+      Windows.DrawText(Handle, PChar(ACaption), Length(ACaption), R, AFormat)
+    else
+      DrawRotatedText(Handle, ACaption, R, AFormat);
     Brush.Style := bsSolid;
   end;
 end;
 
-procedure TTBXOffice2003Theme.PaintCheckMark(Canvas: TCanvas; ARect: TRect; const ItemInfo: TTBXItemInfo);
+procedure TTBXOffice2003Theme.PaintCheckMark(Canvas: TCanvas; ARect: TRect;
+  const ItemInfo: TTBXItemInfo);
 var
   DC: HDC;
   X, Y: Integer;
@@ -570,17 +590,19 @@ begin
   X := (ARect.Left + ARect.Right) div 2 - 2;
   Y := (ARect.Top + ARect.Bottom) div 2 + 1;
   C := GetBtnColor(ItemInfo, ipText);
- { if ItemInfo.ItemOptions and IO_RADIO > 0 then
+  if ItemInfo.ItemOptions and IO_RADIO > 0 then
   begin
-    RoundRectEx(DC, X - 1, Y - 4, X + 5, Y + 2, 2, 2, MixColors(C, ToolbarColor1, 200), clNone);
+    RoundRectEx(DC, X - 1, Y - 4, X + 5, Y + 2, 2, 2,
+      MixColors(C, ToolbarColor1, 200), clNone);
     RoundRectEx(DC, X - 1, Y - 4, X + 5, Y + 2, 6, 6, C, C);
   end
-  else }
+  else
     PolylineEx(DC, [Point(X - 2, Y - 2), Point(X, Y), Point(X + 4, Y - 4),
       Point(X + 4, Y - 3), Point(X, Y + 1), Point(X - 2, Y - 1), Point(X - 2, Y - 2)], C);
 end;
 
-procedure TTBXOffice2003Theme.PaintChevron(Canvas: TCanvas; ARect: TRect; const ItemInfo: TTBXItemInfo);
+procedure TTBXOffice2003Theme.PaintChevron(Canvas: TCanvas; ARect: TRect;
+  const ItemInfo: TTBXItemInfo);
 const
   Pattern: array[Boolean, 0..15] of Byte = (
     ($CC, 0, $66, 0, $33, 0, $66, 0, $CC, 0, 0, 0, 0, 0, 0, 0),
@@ -605,11 +627,12 @@ begin
     W := 5;
     H := 8;
   end;
-  DrawGlyph(Canvas.Handle, R2, W, H, Pattern[ItemInfo.IsVertical][0], GetPartColor(ItemInfo, ipText));
+  DrawGlyph(Canvas.Handle, R2, W, H, Pattern[ItemInfo.IsVertical][0],
+    GetPartColor(ItemInfo, ipText));
 end;
 
-procedure TTBXOffice2003Theme.PaintEditButton(Canvas: TCanvas; const ARect: TRect;
-  var ItemInfo: TTBXItemInfo; ButtonInfo: TTBXEditBtnInfo);
+procedure TTBXOffice2003Theme.PaintEditButton(Canvas: TCanvas;
+  const ARect: TRect; var ItemInfo: TTBXItemInfo; ButtonInfo: TTBXEditBtnInfo);
 var
   DC: HDC;
   BtnDisabled, BtnHot, BtnPressed, Embedded: Boolean;
@@ -620,8 +643,8 @@ var
 begin
   DC := Canvas.Handle;
   R := ARect;
-  Embedded := ((ItemInfo.ViewType and VT_TOOLBAR) = VT_TOOLBAR) and
-    ((ItemInfo.ViewType and TVT_EMBEDDED) = TVT_EMBEDDED);
+  Embedded := (ItemInfo.ViewType and VT_TOOLBAR = VT_TOOLBAR) and
+    (ItemInfo.ViewType and TVT_EMBEDDED = TVT_EMBEDDED);
 
   InflateRect(R, 1, 1);
   Inc(R.Left);
@@ -722,8 +745,8 @@ begin
   PaintFrame(Canvas, R, ItemInfo);
   W := EditFrameWidth;
   InflateRect(R, -W, -W);
-  Embedded := ((ItemInfo.ViewType and VT_TOOLBAR) = VT_TOOLBAR) and
-    ((ItemInfo.ViewType and TVT_EMBEDDED) = TVT_EMBEDDED);
+  Embedded := (ItemInfo.ViewType and VT_TOOLBAR = VT_TOOLBAR) and
+    (ItemInfo.ViewType and TVT_EMBEDDED = TVT_EMBEDDED);
   if not (ItemInfo.Enabled or Embedded) then
     FrameRectEx(DC, R, BtnItemColors[bisDisabled, ipText], False);
 
@@ -731,14 +754,16 @@ begin
 
   if ItemInfo.Enabled then
   begin
-    if ((ItemInfo.ViewType and VT_TOOLBAR) <> VT_TOOLBAR) and (GetPartColor(ItemInfo, ipFrame) = clNone) then
+    if (ItemInfo.ViewType and VT_TOOLBAR <> VT_TOOLBAR) and
+      (GetPartColor(ItemInfo, ipFrame) = clNone) then
       FrameRectEx(DC, R, ToolbarColor2, False)
     else
       FrameRectEx(DC, R, clWindow, False);
 
     InflateRect(R, -1, -1);
     FillRectEx(DC, R, clWindow);
-    if ((ItemInfo.ViewType and VT_TOOLBAR) <> VT_TOOLBAR) and (GetPartColor(ItemInfo, ipFrame) = clNone) then
+    if (ItemInfo.ViewType and VT_TOOLBAR <> VT_TOOLBAR) and
+      (GetPartColor(ItemInfo, ipFrame) = clNone) then
     begin
       R := ARect;
       InflateRect(R, -1, -1);
@@ -769,12 +794,15 @@ begin
     Y := (Top + Bottom) div 2 - 1;
     Pen.Color := GetPartColor(ItemInfo, ipText);
     Brush.Color := Pen.Color;
-    if ItemInfo.IsVertical then Polygon([Point(X, Y + 2), Point(X, Y - 2), Point(X - 2, Y)])
-    else Polygon([Point(X - 2, Y), Point(X + 2, Y), Point(X, Y + 2)]);
+    if ItemInfo.IsVertical then
+      Polygon([Point(X, Y + 2), Point(X, Y - 2), Point(X - 2, Y)])
+    else
+      Polygon([Point(X - 2, Y), Point(X + 2, Y), Point(X, Y + 2)]);
   end;
 end;
 
-procedure TTBXOffice2003Theme.PaintButton(Canvas: TCanvas; const ARect: TRect; const ItemInfo: TTBXItemInfo);
+procedure TTBXOffice2003Theme.PaintButton(Canvas: TCanvas; const ARect: TRect;
+  const ItemInfo: TTBXItemInfo);
 var
   DC: HDC;
   R: TRect;
@@ -798,10 +826,12 @@ begin
       tmpColor1 := GetBtnColor(ItemInfo, ipBody);
       tmpColor2 := GetBtnColor(ItemInfo, ipBody, True);
 
-      if (ItemInfo.ViewType and VT_POPUP = VT_POPUP) or (ItemInfo.ViewType and VT_TOOLBAR = VT_TOOLBAR) and (ItemInfo.ViewType and TVT_EMBEDDED = TVT_EMBEDDED) then
+      if (ItemInfo.ViewType and VT_POPUP = VT_POPUP) or
+        (ItemInfo.ViewType and VT_TOOLBAR = VT_TOOLBAR) and
+        (ItemInfo.ViewType and TVT_EMBEDDED = TVT_EMBEDDED) then
         FillRectEx(DC, R, tmpColor1)
       else if (tmpColor1 <> clNone) and (tmpColor2 <> clNone) then
-        PaintGradient(DC, R, tmpColor1, tmpColor2);
+        PaintGradient(DC, R, tmpColor1, tmpColor2, False);
     end;
     if ComboPart = cpSplitRight then PaintDropDownArrow(Canvas, R, ItemInfo);
   end;
@@ -840,7 +870,8 @@ begin
       
       SaveIndex := SaveDC(Canvas.Handle);
       Sz := WindowInfo.FloatingBorderSize;
-      with R, Sz do ExcludeClipRect(Canvas.Handle, Left + X, Top + Y, Right - X, Bottom - Y);
+      with R, Sz do
+        ExcludeClipRect(Canvas.Handle, Left + X, Top + Y, Right - X, Bottom - Y);
       FillRect(R);
       RestoreDC(Canvas.Handle, SaveIndex);
       InflateRect(R, -Sz.X, -Sz.Y);
@@ -852,15 +883,13 @@ begin
             Point(Right, Top), Point(Right, Bottom - 1),
             Point(Right - 1, Bottom),
             Point(Left, Bottom), Point(Left - 1, Bottom - 1),
-            Point(Left - 1, Top), Point(Left, Top - 1)
-            ])
+            Point(Left - 1, Top), Point(Left, Top - 1)])
         else
           Canvas.Polyline([
             Point(Left, Top - 1), Point(Right - 1, Top - 1),
             Point(Right, Top), Point(Right, Bottom),
             Point(Left - 1, Bottom),
-            Point(Left - 1, Top), Point(Left, Top - 1)
-            ]);
+            Point(Left - 1, Top), Point(Left, Top - 1)]);
     end;
 
     if not WindowInfo.ShowCaption then Exit;
@@ -961,7 +990,8 @@ begin
       else
         DrawTBXIconFlatShadow(Canvas, ARect, ImageList, ImageIndex, SeparatorColor1);
     end
-    else {$IFDEF HIGHLIGHTTOOLBARICONS}if Selected or Pushed or (HoverKind <> hkNone) or HiContrast or TBXHiContrast or TBXLoColor then{$ENDIF}
+    else {$IFDEF HIGHLIGHTTOOLBARICONS}if Selected or Pushed or
+      (HoverKind <> hkNone) or HiContrast or TBXHiContrast or TBXLoColor then{$ENDIF}
       DrawTBXIcon(Canvas, ARect, ImageList, ImageIndex, HiContrast)
     {$IFDEF HIGHLIGHTTOOLBARICONS}
     else
@@ -992,17 +1022,19 @@ var
   R: TRect;
 begin
   R := ARect;
-  if (ItemInfo.ViewType and PVT_TOOLBOX) <> PVT_TOOLBOX then with Canvas do
+  if ItemInfo.ViewType and PVT_TOOLBOX <> PVT_TOOLBOX then
   begin
     R.Right := R.Left + ItemInfo.PopupMargin + 2;
-    PaintIrregularGradient(Handle, R, ToolbarColor1, ToolbarColor2, True);
+    PaintIrregularGradient(Canvas.Handle, R, ToolbarColor1, ToolbarColor2, True,
+      IrregularGradientValue);
     Inc(R.Left);
     R.Right := ARect.Right - 1;
   end;
   PaintFrame(Canvas, R, ItemInfo);
 end;
 
-procedure TTBXOffice2003Theme.PaintMenuItem(Canvas: TCanvas; const ARect: TRect; var ItemInfo: TTBXItemInfo);
+procedure TTBXOffice2003Theme.PaintMenuItem(Canvas: TCanvas; const ARect: TRect;
+  var ItemInfo: TTBXItemInfo);
 var
   DC: HDC;
   R: TRect;
@@ -1046,7 +1078,8 @@ begin
   end;
 end;
 
-procedure TTBXOffice2003Theme.PaintPopupNCArea(Canvas: TCanvas; R: TRect; const PopupInfo: TTBXPopupInfo);
+procedure TTBXOffice2003Theme.PaintPopupNCArea(Canvas: TCanvas; R: TRect;
+  const PopupInfo: TTBXPopupInfo);
 var
   PR: TRect;
 begin
@@ -1112,7 +1145,7 @@ begin
       begin
         R := ARect;
         R.Right := ItemInfo.PopupMargin + 2;
-        PaintIrregularGradient(DC, R, ToolbarColor1, ToolbarColor2, True);
+        PaintIrregularGradient(DC, R, ToolbarColor1, ToolbarColor2, True, IrregularGradientValue);
         Inc(Left, ItemInfo.PopupMargin + 9);
         Top := (Top + Bottom) div 2;
         if Enabled then DrawLineEx(DC, Left, Top, Right, Top, SeparatorColor1);
@@ -1149,19 +1182,20 @@ end;
 procedure DrawButtonBitmap(DC: HDC; R: TRect; Color: TColor);
 const
 {$IFNDEF SMALL_CLOSE_BUTTON}
-  Pattern: array [0..15] of Byte =
+  Pattern: array[0..15] of Byte =
     ($C3, 0, $66, 0, $3C, 0, $18, 0, $3C, 0, $66, 0, $C3, 0, 0, 0);
 {$ELSE}
-  Pattern: array [0..15] of Byte =
+  Pattern: array[0..15] of Byte =
     (0, 0, $63, 0, $36, 0, $1C, 0, $1C, 0, $36, 0, $63, 0, 0, 0);
 {$ENDIF}
 begin
   DrawGlyph(DC, R, 8, 7, Pattern[0], Color);
 end;
 
-procedure TTBXOffice2003Theme.PaintToolbarNCArea(Canvas: TCanvas; R: TRect; const ToolbarInfo: TTBXToolbarInfo);
+procedure TTBXOffice2003Theme.PaintToolbarNCArea(Canvas: TCanvas; R: TRect;
+  const ToolbarInfo: TTBXToolbarInfo);
 const
-  DragHandleOffsets: array [Boolean, DHS_DOUBLE..DHS_SINGLE] of Integer = ((2, 0, 1), (5, 0, 5));
+  DragHandleOffsets: array[Boolean, DHS_DOUBLE..DHS_SINGLE] of Integer = ((2, 0, 1), (5, 0, 5));
 
   function GetBtnItemState(BtnState: Integer): TBtnItemState;
   begin
@@ -1189,9 +1223,14 @@ var
 begin
   DC := Canvas.Handle;
   Horz := not ToolbarInfo.IsVertical;
+  IsMenuBar := (ToolbarInfo.ViewType and TVT_MENUBAR = TVT_MENUBAR)
+    {$IFDEF GRADIENT_DOCK} and Horz {$ENDIF};
+
+  {$IFNDEF GRADIENT_DOCK}
+  FillRectEx(DC, R, DockColor);
+  {$ENDIF}
   with Canvas do
   begin
-    IsMenuBar := ToolbarInfo.ViewType and TVT_MENUBAR = TVT_MENUBAR;
     if (ToolbarInfo.BorderStyle = bsSingle) and not IsMenuBar then
     begin
       I := ColorIntensity(clBtnFace);
@@ -1203,24 +1242,27 @@ begin
         begin
           if Horz then
           begin
-            {left}
-            PaintIrregularGradient(Handle, Rect(Left, Top + 1, Left + 1, Bottom - 1), ToolbarColor1, ToolbarColor2, False);
+            { Left }
+            PaintIrregularGradient(Handle, Rect(Left, Top + 1, Left + 1, Bottom - 1),
+              ToolbarColor1, ToolbarColor2, False, IrregularGradientValue);
 
-            {right}
-            PaintIrregularGradient(Handle, Rect(Right - 1, Top + 1, Right, Bottom - 1), ToolbarColor1, ToolbarColor2, False);
-            PaintIrregularGradient(Handle, Rect(Right, Top + 1, Right + 1, Bottom - 1), ToolbarColor2, ToolbarFrameColor1, False);
+            { Right }
+            PaintIrregularGradient(Handle, Rect(Right - 1, Top + 1, Right, Bottom - 1),
+              ToolbarColor1, ToolbarColor2, False, IrregularGradientValue);
+            PaintIrregularGradient(Handle, Rect(Right, Top + 1, Right + 1, Bottom - 1),
+              ToolbarColor2, ToolbarFrameColor1, False, IrregularGradientValue);
 
-            {top}
+            { Top }
             Pen.Color := ToolbarColor1;
             Polyline([Point(Left + 2, Top), Point(Right - 1, Top)]);
 
-            {bottom}
+            { Bottom }
             Pen.Color := ToolbarColor2;
             Polyline([Point(Left + 1, Bottom - 1), Point(Right - 1, Bottom - 1)]);
             Pen.Color := ToolbarFrameColor1;
             Polyline([Point(Left + 2, Bottom), Point(Right - 1, Bottom)]);
 
-            {pixels}
+            { Pixels }
             SetPixelV(Handle, Left + 1, Top, ToolbarFrameColor2);
             SetPixelV(Handle, Left, Top + 1, ToolbarFrameColor2);
             SetPixelV(Handle, Right - 1, Top, ToolbarFrameColor2);
@@ -1229,24 +1271,27 @@ begin
           end
           else
           begin
-            {left}
+            { Left }
             Pen.Color := ToolbarColor1;
             Polyline([Point(Left, Top + 2), Point(Left, Bottom - 1)]);
 
-            {right}
+            { Right }
             Pen.Color := ToolbarColor2;
             Polyline([Point(Right - 1, Top + 1), Point(Right - 1, Bottom - 1)]);
             Pen.Color := ToolbarFrameColor1;
             Polyline([Point(Right, Top + 2), Point(Right, Bottom - 1)]);
 
-            {top}
-            PaintIrregularGradient(Handle, Rect(Left + 1, Top, Right - 1, Top + 1), ToolbarColor1, ToolbarColor2, True);
+            { Top }
+            PaintIrregularGradient(Handle, Rect(Left + 1, Top, Right - 1, Top + 1),
+              ToolbarColor1, ToolbarColor2, True, IrregularGradientValue);
 
-            {bottom}
-            PaintIrregularGradient(Handle, Rect(Left + 2, Bottom - 1, Right - 1, Bottom), ToolbarColor1, ToolbarColor2, True);
-            PaintIrregularGradient(Handle, Rect(Left + 2, Bottom, Right - 1, Bottom + 1), ToolbarColor2, ToolbarFrameColor1, True);
+            { Bottom }
+            PaintIrregularGradient(Handle, Rect(Left + 2, Bottom - 1, Right - 1, Bottom),
+              ToolbarColor1, ToolbarColor2, True, IrregularGradientValue);
+            PaintIrregularGradient(Handle, Rect(Left + 2, Bottom, Right - 1, Bottom + 1),
+              ToolbarColor2, ToolbarFrameColor1, True, IrregularGradientValue);
 
-            {pixels}
+            { Pixels }
             SetPixelV(Handle, Left + 1, Top, ToolbarFrameColor2);
             SetPixelV(Handle, Left, Top + 1, ToolbarFrameColor2);
             SetPixelV(Handle, Left + 1, Bottom - 1, ToolbarColor2);
@@ -1302,7 +1347,8 @@ begin
       end;
 
       if not IsMenuBar then
-        PaintIrregularGradient(Canvas.Handle, Rect(R.Left - 1, R.Top - 1, R.Right, R.Bottom), ToolbarColor1, ToolbarColor2, not Horz)
+        PaintIrregularGradient(Canvas.Handle, Rect(R.Left - 1, R.Top - 1, R.Right, R.Bottom),
+          ToolbarColor1, ToolbarColor2, not Horz, IrregularGradientValue)
       else
       begin
         Inc(R2.Left);
@@ -1354,11 +1400,35 @@ end;
 
 procedure TTBXOffice2003Theme.PaintDock(Canvas: TCanvas; const ClientRect,
   DockRect: TRect; DockPosition: Integer);
+{$IFDEF GRADIENT_DOCK}
+var
+  DC: HDC;
+  P: TPoint;
+  MaxWidth: Integer;
+  Color1, Color2: TColor;
+begin
+  DC := Canvas.Handle;
+  if GetCurrentPositionEx(DC, @P) then
+  begin
+    MaxWidth := Screen.Width;
+    Color1 := Blend(DockColor2, DockColor, Min(TSmallPoint(P.X).X * 100 div MaxWidth, 99));
+    Color2 := Blend(DockColor2, DockColor, Min(TSmallPoint(P.Y).X * 100 div MaxWidth, 99));
+  end
+  else
+  begin
+    Color1 := DockColor;
+    Color2 := DockColor2;
+  end;
+  PaintGradient(DC, DockRect, Color1, Color2, True);
+end;
+{$ELSE}
 begin
   FillRectEx(Canvas.Handle, DockRect, DockColor);
 end;
+{$ENDIF}
 
-procedure TTBXOffice2003Theme.PaintDockPanelNCArea(Canvas: TCanvas; R: TRect; const DockPanelInfo: TTBXDockPanelInfo);
+procedure TTBXOffice2003Theme.PaintDockPanelNCArea(Canvas: TCanvas; R: TRect;
+  const DockPanelInfo: TTBXDockPanelInfo);
 
   function GetBtnItemState(BtnState: Integer): TBtnItemState;
   begin
@@ -1467,21 +1537,32 @@ begin
   end;
 end;
 
+{$IFNDEF ADAPT_TO_MS_LUNA_SCHEME}
+procedure TTBXOffice2003Theme.SetColorScheme(const Value: TOffice2003Scheme);
+begin
+  if FColorScheme <> Value then
+  begin
+    FColorScheme := Value;
+    SetupColorCache;
+  end;
+end;
+{$ENDIF}
+
 procedure TTBXOffice2003Theme.SetupColorCache;
 const
-  Office2003Colors: array[osBlue..osGreen, 0..27] of TColor = (
-    ($F5BE9E, $FEECDD, $E2A981, $9C613B, $FAD5BD, $CB8C6A, $FFF9F1, $764127,
-     $FFFFFF, $F0C7A9, $B99D7F, $DEDEDE, $F6F6F6, $962D00, $000000, $8D8D8D,
-     $800000, $C9662A, $8CD5FF, $55ADFF, $4E91FE, $8ED3FF, $CCF4FF, $91D0FF,
-     $FFEFE3, $E7B593, $C2EEFF, $AE9990),
-    ($E5D7D7, $FAF4F3, $B59799, $947C7C, $EFE5E5, $8F6D6E, $FFFFFF, $755454,
-     $FFFFFF, $D3C0C0, $B2ACA5, $DEDEDE, $FFFAFD, $947C7C, $000000, $8D8D8D,
-     $6F4B4B, $99797A, $8CD5FF, $55ADFF, $4E91FE, $8ED3FF, $CCF4FF, $91D0FF,
-     $F1E9E8, $CDB9BA, $C2EEFF, $B39A9B),
-    ($A7D9D9, $DEF7F4, $91C6B7, $588060, $C0E7E5, $588060, $DEF7F4, $335E51,
-     $FFFFFF, $9FD4C5, $7FB9A4, $DEDEDE, $EEF4F4, $5E8D75, $000000, $8D8D8D,
-     $385D3F, $5E8674, $8CD5FF, $55ADFF, $4E91FE, $8ED3FF, $CCF4FF, $91D0FF,
-     $D5F0EC, $9FCEC2, $C2EEFF, $7BA097) 
+  Office2003Colors: array[osBlue..osGreen, 0..28] of TColor = (
+    ($F5BE9E, $F9DAC3, $FEECDD, $E2A981, $9C613B, $FAD5BD, $CB8C6A, $FFF9F1,
+     $764127, $FFFFFF, $F0C7A9, $B99D7F, $DEDEDE, $F6F6F6, $962D00, $000000,
+     $8D8D8D, $800000, $C9662A, $8CD5FF, $55ADFF, $4E91FE, $8ED3FF, $CCF4FF,
+     $91D0FF, $FFEFE3, $E7B593, $C2EEFF, $AE9990),
+    ($E5D7D7, $F7F3F3, $FAF4F3, $B59799, $947C7C, $EFE5E5, $8F6D6E, $FFFFFF,
+     $755454, $FFFFFF, $D3C0C0, $B2ACA5, $DEDEDE, $FFFAFD, $947C7C, $000000,
+     $8D8D8D, $6F4B4B, $99797A, $8CD5FF, $55ADFF, $4E91FE, $8ED3FF, $CCF4FF,
+     $91D0FF, $F1E9E8, $CDB9BA, $C2EEFF, $B39A9B),
+    ($A7D9D9, $E4F0F2, $DEF7F4, $91C6B7, $588060, $C0E7E5, $588060, $DEF7F4,
+     $335E51, $FFFFFF, $9FD4C5, $7FB9A4, $DEDEDE, $EEF4F4, $5E8D75, $000000,
+     $8D8D8D, $385D3F, $5E8674, $8CD5FF, $55ADFF, $4E91FE, $8ED3FF, $CCF4FF,
+     $91D0FF, $D5F0EC, $9FCEC2, $C2EEFF, $7BA097)
   );
   Office2003IrregularGradientValues: array[TOffice2003Scheme] of Integer = (8, 8, 25, 15);
 
@@ -1501,6 +1582,9 @@ begin
   if TBXLoColor then
   begin
     DockColor             := clBtnFace;
+    {$IFDEF GRADIENT_DOCK}
+    DockColor2            := clBtnFace;
+    {$ENDIF}
 
     ToolbarColor1         := clBtnFace;
     ToolbarColor2         := clBtnFace;
@@ -1574,40 +1658,50 @@ begin
     MenuItemColors[misDisabledHot, ipText]  := clGrayText;
     MenuItemColors[misDisabledHot, ipFrame] := MenuItemFrame;
 
+    StatusBarColor1 := clBtnFace;
+    StatusBarColor2 := clBtnFace;
     StatusPanelFrameColor := clBtnShadow;
-    FMDIAreaColor := clBtnShadow;
+    
+    MDIColor := clBtnShadow;
   end
   else
   begin
-
+    {$IFDEF ADAPT_TO_MS_LUNA_SCHEME}
     Scheme := GetOffice2003Scheme;
+    {$ELSE}
+    Scheme := FColorScheme;
+    {$ENDIF}
+
     if Scheme <> osUnknown then
     begin
       DockColor             := Office2003Colors[Scheme, 0];
+      {$IFDEF GRADIENT_DOCK}
+      DockColor2            := Office2003Colors[Scheme, 1];
+      {$ENDIF}
 
-      ToolbarColor1         := Office2003Colors[Scheme, 1];
-      ToolbarColor2         := Office2003Colors[Scheme, 2];
-      ToolbarFrameColor1    := Office2003Colors[Scheme, 3];
-      ToolbarFrameColor2    := Office2003Colors[Scheme, 4];
-      SeparatorColor1       := Office2003Colors[Scheme, 5];
-      SeparatorColor2       := Office2003Colors[Scheme, 6];
-      DragHandleColor1      := Office2003Colors[Scheme, 7];
-      DragHandleColor2      := Office2003Colors[Scheme, 8];
+      ToolbarColor1         := Office2003Colors[Scheme, 2];
+      ToolbarColor2         := Office2003Colors[Scheme, 3];
+      ToolbarFrameColor1    := Office2003Colors[Scheme, 4];
+      ToolbarFrameColor2    := Office2003Colors[Scheme, 5];
+      SeparatorColor1       := Office2003Colors[Scheme, 6];
+      SeparatorColor2       := Office2003Colors[Scheme, 7];
+      DragHandleColor1      := Office2003Colors[Scheme, 8];
+      DragHandleColor2      := Office2003Colors[Scheme, 9];
 
-      EmbeddedColor         := Office2003Colors[Scheme, 9];
-      EmbeddedFrameColor    := Office2003Colors[Scheme, 10];
-      EmbeddedDisabledColor := Office2003Colors[Scheme, 11];
+      EmbeddedColor         := Office2003Colors[Scheme, 10];
+      EmbeddedFrameColor    := Office2003Colors[Scheme, 11];
+      EmbeddedDisabledColor := Office2003Colors[Scheme, 12];
 
-      PopupColor            := Office2003Colors[Scheme, 12];
-      PopupFrameColor       := Office2003Colors[Scheme, 13];
+      PopupColor            := Office2003Colors[Scheme, 13];
+      PopupFrameColor       := Office2003Colors[Scheme, 14];
 
       DockPanelColor        := ToolbarColor1;
 
-      EnabledText           := Office2003Colors[Scheme, 14];
-      DisabledText          := Office2003Colors[Scheme, 15];
-      MenuItemFrame         := Office2003Colors[Scheme, 16];
+      EnabledText           := Office2003Colors[Scheme, 15];
+      DisabledText          := Office2003Colors[Scheme, 16];
+      MenuItemFrame         := Office2003Colors[Scheme, 17];
 
-      WinFrameColors[wfpBorder]      := Office2003Colors[Scheme, 17];
+      WinFrameColors[wfpBorder]      := Office2003Colors[Scheme, 18];
       WinFrameColors[wfpCaption]     := WinFrameColors[wfpBorder];
       WinFrameColors[wfpCaptionText] := clWhite;
 
@@ -1632,18 +1726,18 @@ begin
       BtnBodyColors[bisNormal, True]          := clNone;
       BtnBodyColors[bisDisabled, False]       := clNone;
       BtnBodyColors[bisDisabled, True]        := clNone;
-      BtnBodyColors[bisSelected, False]       := Office2003Colors[Scheme, 18];
-      BtnBodyColors[bisSelected, True]        := Office2003Colors[Scheme, 19];
-      BtnBodyColors[bisPressed, False]        := Office2003Colors[Scheme, 20];
-      BtnBodyColors[bisPressed, True]         := Office2003Colors[Scheme, 21];
-      BtnBodyColors[bisHot, False]            := Office2003Colors[Scheme, 22];
-      BtnBodyColors[bisHot, True]             := Office2003Colors[Scheme, 23];
+      BtnBodyColors[bisSelected, False]       := Office2003Colors[Scheme, 19];
+      BtnBodyColors[bisSelected, True]        := Office2003Colors[Scheme, 20];
+      BtnBodyColors[bisPressed, False]        := Office2003Colors[Scheme, 21];
+      BtnBodyColors[bisPressed, True]         := Office2003Colors[Scheme, 22];
+      BtnBodyColors[bisHot, False]            := Office2003Colors[Scheme, 23];
+      BtnBodyColors[bisHot, True]             := Office2003Colors[Scheme, 24];
       BtnBodyColors[bisDisabledHot, False]    := BtnBodyColors[bisHot, False];
       BtnBodyColors[bisDisabledHot, True]     := BtnBodyColors[bisHot, True];
       BtnBodyColors[bisSelectedHot, False]    := BtnBodyColors[bisPressed, False];
       BtnBodyColors[bisSelectedHot, True]     := BtnBodyColors[bisPressed, True];
-      BtnBodyColors[bisPopupParent, False]    := Office2003Colors[Scheme, 24];
-      BtnBodyColors[bisPopupParent, True]     := Office2003Colors[Scheme, 25];
+      BtnBodyColors[bisPopupParent, False]    := Office2003Colors[Scheme, 25];
+      BtnBodyColors[bisPopupParent, True]     := Office2003Colors[Scheme, 26];
 
       MenuItemColors[misNormal, ipBody]       := clNone;
       MenuItemColors[misNormal, ipText]       := EnabledText;
@@ -1651,19 +1745,32 @@ begin
       MenuItemColors[misDisabled, ipBody]     := clNone;
       MenuItemColors[misDisabled, ipText]     := DisabledText;
       MenuItemColors[misDisabled, ipFrame]    := clNone;
-      MenuItemColors[misHot, ipBody]          := Office2003Colors[Scheme, 26];
+      MenuItemColors[misHot, ipBody]          := Office2003Colors[Scheme, 27];
       MenuItemColors[misHot, ipText]          := MenuItemColors[misNormal, ipText];
       MenuItemColors[misHot, ipFrame]         := MenuItemFrame;
       MenuItemColors[misDisabledHot, ipBody]  := PopupColor;
       MenuItemColors[misDisabledHot, ipText]  := DisabledText;
       MenuItemColors[misDisabledHot, ipFrame] := MenuItemColors[misHot, ipFrame];
 
+      {$IFDEF MODERN_STATUSBAR}
+      StatusBarColor1 := ToolbarColor1;
+      StatusBarColor2 := ToolbarColor2;
       StatusPanelFrameColor := Blend(ToolbarColor2, clBlack, 90);
-      FMDIAreaColor := Office2003Colors[Scheme, 27];
+      {$ELSE}
+      StatusBarColor1 := clBtnFace;
+      StatusBarColor2 := clBtnFace;
+      StatusPanelFrameColor := Blend(clBtnShadow, clBtnFace, 30);
+      SetContrast(StatusPanelFrameColor, clBtnFace, 30);
+      {$ENDIF}
+      
+      MDIColor := Office2003Colors[Scheme, 28];
     end
     else
     begin
       DockColor             := clBtnFace;
+      {$IFDEF GRADIENT_DOCK}
+      DockColor2            := Blend(clBtnFace, clWindow, 20);
+      {$ENDIF}
 
       ToolbarColor1         := Blend(clBtnFace, clWindow, 23);
       ToolbarColor2         := Blend(clBtnFace, clWindow, 96);
@@ -1739,13 +1846,24 @@ begin
       MenuItemColors[misDisabledHot, ipText]  := DisabledText;
       MenuItemColors[misDisabledHot, ipFrame] := MenuItemColors[misHot, ipFrame];
 
+      {$IFDEF MODERN_STATUSBAR}
+      StatusBarColor1 := ToolbarColor1;
+      StatusBarColor2 := ToolbarColor2;
       StatusPanelFrameColor := Blend(ToolbarColor2, clBlack, 90);
-      FMDIAreaColor := clBtnShadow;
+      {$ELSE}
+      StatusBarColor1 := clBtnFace;
+      StatusBarColor2 := clBtnFace;
+      StatusPanelFrameColor := Blend(clWindow, clBtnFace, 30);
+      SetContrast(StatusPanelFrameColor, clBtnFace, 30);
+      {$ENDIF}
+      
+      MDIColor := clBtnShadow;
     end;
 
     IrregularGradientValue := Office2003IrregularGradientValues[Scheme];
 
     Undither(DockColor);
+    {$IFDEF GRADIENT_DOCK} Undither(DockColor2); {$ENDIF}
     
     Undither(ToolbarColor1);
     Undither(ToolbarColor2);
@@ -1816,8 +1934,11 @@ begin
     Undither(MenuItemColors[misDisabledHot, ipText]);
     Undither(MenuItemColors[misDisabledHot, ipFrame]);
 
+    Undither(StatusBarColor1);
+    Undither(StatusBarColor2);
     Undither(StatusPanelFrameColor);
-    Undither(FMDIAreaColor);
+    
+    Undither(MDIColor);
   end;
   
   if Assigned(FOnSetupColorCache) then FOnSetupColorCache(Self);
@@ -1834,6 +1955,9 @@ begin
   if CounterLock = 0 then InitializeStock;
   Inc(CounterLock);
   AddTBXSysChangeNotification(Self);
+  {$IFNDEF ADAPT_TO_MS_LUNA_SCHEME}
+  FColorScheme := osUnknown;
+  {$ENDIF}
   SetupColorCache;
 end;
 
@@ -1845,7 +1969,8 @@ begin
   inherited;
 end;
 
-procedure TTBXOffice2003Theme.GetViewMargins(ViewType: Integer; out Margins: TTBXMargins);
+procedure TTBXOffice2003Theme.GetViewMargins(ViewType: Integer;
+  out Margins: TTBXMargins);
 begin
   Margins.LeftWidth := 0;
   Margins.TopHeight := 0;
@@ -1903,7 +2028,8 @@ begin
   end;
 end;
 
-procedure TTBXOffice2003Theme.PaintFrameControl(Canvas: TCanvas; R: TRect; Kind, State: Integer; Params: Pointer);
+procedure TTBXOffice2003Theme.PaintFrameControl(Canvas: TCanvas; R: TRect;
+  Kind, State: Integer; Params: Pointer);
 var
   DC: HDC;
   X, Y: Integer;
@@ -1997,16 +2123,23 @@ procedure TTBXOffice2003Theme.PaintStatusBar(Canvas: TCanvas; R: TRect; Part: In
 
   procedure DrawHandleElement(const P: TPoint);
   begin
-    Canvas.Brush.Color := DragHandleColor2;
+    Canvas.Brush.Color :=
+      {$IFDEF MODERN_STATUSBAR} DragHandleColor2 {$ELSE} clBtnHighlight {$ENDIF};
     Canvas.FillRect(Rect(P.X - 2, P.Y - 2, P.X, P.Y));
-    Canvas.Brush.Color := DragHandleColor1;
+    Canvas.Brush.Color :=
+      {$IFDEF MODERN_STATUSBAR} DragHandleColor1 {$ELSE} clBtnShadow {$ENDIF};
     Canvas.FillRect(Rect(P.X - 3, P.Y - 3, P.X - 1, P.Y - 1));
   end;
   
 begin
   case Part of
     SBP_BODY:
-      PaintIrregularGradient(Canvas.Handle, R, ToolbarColor1, ToolbarColor2, False);
+      {$IFDEF MODERN_STATUSBAR}
+      PaintIrregularGradient(Canvas.Handle, R, StatusBarColor1, StatusBarColor2,
+        False, IrregularGradientValue);
+      {$ELSE}
+      FillRectEx(Canvas.Handle, R, StatusBarColor1);
+      {$ENDIF}
     SBP_PANE, SBP_LASTPANE:
       begin
         if Part = SBP_PANE then Dec(R.Right, 2);

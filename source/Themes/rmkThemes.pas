@@ -10,12 +10,13 @@ type
 
 procedure ButtonFrame(Canvas: TCanvas; R: TRect; RL, RR: Integer; c1, c2, c3:
   TColor);
+
 procedure SmartFrame(Canvas: TCanvas; R: TRect; RL, RR: Integer; c1, c2: TColor);
 procedure GradientGlass(const Canvas: TCanvas; const ARect: TRect;
             const Aqua:Boolean; const Direction: TGradDir);  Overload;
 procedure GradientGlass(const Canvas: TCanvas; const ARect: TRect;
             const Aqua, Dark: Boolean; const Direction: TGradDir); Overload;
-procedure OLDGradientFill(const Canvas: TCanvas; const ARect: TRect;
+procedure GradientFillOld(const Canvas: TCanvas; const ARect: TRect;
   const StartColor, EndColor: TColor; const Direction: TGradDir);
 
 // ---
@@ -126,16 +127,67 @@ begin
   end;
 end;
 
+// From Alex aluminum theme
+procedure RoundFrame(DC: HDC; R: TRect; TL, TR, BL, BR: Integer; Color: TColor); overload;
+var
+  Radius: Integer;
+  CornerID: Integer;
+
+  procedure PutPixel(X, Y: Integer; Alpha: Integer);
+  begin
+    with R do
+      case CornerID of
+        0: SetPixelEx(DC, Left + X,  Top + Y,    Color, Alpha);
+        1: SetPixelEx(DC, Right - X, Top + Y,    Color, Alpha);
+        2: SetPixelEx(DC, Left + X,  Bottom - Y, Color, Alpha);
+        3: SetPixelEx(DC, Right - X, Bottom - Y, Color, Alpha);
+      end;
+  end;
+
+begin
+  if Color = clNone then Exit;
+  with R do
+  begin
+    Dec(Right); Dec(Bottom);
+    if Color < 0 then Color := GetSysColor(Color and $FF);
+
+    { Edges }
+    DrawLineEx(DC, Left, Bottom - BL, Left, Top + TL - 1, Color);
+    DrawLineEx(DC, Left + TL, Top, Right - TR + 1, Top, Color);
+    DrawLineEx(DC, Left + BL, Bottom, Right - BR + 1, Bottom, Color);
+    DrawLineEx(DC, Right, Top + TR, Right, Bottom - BR + 1, Color);
+
+    { Corners }
+    for CornerID := 0 to 3 do
+    begin
+      case CornerID of
+        0: Radius := TL;
+        1: Radius := TR;
+        2: Radius := BL;
+      else
+        Radius := BR;
+      end;
+      case Radius of
+        1: begin PutPixel(0, 0, $3F); PutPixel(1, 1, $3F); end;
+        2: begin PutPixel(0, 0, $1F); PutPixel(1, 0, $4F); PutPixel(0, 1, $4F); PutPixel(1, 1, $FF); end;
+      end;
+    end;
+  end;
+end;
+
 procedure SmartFrame(Canvas: TCanvas; R: TRect; RL, RR: Integer; c1, c2: TColor);
 var
   Color: TColor;
 begin
+  RoundFrame(Canvas.Handle, R, RL, RR, RL, RR, c1);
+  {
   with Canvas, R do
   begin
     Color := Pen.Color;
     Pen.Color := c1;
     Dec(Right);
     Dec(Bottom);
+    Pen.Color := c1;
     PolyLine([
       Point(Left + RL, Top),
         Point(Right - RR, Top),
@@ -185,6 +237,7 @@ begin
     Inc(Bottom);
     Pen.Color := Color;
   end;
+  }
 end;
 
 procedure GradientGlass(const Canvas: TCanvas; const ARect: TRect;
@@ -205,12 +258,20 @@ begin
       bc1 := $EF; bc2 := $D0; bc3 := $E0; bc4 := $EF;
     end else
     begin
+      //rc1 := $ff; rc2 := $b0; rc3 := $4; rc4 := $30;
+      //gc1 := $ff; gc2 := $B0; gc3 := $4; gc4 := $40;
+      //bc1 := $Ff; bc2 := $b0; bc3 := $4; bc4 := $b0;
+
       rc1 := $f0; rc2 := $80; rc3 := $70; rc4 := $B0;
       gc1 := $f8; gc2 := $B0; gc3 := $E8; gc4 := $FF;
       bc1 := $FF; bc2 := $E0; bc3 := $F0; bc4 := $FF;
     end;
   end else
   begin
+    //rc1 := $ff; rc2 := $10; rc3 := $4; rc4 := $60;
+    //gc1 := $ff; gc2 := $10; gc3 := $4; gc4 := $80;
+    //bc1 := $Ff; bc2 := $20; bc3 := $4; bc4 := $c0;
+
     rc1 := $F8; rc2 := $d8; rc3 := $f0; rc4 := $F8;
     gc1 := $F8; gc2 := $d8; gc3 := $f0; gc4 := $F8;
     bc1 := $F8; bc2 := $d8; bc3 := $f0; bc4 := $F8;
@@ -319,7 +380,7 @@ begin
   GradientGlass(Canvas, Arect, Aqua, False, Direction);
 end;
 
-procedure OLDGradientFill(const Canvas: TCanvas; const ARect: TRect;
+procedure GradientFillOld(const Canvas: TCanvas; const ARect: TRect;
   const StartColor, EndColor: TColor;
   const Direction: TGradDir);
 var

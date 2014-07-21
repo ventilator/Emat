@@ -1,0 +1,4 @@
+\in_mad.dll
+\in_midi.dll
+
+Emat läd alle Dateien nach dem Muster in_*.dll

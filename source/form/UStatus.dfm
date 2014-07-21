@@ -4,8 +4,8 @@ object FStatus: TFStatus
   BorderIcons = [biMinimize, biMaximize]
   BorderStyle = bsNone
   Caption = 'Bitte warten...'
-  ClientHeight = 146
-  ClientWidth = 458
+  ClientHeight = 151
+  ClientWidth = 481
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,8 +19,8 @@ object FStatus: TFStatus
   object TBXMultiDock1: TTBXMultiDock
     Left = 0
     Top = 0
-    Width = 458
-    Height = 147
+    Width = 481
+    Height = 145
     object TBXDockablePanel1: TTBXDockablePanel
       Left = 0
       Top = 0
@@ -34,7 +34,7 @@ object FStatus: TFStatus
       SupportedDocks = [dkStandardDock, dkMultiDock]
       TabOrder = 0
       object LTitel: TLMDLabel
-        Left = 32
+        Left = 8
         Top = 8
         Width = 222
         Height = 15
@@ -46,7 +46,7 @@ object FStatus: TFStatus
         Left = 8
         Top = 64
         Width = 437
-        Height = 57
+        Height = 65
         Bevel.Mode = bmCustom
         AutoSize = False
         MultiLine = True
@@ -66,14 +66,13 @@ object FStatus: TFStatus
         PosTextSuffix = ' / 2000'
         ShowPosText = True
       end
-      object Animate1: TAnimate
-        Left = 8
-        Top = 8
-        Width = 16
-        Height = 16
-        Active = True
-        CommonAVI = aviFindFile
-        StopFrame = 8
+      object LSpeed: TLabel
+        Left = 336
+        Top = 9
+        Width = 109
+        Height = 13
+        Caption = ' Titel/Sekunde'
+        Visible = False
       end
     end
   end

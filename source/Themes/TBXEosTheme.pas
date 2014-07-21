@@ -424,10 +424,9 @@ begin
   //else
   IntersectRect(R, ARect, AClipRect);
   if not Transparent then
-  with Canvas do
   begin
-    Brush.Color := AColor;
-    FillRect(R);
+    Canvas.Brush.Color := AColor;
+    Canvas.FillRect(R);
   end;
 end;
 
@@ -534,7 +533,8 @@ var
           FillRectEx(Canvas.Handle, R, ToolBarColor);
           FrameRectEx(Canvas.Handle, R, EditFrameColor, True);
         end
-        else FrameRectEx(Canvas.Handle, R, EditFrameColor, True);
+        else
+          FrameRectEx(Canvas.Handle, R, EditFrameColor, True);
   end;
 
 begin
@@ -994,7 +994,8 @@ begin
       InflateRect(R, -1, -1);
       FrameRectEx(Canvas.Handle, R, ToolBarColor, True);
     end
-    else if Pushed or Selected {or Embedded} or (HoverKind <> hkNone) or // rmkO? Embedded ?
+    else
+      if Pushed or Selected {or Embedded} or (HoverKind <> hkNone) or // rmkO? Embedded ?
       ((ItemOptions and IO_DESIGNING) <> 0) then
     begin
       InflateRect(R, -1, -1);
@@ -1540,7 +1541,7 @@ begin
     R2 := R;
     if not TBXLoColor and (I in [64..250]) then
     begin
-      FrameRectEx(Canvas.Handle, R, ToolBarColor, true);
+      FrameRectEx(Canvas.Handle, R, ToolBarColor, True);
       FrameRectEx(Canvas.Handle, R, ToolbarColor, False);
       DrawLineEx(Canvas.Handle, R.Left - 1, R.Bottom, R.Left - 1, R.Top - 1, Blend(BarSepColor, clWhite,75)); // Left
       DrawLineEx(Canvas.Handle, R.Left - 1, R.Top - 1, R.Right + 1, R.Top - 1, Blend(BarSepColor, clWhite,75)); // Top
@@ -1696,6 +1697,7 @@ begin
   BaseColor:= $00e0ffff;
   //BaseColor:= $00e0ffe0;
   //BaseColor:= $00ffe0e0;
+  //BaseColor:= clBtnFace;
 
   HotColor:= $0068cae6;
 

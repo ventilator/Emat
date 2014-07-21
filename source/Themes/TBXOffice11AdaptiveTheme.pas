@@ -1325,24 +1325,23 @@ begin
           GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
           R2 := R;
           R2.Top := R2.Bottom - 1;
+          R2.Right := R2.Right - 1;
 
           if ToolbarInfo.BorderStyle <> bsSingle then exit;
 
-          GradientFill(Canvas, R2, gradCol1, gradCol2, TGLeftRight);
+          GradientFill(Canvas, R2, gradBL, Blend(gradCol1, gradCol2, 50), TGLeftRight);
 
           Pen.Color := gradBL;
           MoveTo(Right - 1, Top + 1);
           LineTo(Right - 1, Bottom - 1);
 
-          MoveTo(Left + 1, Bottom - 1);
-          LineTo(Right - 1, Bottom - 1);
+          Pixels[Left, Top]:= Blend(gradCol1, gradCol2, 60);
+          Pixels[Left, Bottom - 1]:= gradCol1;
+          Pixels[Right - 2, Top]:= Blend(gradCol1, gradBL, 50);
 
-          Pen.Color := gradCol1;
-          MoveTo(Left, Top);
-          LineTo(Left, Top + 1);
-
-          MoveTo(Left, Bottom - 2);
-          LineTo(Left, Bottom);
+          Pixels[Left, Bottom - 2]:= Blend(gradCol1, gradCol2, 25);
+          Pixels[Right - 1, Bottom - 1]:= gradCol1;
+          Pixels[Right - 2, Bottom - 2]:= Blend(gradCol1, gradBL, 50);
         end
         else
         begin
@@ -1501,8 +1500,20 @@ end;
 
 procedure TTBXOffice11AdaptiveTheme.PaintDock(Canvas: TCanvas; const ClientRect,
   DockRect: TRect; DockPosition: Integer);
+var
+  R: TRect;
 begin
-  GradientFill(Canvas, DockRect, gradCol2, gradCol1, TGLeftRight);
+  if ClientRect.Bottom - ClientRect.Top > 2 then
+    GradientFill(Canvas, DockRect, gradCol2, gradCol1, TGLeftRight)
+  else
+  begin
+    Canvas.Pen.Width := 0;
+    Canvas.Brush.Style := bsSolid;
+    Canvas.Brush.Color := clBtnFace;
+    R := DockRect;
+    InFlateRect(R, 1, 1);
+    Canvas.Rectangle(R);
+  end;
 end;
 
 procedure TTBXOffice11AdaptiveTheme.PaintDockPanelNCArea(Canvas: TCanvas; R:
@@ -1697,6 +1708,7 @@ var
 begin
   DC := StockCompatibleBitmap.Canvas.Handle;
 
+  {
   if USE_THEMES then
   begin
     gradCol1 := Blend(clGradientInactiveCaption, clGradientActiveCaption, 25);
@@ -1761,6 +1773,7 @@ begin
     TBXAdaptiveInfo.MenuFrameColor := MenuItemColors[misHot, ipFrame];
   end
   else
+  }
   begin
     gradCol1 := clBtnFace;
     gradCol2 := clWindow;

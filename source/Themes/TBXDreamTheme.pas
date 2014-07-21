@@ -1673,12 +1673,9 @@ const
 
   function GetBtnItemState(BtnState: Integer): TBtnItemState;
   begin
-    if (BtnState and CDBS_PRESSED) <> 0 then
-      Result := bisPressed
-    else if (BtnState and CDBS_HOT) <> 0 then
-      Result := bisHot
-    else
-      Result := bisNormal;
+    if (BtnState and CDBS_PRESSED) <> 0 then Result := bisPressed
+    else if (BtnState and CDBS_HOT) <> 0 then Result := bisHot
+    else Result := bisNormal;
   end;
 
 var
@@ -1687,6 +1684,7 @@ var
   I                 : Integer;
   BtnVisible, Horz  : Boolean;
   BtnItemState      : TBtnItemState;
+  c1, c2, c3: TColor;
 begin
   with Canvas do
   begin
@@ -1695,30 +1693,22 @@ begin
       or ((ToolbarInfo.ViewType and TVT_TOOLWINDOW) = TVT_TOOLWINDOW)
       or ((ToolbarInfo.ViewType and TVT_MENUBAR) = TVT_MENUBAR) then
     begin
-
-      with R do
-      begin
-        if (R.Right > R.Bottom) then
-        begin
+      with R do begin
+        if (R.Right > R.Bottom) then begin
           R2 := r;
           R2.Top := R2.Top + 2;
           R2.Bottom := R.Bottom - 2;
           GradientFill(Canvas, R, $00DCD8D0, clWhite, TGTopBottom);
           GradientFill(Canvas, R2, $00DCD8D0, clWhite, TGTopBottom);
-        end
-        else
-          GradientFill(Canvas, R, $00DCD8D0, clWhite, TGLeftRight);
+        end else GradientFill(Canvas, R, $00DCD8D0, clWhite, TGLeftRight);
         R2 := R;
         R2.Left := R2.Right - 1;
-
         R2.Top := R2.Top + 1;
-
         Pen.Color := gradBL;
         MoveTo(Left + 2, Bottom - 1);
         LineTo(Right - 3, Bottom - 1);
         LineTo(Right - 1, Bottom - 3);
         LineTo(Right - 1, Top);
-
         Pen.Color := clWhite;
         MoveTo(Left + 1, Bottom - 2);
         LineTo(Left, Bottom - 3);
@@ -1726,125 +1716,106 @@ begin
         LineTo(Left + 2, Top);
         LineTo(Right - 3, Top);
         LineTo(Right - 1, Top + 2);
-
         Pen.Color := $00E0E0E0;
         MoveTo(Left, Top);
         LineTo(Left, Top + 1);
         LineTo(Left + 2, Top - 1);
-
         MoveTo(Right - 1, Top);
         LineTo(Right - 2, Top);
         LineTo(Right, Top + 2);
-
         MoveTo(Left, Bottom - 1);
         LineTo(Left, Bottom - 2);
         LineTo(Left + 2, Bottom);
-
         MoveTo(Right - 1, Bottom - 2);
         LineTo(Right - 2, Bottom - 1);
         LineTo(Right, Bottom - 1);
       end;
       InflateRect(R, -2, -2);
-    end
-    else
-      InflateRect(R, -2, -2);
+    end else InflateRect(R, -2, -2);
 
     if not ToolbarInfo.AllowDrag then Exit;
 
     BtnVisible := (ToolbarInfo.CloseButtonState and CDBS_VISIBLE) <> 0;
     Sz := GetTBXDragHandleSize(ToolbarInfo);
     Horz := not ToolbarInfo.IsVertical;
-    if Horz then
-      R.Right := R.Left + Sz
-    else
-      R.Bottom := R.Top + Sz;
+    if Horz then R.Right := R.Left + Sz
+    else         R.Bottom := R.Top + Sz;
 
     { Drag Handle }
-    if ToolbarInfo.DragHandleStyle <> DHS_NONE then
-    begin
+    if ToolbarInfo.DragHandleStyle <> DHS_NONE then begin
       R2 := R;
       if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then
-        if Horz then
-          OffsetRect(R2, -1, 0)
-        else
-          OffsetRect(R2, 0, -1);
+        if Horz then OffsetRect(R2, -1, 0)
+        else         OffsetRect(R2, 0, -1);
       if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then
-        if Horz then
-          OffsetRect(R2, -1, 0)
-        else
-          OffsetRect(R2, 0, -1);
-      if Horz then
-      begin
+        if Horz then OffsetRect(R2, -1, 0)
+        else         OffsetRect(R2, 0, -1);
+      c1:= $00909090;
+      c2:= $00DDF8FF;
+      c3:= $00F0F4F8;
+      if Horz then begin
         Inc(R2.Top, 4);
         Dec(R2.Bottom, 2);
         Inc(R2.Left, 1);
-        if BtnVisible then
-        begin
+        if BtnVisible then begin
           Inc(R2.Top, Sz - 2);
           Inc(R2.Left, 4);
           Dec(R2.Right, 4);
         end;
         i := R2.Top;
-        while (i < R2.Bottom - 3) do
-        begin
-          Pixels[R2.Left, i] := clWhite;
-          Pixels[R2.Left, i + 1] := clWhite;
-          Pixels[R2.Left + 1, i] := clWhite;
-          Pixels[R2.Left + 1, i + 1] := clBlack;
-          Pixels[R2.Left + 1, i + 2] := $00B0B0B0;
-          Pixels[R2.Left + 2, i + 2] := $00B0B0B0;
-          Pixels[R2.Left + 2, i + 1] := $00B0B0B0;
-          Pixels[R2.Left + 2, i] := $00B0B0B0;
-          Pixels[R2.Left, i + 2] := $00B0B0B0;
-          if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then
-          begin
-            Pixels[R2.Left + 4, i] := clWhite;
-            Pixels[R2.Left + 4, i + 1] := clWhite;
-            Pixels[R2.Left + 4 + 1, i] := clWhite;
-            Pixels[R2.Left + 4 + 1, i + 1] := clBlack;
-            Pixels[R2.Left + 4 + 1, i + 2] := $00B0B0B0;
-            Pixels[R2.Left + 4 + 2, i + 2] := $00B0B0B0;
-            Pixels[R2.Left + 4 + 2, i + 1] := $00B0B0B0;
-            Pixels[R2.Left + 4 + 2, i] := $00B0B0B0;
-            Pixels[R2.Left + 4, i + 2] := $00B0B0B0;
+        while (i < R2.Bottom - 3) do begin
+          Pixels[R2.Left, i] := c1;
+          Pixels[R2.Left, i + 1] := c1;
+          Pixels[R2.Left + 1, i] := c1;
+          Pixels[R2.Left + 1, i + 1] := c2;
+          Pixels[R2.Left + 1, i + 2] := c3;
+          Pixels[R2.Left + 2, i + 2] := c3;
+          Pixels[R2.Left + 2, i + 1] := c3;
+          Pixels[R2.Left + 2, i] := c3;
+          Pixels[R2.Left, i + 2] := c3;
+          if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then begin
+            Pixels[R2.Left + 4, i] := c1;
+            Pixels[R2.Left + 4, i + 1] := c1;
+            Pixels[R2.Left + 4 + 1, i] := c1;
+            Pixels[R2.Left + 4 + 1, i + 1] := c2;
+            Pixels[R2.Left + 4 + 1, i + 2] := c3;
+            Pixels[R2.Left + 4 + 2, i + 2] := c3;
+            Pixels[R2.Left + 4 + 2, i + 1] := c3;
+            Pixels[R2.Left + 4 + 2, i] := c3;
+            Pixels[R2.Left + 4, i + 2] := c3;
           end;
           Inc(i, 4);
         end;
-      end
-      else
-      begin
+      end else begin
         Inc(R2.Left, 4);
         Dec(R2.Right, 2);
         Inc(R2.Top, 1);
-        if BtnVisible then
-        begin
+        if BtnVisible then begin
           Dec(R2.Right, Sz - 2);
           Inc(R2.Top, 4);
           Dec(R2.Bottom, 4);
         end;
         i := R2.Left;
-        while (i < R2.Right - 3) do
-        begin
-          Pixels[i, R2.Top] := clWhite;
-          Pixels[i, R2.Top + 1] := clWhite;
-          Pixels[i + 1, R2.Top] := clWhite;
-          Pixels[i + 1, R2.Top + 1] := clBlack;
-          Pixels[i + 1, R2.Top + 2] := $00B0B0B0;
-          Pixels[i + 2, R2.Top + 2] := $00B0B0B0;
-          Pixels[i + 2, R2.Top + 1] := $00B0B0B0;
-          Pixels[i + 2, R2.Top] := $00B0B0B0;
-          Pixels[i, R2.Top + 2] := $00B0B0B0;
-          if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then
-          begin
-            Pixels[i, R2.Top + 4] := clWhite;
-            Pixels[i, R2.Top + 1 + 4] := clWhite;
-            Pixels[i + 1, R2.Top + 4] := clWhite;
-            Pixels[i + 1, R2.Top + 1 + 4] := clBlack;
-            Pixels[i + 1, R2.Top + 2 + 4] := $00B0B0B0;
-            Pixels[i + 2, R2.Top + 2 + 4] := $00B0B0B0;
-            Pixels[i + 2, R2.Top + 1 + 4] := $00B0B0B0;
-            Pixels[i + 2, R2.Top + 4] := $00B0B0B0;
-            Pixels[i, R2.Top + 2 + 4] := $00B0B0B0;
+        while (i < R2.Right - 3) do begin
+          Pixels[i, R2.Top] := c1;
+          Pixels[i, R2.Top + 1] := c1;
+          Pixels[i + 1, R2.Top] := c1;
+          Pixels[i + 1, R2.Top + 1] := c2;
+          Pixels[i + 1, R2.Top + 2] := c3;
+          Pixels[i + 2, R2.Top + 2] := c3;
+          Pixels[i + 2, R2.Top + 1] := c3;
+          Pixels[i + 2, R2.Top] := c3;
+          Pixels[i, R2.Top + 2] := c3;
+          if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then begin
+            Pixels[i, R2.Top + 4] := c1;
+            Pixels[i, R2.Top + 1 + 4] := c1;
+            Pixels[i + 1, R2.Top + 4] := c1;
+            Pixels[i + 1, R2.Top + 1 + 4] := c2;
+            Pixels[i + 1, R2.Top + 2 + 4] := c3;
+            Pixels[i + 2, R2.Top + 2 + 4] := c3;
+            Pixels[i + 2, R2.Top + 1 + 4] := c3;
+            Pixels[i + 2, R2.Top + 4] := c3;
+            Pixels[i, R2.Top + 2 + 4] := c3;
           end;
           Inc(i, 4);
         end;
@@ -1856,7 +1827,6 @@ begin
     if BtnVisible then
     begin
       R2 := R;
-
       if Horz then
       begin
         Dec(R2.Right);
@@ -1888,12 +1858,6 @@ begin
         FillRectEx(Canvas.Handle, R2, BtnItemColors[BtnItemState, ipBody]);
         DrawButtonBitmap(Canvas, R2, clBlack);
       end;
-      {
-      BtnItemState := GetBtnItemState(ToolbarInfo.CloseButtonState);
-      FrameRectEx(Canvas.Handle, R2, BtnItemColors[BtnItemState, ipFrame], True);
-      FillRectEx(Canvas.Handle, R2, BtnItemColors[BtnItemState, ipBody]);
-      DrawButtonBitmap(Canvas, R2, BtnItemColors[BtnItemState, ipText]);
-      }
     end;
   end;
 end;
@@ -1916,12 +1880,9 @@ procedure TTBXDreamTheme.PaintDockPanelNCArea(Canvas: TCanvas; R: TRect; const
 
   function GetBtnItemState(BtnState: Integer): TBtnItemState;
   begin
-    if (BtnState and CDBS_PRESSED) <> 0 then
-      Result := bisPressed
-    else if (BtnState and CDBS_HOT) <> 0 then
-      Result := bisHot
-    else
-      Result := bisNormal;
+    if (BtnState and CDBS_PRESSED) <> 0 then Result := bisPressed
+    else if (BtnState and CDBS_HOT) <> 0 then Result := bisHot
+    else Result := bisNormal;
   end;
 
 var
@@ -1929,6 +1890,7 @@ var
   I, Sz, Flags      : Integer;
   R2                : TRect;
   BtnItemState      : TBtnItemState;
+  c1, c2, c3: TColor;
 begin
   with Canvas, DockPanelInfo do
   begin
@@ -1939,30 +1901,20 @@ begin
     begin
       FrameRectEx(Canvas.Handle, R, clBtnFace, True);
       FrameRectEx(Canvas.Handle, R, C, True);
-      with R do
-      begin
+      with R do begin
         Pixels[Left, Top] := clBtnFace;
-        if IsVertical then
-          Pixels[Right - 1, Top] := clBtnFace
-        else
-          Pixels[Left, Bottom - 1] := clBtnFace;
+        if IsVertical then Pixels[Right - 1, Top] := clBtnFace
+        else               Pixels[Left, Bottom - 1] := clBtnFace;
       end;
-    end
-    else
-    begin
+    end else begin
       FrameRectEx(Canvas.Handle, R, C, True);
-      if I < 64 then
-        Brush.Bitmap := AllocPatternBitmap(C, clWhite)
-      else
-        Brush.Bitmap := AllocPatternBitmap(C, clBtnShadow);
+      if I < 64 then Brush.Bitmap := AllocPatternBitmap(C, clWhite)
+      else           Brush.Bitmap := AllocPatternBitmap(C, clBtnShadow);
       FrameRect(R);
-      with R do
-      begin
+      with R do begin
         Pixels[Left, Top] := C;
-        if IsVertical then
-          Pixels[Right - 1, Top] := C
-        else
-          Pixels[Left, Bottom - 1] := C;
+        if IsVertical then Pixels[Right - 1, Top] := C
+        else               Pixels[Left, Bottom - 1] := C;
       end;
       InflateRect(R, -1, -1);
       FrameRectEx(Canvas.Handle, R, C, True);
@@ -1970,8 +1922,7 @@ begin
     R := R2;
     InflateRect(R, -BorderSize.X, -BorderSize.Y);
     Sz := GetSystemMetrics(SM_CYSMCAPTION);
-    if IsVertical then
-    begin
+    if IsVertical then begin
       R.Bottom := R.Top + Sz - 1;
       DrawLineEx(Canvas.Handle, R.Left, R.Bottom, R.Right, R.Bottom, C);
       HeaderColor := clBtnFace;
@@ -1980,118 +1931,94 @@ begin
       DrawLineEx(Canvas.Handle, R.Left, R.Bottom - 1, R.Right, R.Bottom - 1,
         clSilver);
       R.Bottom := R.Bottom - 1;
-    end else
-    begin
+    end else begin
       R.Right := R.Left + Sz - 1;
       DrawLineEx(Canvas.Handle, R.Right, R.Top, R.Right, R.Bottom, C);
       HeaderColor := clBtnFace;
       R.Right := R.Right + 1;
       GradientFill(Canvas, R, $00DCD8D0, clWhite, TGLeftRight);
-      DrawLineEx(Canvas.Handle, R.Right - 1, R.Top, R.Right - 1, R.Bottom,
-        clSilver);
+      DrawLineEx(Canvas.Handle, R.Right - 1, R.Top, R.Right - 1, R.Bottom, clSilver);
       R.Right := R.Right - 1;
     end;
-
-    if (CDBS_VISIBLE and CloseButtonState) <> 0 then
-    begin
+    if (CDBS_VISIBLE and CloseButtonState) <> 0 then begin
       R2 := R;
-      if IsVertical then
-      begin
+      if IsVertical then begin
         R2.Left := R2.Right - Sz + 1;
         R.Right := R2.Left;
-      end
-      else
-      begin
+      end else begin
         R2.Top := R2.Bottom - Sz + 1;
         R.Bottom := R2.Top;
       end;
-
       BtnItemState := GetBtnItemState(CloseButtonState);
-
-      if BtnItemState = bisHot then
-      begin
+      if BtnItemState = bisHot then begin
         FrameRectEx(Canvas.Handle, R2, clGray, True);
         FillRectEx(Canvas.Handle, R2, clWhite);
         DrawButtonBitmap(Canvas, R2, clBlack);
       end
-      else if BtnItemState = bisPressed then
-      begin
+      else if BtnItemState = bisPressed then begin
         FrameRectEx(Canvas.Handle, R2, clGray, True);
         FillRectEx(Canvas.Handle, R2, clSilver);
         DrawButtonBitmap(Canvas, R2, clWhite);
-      end
-      else
-      begin
+      end else begin
         FrameRectEx(Canvas.Handle, R2, BtnItemColors[BtnItemState, ipFrame],
           True);
         FillRectEx(Canvas.Handle, R2, BtnItemColors[BtnItemState, ipBody]);
         DrawButtonBitmap(Canvas, R2, clBlack);
       end;
     end;
-
     R2 := R;
-    if IsVertical then
-    begin
+    c1:= $00909090;
+    c2:= $00DDF8FF;
+    c3:= $00F0F4F8;
+    if IsVertical then begin
       Inc(R2.Top, 2);
       Dec(R2.Bottom, 2);
       Inc(R2.Left, 1);
       i := R2.Top;
-      while (i < R2.Bottom - 1) do
-      begin
-        Pixels[R2.Left, i] := clWhite;
-        Pixels[R2.Left, i + 1] := clWhite;
-        Pixels[R2.Left + 1, i] := clWhite;
-        Pixels[R2.Left + 1, i + 1] := clBlack;
-        Pixels[R2.Left + 1, i + 2] := $00B0B0B0;
-        Pixels[R2.Left + 2, i + 2] := $00B0B0B0;
-        Pixels[R2.Left + 2, i + 1] := $00B0B0B0;
-        Pixels[R2.Left + 2, i] := $00B0B0B0;
-        Pixels[R2.Left, i + 2] := $00B0B0B0;
+      while (i < R2.Bottom - 1) do begin
+        Pixels[R2.Left, i] := c1;
+        Pixels[R2.Left, i + 1] := c1;
+        Pixels[R2.Left + 1, i] := c1;
+        Pixels[R2.Left + 1, i + 1] := c2;
+        Pixels[R2.Left + 1, i + 2] := c3;
+        Pixels[R2.Left + 2, i + 2] := c3;
+        Pixels[R2.Left + 2, i + 1] := c3;
+        Pixels[R2.Left + 2, i] := c3;
+        Pixels[R2.Left, i + 2] := c3;
         Inc(i, 4);
       end;
-    end
-    else
-    begin
+    end else begin
       Inc(R2.Left, 2);
       Dec(R2.Right, 2);
       Inc(R2.Top, 1);
       i := R2.Left;
-      while (i < R2.Right - 1) do
-      begin
-        Pixels[i, R2.Top] := clWhite;
-        Pixels[i, R2.Top + 1] := clWhite;
-        Pixels[i + 1, R2.Top] := clWhite;
-        Pixels[i + 1, R2.Top + 1] := clBlack;
-        Pixels[i + 1, R2.Top + 2] := $00B0B0B0;
-        Pixels[i + 2, R2.Top + 2] := $00B0B0B0;
-        Pixels[i + 2, R2.Top + 1] := $00B0B0B0;
-        Pixels[i + 2, R2.Top] := $00B0B0B0;
-        Pixels[i, R2.Top + 2] := $00B0B0B0;
+      while (i < R2.Right - 1) do begin
+        Pixels[i, R2.Top] := c1;
+        Pixels[i, R2.Top + 1] := c1;
+        Pixels[i + 1, R2.Top] := c1;
+        Pixels[i + 1, R2.Top + 1] := c2;
+        Pixels[i + 1, R2.Top + 2] := c3;
+        Pixels[i + 2, R2.Top + 2] := c3;
+        Pixels[i + 2, R2.Top + 1] := c3;
+        Pixels[i + 2, R2.Top] := c3;
+        Pixels[i, R2.Top + 2] := c3;
         Inc(i, 4);
       end;
     end;
-
-    if IsVertical then
-      InflateRect(R, -9, 0)
-    else
-      InflateRect(R, 0, -9);
+    if IsVertical then InflateRect(R, -9, 0) else InflateRect(R, 0, -9);
     Font.Assign(SmCaptionFont);
     Font.Color := clBlack;
     Brush.Color := HeaderColor;
     Brush.Style := bsClear;
     Flags := DT_SINGLELINE or DT_VCENTER or DT_END_ELLIPSIS or DT_HIDEPREFIX;
-
-    if IsVertical then
-      DrawText(Canvas.Handle, Caption, -1, R, Flags)
-    else
-      DrawRotatedText(Canvas.Handle, string(Caption), R, Flags);
+    if IsVertical then DrawText(Canvas.Handle, Caption, -1, R, Flags)
+    else DrawRotatedText(Canvas.Handle, string(Caption), R, Flags);
   end;
 end;
 
 procedure TTBXDreamTheme.SetupColorCache;
 var
   HotBtnFace, DisabledText: TColor;
-
 begin
   gradCol1 := $00DCD8D0;
   gradCol2 := $00DCD8D0;
@@ -2108,21 +2035,17 @@ begin
   DockPanelColor := PopupColor;
   PopupFrameColor := $00C0C0C0;
   PopupSeparatorColor := clSilver;
-
   HotBtnFace := Blend(clHighlight, clWindow, 20);
   SetContrast(HotBtnFace, ToolbarColor, 50);
   DisabledText := clSilver;
-
   WinFrameColors[wfsActive, wfpBorder] := $00909090;
   WinFrameColors[wfsActive, wfpCaption] := clWhite;
   WinFrameColors[wfsActive, wfpCaptionText] := clBlack;
   SetContrast(WinFrameColors[wfsActive, wfpCaptionText], clBtnShadow, 180);
-  WinFrameColors[wfsInactive, wfpBorder] := WinFrameColors[wfsActive,
-    wfpBorder];
+  WinFrameColors[wfsInactive, wfpBorder] := WinFrameColors[wfsActive, wfpBorder];
   WinFrameColors[wfsInactive, wfpCaption] := clBtnFace;
   WinFrameColors[wfsInactive, wfpCaptionText] := DisabledText;
   SetContrast(WinFrameColors[wfsInactive, wfpCaptionText], clBtnFace, 120);
-
   PnlFrameColors[wfsActive, wfpBorder] := $00909090;
   PnlFrameColors[wfsActive, wfpCaption] := clWhite;
   PnlFrameColors[wfsActive, wfpCaptionText] := clBlack;
@@ -2130,50 +2053,37 @@ begin
   PnlFrameColors[wfsInactive, wfpCaption] := clBtnFace;
   PnlFrameColors[wfsInactive, wfpCaptionText] := DisabledText;
   SetContrast(PnlFrameColors[wfsInactive, wfpCaptionText], clBtnFace, 120);
-
   BtnItemColors[bisNormal, ipBody] := clNone;
   BtnItemColors[bisNormal, ipText] := clBtnText;
   SetContrast(BtnItemColors[bisNormal, ipText], ToolbarColor, 180);
   BtnItemColors[bisNormal, ipFrame] := clNone;
-
   BtnItemColors[bisDisabled, ipBody] := clNone;
   BtnItemColors[bisDisabled, ipText] := DisabledText;
   SetContrast(BtnItemColors[bisDisabled, ipText], ToolbarColor, 80);
   BtnItemColors[bisDisabled, ipFrame] := $00D0D0D0;
-
-  BtnItemColors[bisSelected, ipBody] := Blend(clHighlight, Blend(clBtnFace,
-    clWindow, 50), 10);
+  BtnItemColors[bisSelected, ipBody] := Blend(clHighlight, Blend(clBtnFace, clWindow, 50), 10);
   SetContrast(BtnItemColors[bisSelected, ipBody], ToolbarColor, 5);
   BtnItemColors[bisSelected, ipText] := BtnItemColors[bisNormal, ipText];
   BtnItemColors[bisSelected, ipFrame] := clSilver;
-
   BtnItemColors[bisPressed, ipBody] := Blend(clHighlight, clWindow, 30);
   BtnItemColors[bisPressed, ipText] := clBlack;
   BtnItemColors[bisPressed, ipFrame] := clRed;
-
   BtnItemColors[bisHot, ipBody] := HotBtnFace;
   BtnItemColors[bisHot, ipText] := clMenuText;
-  SetContrast(BtnItemColors[bisHot, ipText], BtnItemColors[bisHot, ipBody],
-    180);
+  SetContrast(BtnItemColors[bisHot, ipText], BtnItemColors[bisHot, ipBody], 180);
   BtnItemColors[bisHot, ipFrame] := $00A0A0A0;
-
   BtnItemColors[bisDisabledHot, ipBody] := HotBtnFace;
   BtnItemColors[bisDisabledHot, ipText] := DisabledText;
   BtnItemColors[bisDisabledHot, ipFrame] := clHighlight;
-
   BtnItemColors[bisSelectedHot, ipBody] := Blend(clHighlight, clWindow, 50);
   SetContrast(BtnItemColors[bisSelectedHot, ipBody], ToolbarColor, 30);
   BtnItemColors[bisSelectedHot, ipText] := clBlack;
-  SetContrast(BtnItemColors[bisSelectedHot, ipText],
-    BtnItemColors[bisSelectedHot, ipBody], 180);
+  SetContrast(BtnItemColors[bisSelectedHot, ipText], BtnItemColors[bisSelectedHot, ipBody], 180);
   BtnItemColors[bisSelectedHot, ipFrame] := clHighlight;
-  SetContrast(BtnItemColors[bisSelectedHot, ipFrame],
-    BtnItemColors[bisSelectedHot, ipBody], 100);
-
+  SetContrast(BtnItemColors[bisSelectedHot, ipFrame], BtnItemColors[bisSelectedHot, ipBody], 100);
   BtnItemColors[bisPopupParent, ipBody] := ToolbarColor;
   BtnItemColors[bisPopupParent, ipText] := BtnItemColors[bisNormal, ipText];
   BtnItemColors[bisPopupParent, ipFrame] := BtnItemColors[bisHot, ipFrame];
-
   MenuItemColors[misNormal, ipBody] := clNone;
   MenuItemColors[misNormal, ipText] := clWindowText;
   SetContrast(MenuItemColors[misNormal, ipText], PopupColor, 180);
@@ -2182,15 +2092,12 @@ begin
   MenuItemColors[misDisabled, ipText] := Blend(clGrayText, clWindow, 70);
   SetContrast(MenuItemColors[misDisabled, ipText], PopupColor, 80);
   MenuItemColors[misDisabled, ipFrame] := clNone;
-
   MenuItemColors[misHot, ipBody] := BtnItemColors[bisHot, ipBody];
   MenuItemColors[misHot, ipText] := BtnItemColors[bisHot, ipText];
   MenuItemColors[misHot, ipFrame] := clSilver;
-
   MenuItemColors[misDisabledHot, ipBody] := PopupColor;
   MenuItemColors[misDisabledHot, ipText] := Blend(clGrayText, clWindow, 70);
   MenuItemColors[misDisabledHot, ipFrame] := clHighlight;
-
   IconShadowColor := Blend(clBlack, HotBtnFace, 25);
 end;
 
@@ -2389,10 +2296,8 @@ begin
             if Boolean(State and PFS_PUSHED) then
             begin
               if Boolean(State and (PFS_CHECKED or PFS_MIXED)) then
-                //GradientFill(Canvas, R, $0080E0FF, $002090E8, TGTopBottom)
                 GradientFill(Canvas, R, clWhite, clSilver, TGTopBottom)
               else
-                //GradientFill(Canvas, R, $00F0FDFF, $00D0F8FF, TGTopBottom);
                 GradientFill(Canvas, R, clWhite, clSilver, TGTopBottom);
               Pen.Color := clSilver;
             end else
@@ -2438,8 +2343,7 @@ begin
             Pen.Color := TextColor;
             Brush.Color := Pen.Color;
             Polygon([Point(X - 2, Y), Point(X, Y + 2), Point(X + 4, Y - 2),
-              Point(X + 4, Y - 4), Point(X, Y), Point(X - 2, Y - 2), Point(X -
-                2, Y)]);
+              Point(X + 4, Y - 4), Point(X, Y), Point(X - 2, Y - 2), Point(X - 2, Y)]);
           end;
         end;
 
@@ -2548,12 +2452,10 @@ begin
         end;
       SBP_GRIPPER:
         begin
-          c1 := clWhite;
-          c2 := clBlack;
-          c3 := $00B0B0B0;
-
-          with R do
-          begin
+          c1:= $00909090;
+          c2:= $00DDF8FF;
+          c3:= $00F0F4F8;
+          with R do begin
             Pixels[Right - 12, Bottom - 4] := c1;
             Pixels[Right - 12, Bottom - 3] := c1;
             Pixels[Right - 11, Bottom - 4] := c1;

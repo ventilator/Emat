@@ -2352,7 +2352,8 @@ begin
             begin
               InflateRect(R, -1, -1);
               GradientGlass(Canvas, R, true, TGTopBottom);
-              Pen.Color := BtnItemColors[bisSelected, ipFrame]; //clSilver;
+              //Pen.Color := BtnItemColors[bisSelected, ipFrame]; //clSilver;
+              Pen.Color := BtnItemColors[bisHot, ipFrame]; //clSilver;
               InflateRect(R, 1, 1);
             end
             else

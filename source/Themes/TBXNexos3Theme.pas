@@ -1712,13 +1712,14 @@ const
   end;
 
 var
-  Sz: Integer;
+  Sz, DHSize : Integer;
   R2: TRect;
   C: TColor;
   Hi1, Lo1, Hi2, Hi3, Hi4: TColor;
   I: Integer;
   BtnVisible, Horz: Boolean;
   BtnItemState: TBtnItemState;
+  C1, C2, C3, c4, c5: TColor;
 begin
   with Canvas do
   begin
@@ -1784,6 +1785,7 @@ begin
       R.Bottom := R.Top + Sz;
 
     { Drag Handle }
+    {
     c := gradHandle1;
     Brush.Color := c;
     Hi1 := GetNearestColor(Handle, MixColors(c, gradHandle2, 64));
@@ -1871,6 +1873,75 @@ begin
           end;
           Inc(i, 4);
         end;
+      end;
+    end;
+    }
+
+    // Drag Handle
+    DHSize := GetTBXDragHandleSize(ToolbarInfo);
+    if Horz then
+      R.Right := R.Left + DHSize
+    else
+      R.Bottom := R.Top + DHSize;
+
+    if ToolbarInfo.DragHandleStyle <> DHS_NONE then
+    begin
+
+      c1 := $00999999;
+      c2 := $00A6A6A6;
+      c3 := $00B0B0B0;
+      c4 := $00FCFCFC;
+      c5 := $00D8E0E4;
+
+      R2 := R;
+      if Horz then
+      begin
+        Inc(R2.Left, DragHandleOffsets[BtnVisible,
+          ToolbarInfo.DragHandleStyle]);
+        if BtnVisible then
+          Inc(R2.Top, Sz - 2);
+        I:= R2.Top + 3;
+        while i < R2.Bottom - 4 do
+        begin
+          Pixels[R2.Left    , i]:= c1;
+          Pixels[R2.Left + 1, i]:= c2;
+          Pixels[R2.Left + 2, i]:= c3;
+          Pixels[R2.Left   ,  i + 1]:= c4;
+          Pixels[R2.Left + 1, i + 1]:= c5;
+          Pixels[R2.Left + 2, i + 1]:= c5;
+          inc(i, 2);
+        end;
+        Pixels[R2.Left    , i]:= c1;
+        Pixels[R2.Left + 1, i]:= c2;
+        Pixels[R2.Left + 2, i]:= c3;
+
+        Pen.Color := C2;
+        MoveTo(R2.Left, R2.Top + 3);
+        LineTo(R2.Left, i);
+      end
+      else
+      begin
+        Inc(R2.Top, DragHandleOffsets[BtnVisible, ToolbarInfo.DragHandleStyle]);
+        if BtnVisible then
+          Dec(R2.Right, Sz - 2);
+        i:= R2.Left + 3;
+        while i < R2.Right - 4 do
+        begin
+          Pixels[i, R2.Top    ]:= c1;
+          Pixels[i, R2.Top + 1]:= c2;
+          Pixels[i, R2.Top + 2]:= c3;
+          Pixels[i + 1, R2.Top    ]:= c4;
+          Pixels[i + 1, R2.Top + 1]:= c5;
+          Pixels[i + 1, R2.Top + 2]:= c5;
+          inc(i, 2);
+        end;
+        Pixels[i, R2.Top]:= c1;
+        Pixels[i, R2.Top + 1]:= c2;
+        Pixels[i, R2.Top + 2]:= c3;
+
+        Pen.Color := C2;
+        MoveTo(R2.Left + 3, R2.Top);
+        LineTo(i, R2.Top);
       end;
     end;
 

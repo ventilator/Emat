@@ -538,47 +538,55 @@ var
 begin
   if not Transparent then
   begin
-    if ((AViewType and TVT_NORMALTOOLBAR) = TVT_NORMALTOOLBAR)
-      and (not (AViewType and TVT_EMBEDDED = TVT_EMBEDDED))
-      or ((AViewType and TVT_TOOLWINDOW) = TVT_TOOLWINDOW) then
+    if AColor <> ToolbarColor then
     begin
       IntersectRect(R, ARect, AClipRect);
-      if (ADockRect.Top = 0) and
-        (ADockRect.Left = 0) and
-        (ADockRect.Right = 0) and
-        (ADockRect.Bottom = 0) then
-        IsHoriz := (ARect.Right > ARect.Bottom)
-      else
-        IsHoriz := Abs(R.Right - R.Left) > Abs(R.Bottom - R.Top);
-      if IsHoriz then
-      begin
-        R.Top := R.Top - 1;
-        R.Bottom := R.Bottom + 1;
-        GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
-        R.Bottom := R.Bottom - 1;
-        R.Top := R.Top + 1;
-      end
-      else
-      begin
-        R.Left := R.Left - 1;
-        R.Right := R.Right + 1;
-        GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
-        R.Right := R.Right - 1;
-        R.Left := R.Left + 1;
-      end;
+      FillRectEx(Canvas.Handle, R, AColor);
     end
     else
     begin
-      Brush := CreateSolidBrush(ColorToRGB(AColor));
-      IntersectRect(R, ARect, AClipRect);
-      //The rects are compared to determine if we're drawing a toolbar, not a popup menu...
-      if (ADockRect.Left <> ARect.Left) or (ADockRect.Top <> ARect.Top)
-        or (ADockRect.Right <> ARect.Right) or (ADockRect.Bottom <> ARect.Bottom)
-          then
-        GradientFill(Canvas, R, gradCol2, clBtnFace, TGLeftRight)
+      if ((AViewType and TVT_NORMALTOOLBAR) = TVT_NORMALTOOLBAR)
+        and (not (AViewType and TVT_EMBEDDED = TVT_EMBEDDED))
+        or ((AViewType and TVT_TOOLWINDOW) = TVT_TOOLWINDOW) then
+      begin
+        IntersectRect(R, ARect, AClipRect);
+        if (ADockRect.Top = 0) and
+          (ADockRect.Left = 0) and
+          (ADockRect.Right = 0) and
+          (ADockRect.Bottom = 0) then
+          IsHoriz := (ARect.Right > ARect.Bottom)
+        else
+          IsHoriz := Abs(R.Right - R.Left) > Abs(R.Bottom - R.Top);
+        if IsHoriz then
+        begin
+          R.Top := R.Top - 1;
+          R.Bottom := R.Bottom + 1;
+          GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
+          R.Bottom := R.Bottom - 1;
+          R.Top := R.Top + 1;
+        end
+        else
+        begin
+          R.Left := R.Left - 1;
+          R.Right := R.Right + 1;
+          GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
+          R.Right := R.Right - 1;
+          R.Left := R.Left + 1;
+        end;
+      end
       else
-        FillRect(Canvas.Handle, R, Brush);
-      DeleteObject(Brush);
+      begin
+        Brush := CreateSolidBrush(ColorToRGB(AColor));
+        IntersectRect(R, ARect, AClipRect);
+        //The rects are compared to determine if we're drawing a toolbar, not a popup menu...
+        if (ADockRect.Left <> ARect.Left) or (ADockRect.Top <> ARect.Top)
+          or (ADockRect.Right <> ARect.Right) or (ADockRect.Bottom <>
+          ARect.Bottom) then
+          GradientFill(Canvas, R, gradCol2, clBtnFace, TGLeftRight)
+        else
+          FillRect(Canvas.Handle, R, Brush);
+        DeleteObject(Brush);
+      end;
     end;
   end;
 end;
@@ -593,7 +601,8 @@ begin
   begin
     R := ARect;
     Brush.Style := bsClear;
-    if Font.Color = clNone then Font.Color := GetPartColor(ItemInfo, ipText);
+    if Font.Color = clNone then
+      Font.Color := GetPartColor(ItemInfo, ipText);
     //Font.Color := GetPartColor(ItemInfo, ipText);
     if not Rotated then
       Windows.DrawText(Handle, PChar(ACaption), Length(ACaption), R, AFormat)
@@ -659,7 +668,6 @@ end;
 procedure TTBXWhidbeyTheme.PaintEditButton(Canvas: TCanvas; const ARect:
   TRect;
   var ItemInfo: TTBXItemInfo; ButtonInfo: TTBXEditBtnInfo);
-
 var
   BtnDisabled, BtnHot, BtnPressed, Embedded: Boolean;
   R, BR: TRect;
@@ -905,10 +913,8 @@ begin
           FillRectEx(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody));
 {$ENDIF}
       end
-      else
-      if ((ViewType and TVT_MENUBAR) = TVT_MENUBAR) and (HoverKind <>
-        hkNone)
-      then
+      else if ((ViewType and TVT_MENUBAR) = TVT_MENUBAR) and (HoverKind <>
+        hkNone) then
       begin
         FillRectEx(Canvas.Handle, R, GetBtnColor(ItemInfo, ipBody));
         //GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
@@ -1283,7 +1289,7 @@ begin
       if not IsRectEmpty(PR) then
         with PR do
         begin
-          Pen.Color := PopupColor;//ToolbarColor;
+          Pen.Color := PopupColor; //ToolbarColor;
           if Bottom = R.Top then
           begin
             if Left <= R.Left then
@@ -1372,8 +1378,7 @@ begin
         DrawLineEx(Canvas.Handle, Left, Top, Right, Top, PopupSeparatorColor);
       end;
     end
-    else
-    if enabled then
+    else if enabled then
     begin
       Top := Top + 4;
       Bottom := Bottom - 2;
@@ -1405,78 +1410,86 @@ const
   end;
 
 var
-  Sz: Integer;
+  Sz, DHSize: Integer;
   R2: TRect;
   C: TColor;
   Hi1, Lo1, Hi2, Lo2, Hi3, Lo3, Hi4: TColor;
   I: Integer;
   BtnVisible, Horz: Boolean;
   BtnItemState: TBtnItemState;
+  C1, C2, C3, c4, c5: TColor;
 begin
   with Canvas do
   begin
-    if ((ToolbarInfo.ViewType and TVT_NORMALTOOLBAR) = TVT_NORMALTOOLBAR)
-      or (ToolbarInfo.ViewType = VT_TOOLBAR)
-      or ((ToolbarInfo.ViewType and TVT_TOOLWINDOW) = TVT_TOOLWINDOW) then
+    C := Brush.Color;
+    if ToolbarInfo.BorderStyle = bsSingle then
     begin
-      with R do
+      if ((ToolbarInfo.ViewType and TVT_NORMALTOOLBAR) = TVT_NORMALTOOLBAR)
+        or (ToolbarInfo.ViewType = VT_TOOLBAR)
+        or ((ToolbarInfo.ViewType and TVT_TOOLWINDOW) = TVT_TOOLWINDOW) then
       begin
-        if (Toolbarinfo.IsVertical) then
+        with R do
         begin
-          GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
-          R2 := R;
-          R2.Top := R2.Bottom - 1;
+          if C = ToolbarColor then
+          begin
+            if (Toolbarinfo.IsVertical) then
+            begin
+              GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
+              R2 := R;
+              R2.Top := R2.Bottom - 1;
+              R2.Right := R2.Right - 1;
 
-          if ToolbarInfo.BorderStyle <> bsSingle then exit;
+              GradientFill(Canvas, R2, gradBL, Blend(gradCol1, gradCol2, 50),
+                TGLeftRight);
 
-          GradientFill(Canvas, R2, gradCol1, gradCol2, TGLeftRight);
+              Pen.Color := gradBL;
+              MoveTo(Right - 1, Top + 1);
+              LineTo(Right - 1, Bottom - 1);
 
-          Pen.Color := gradBL;
-          MoveTo(Right - 1, Top + 1);
-          LineTo(Right - 1, Bottom - 1);
+              Pixels[Left, Top] := Blend(gradCol1, gradCol2, 60);
+              Pixels[Left, Bottom - 1] := gradCol1;
+              Pixels[Right - 2, Top] := Blend(gradCol1, gradBL, 50);
 
-          MoveTo(Left + 1, Bottom - 1);
-          LineTo(Right - 1, Bottom - 1);
+              Pixels[Left, Bottom - 2] := Blend(gradCol1, gradCol2, 25);
+              Pixels[Right - 1, Bottom - 1] := gradCol1;
+              Pixels[Right - 2, Bottom - 2] := Blend(gradCol1, gradBL, 50);
+            end
+            else
+            begin
+              GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
+              R2 := R;
+              R2.Top := R.Top + 1;
+              R2.Left := R2.Right - 1;
 
-          Pen.Color := gradCol1;
-          MoveTo(Left, Top);
-          LineTo(Left, Top + 1);
+              if ToolbarInfo.BorderStyle <> bsSingle then
+                exit;
 
-          MoveTo(Left, Bottom - 2);
-          LineTo(Left, Bottom);
-        end
-        else
-        begin
-          GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
-          R2 := R;
-          R2.Top:= R.Top + 1;
-          R2.Left := R2.Right - 1;
+              GradientFill(Canvas, R2, GradBL, Blend(gradCol1, gradCol2, 50),
+                TGTopBottom);
 
-          if ToolbarInfo.BorderStyle <> bsSingle then exit;
+              Pen.Color := gradBL;
+              MoveTo(Left + 1, Bottom - 1);
+              LineTo(Right - 1, Bottom - 1);
 
-          GradientFill(Canvas, R2, GradBL, Blend(gradCol1, gradCol2, 50), TGTopBottom);
+              Pixels[Left, Top] := Blend(gradCol1, gradCol2, 60);
+              Pixels[Left, Bottom - 1] := gradCol1;
+              Pixels[Left, Bottom - 2] := Blend(gradCol1, gradBL, 50);
 
-
-          Pen.Color := gradBL;
-          MoveTo(Left + 1, Bottom - 1);
-          LineTo(Right - 1, Bottom - 1);
-
-          Pixels[Left, Top]:= Blend(gradCol1, gradCol2, 60);
-          Pixels[Left, Bottom - 1]:= gradCol1;
-          Pixels[Left, Bottom - 2]:= Blend(gradCol1, gradBL, 50);
-
-          Pixels[Right - 2, Top]:= Blend(gradCol1, gradCol2, 25);
-          Pixels[Right - 1, Bottom - 1]:= gradCol1;
-          Pixels[Right - 2, Bottom - 2]:= Blend(gradCol1, gradBL, 50);
+              Pixels[Right - 2, Top] := Blend(gradCol1, gradCol2, 25);
+              Pixels[Right - 1, Bottom - 1] := gradCol1;
+              Pixels[Right - 2, Bottom - 2] := Blend(gradCol1, gradBL, 50);
+            end;
+          end else
+            FillRect(R);
+          InflateRect(R, -2, -2);
         end;
+      end else
+      begin
+        GradientFill(Canvas, R, gradCol2, clBtnFace, TGLeftRight);
+        InflateRect(R, -2, -2);
       end;
-      InflateRect(R, -2, -2);
-    end
-    else
-    begin
-      GradientFill(Canvas, R, gradCol2, clBtnFace, TGLeftRight);
-      InflateRect(R, -2, -2);
-    end;
+    end else
+      FillRect(R);
 
     if not ToolbarInfo.AllowDrag then
       Exit;
@@ -1490,6 +1503,12 @@ begin
       R.Bottom := R.Top + Sz;
 
     // Drag Handle
+    DHSize := GetTBXDragHandleSize(ToolbarInfo);
+    if Horz then
+      R.Right := R.Left + DHSize
+    else
+      R.Bottom := R.Top + DHSize;
+
     c := gradHandle1;
     Brush.Color := c;
     Hi1 := GetNearestColor(Handle, MixColors(c, gradHandle2, 64));
@@ -1505,9 +1524,9 @@ begin
       R2 := R;
       if ToolbarInfo.DragHandleStyle = DHS_DOUBLE then
         if Horz then
-          OffsetRect(R2, -2, 0)
+          OffsetRect(R2, -1, 0)
         else
-          OffsetRect(R2, 0, -2);
+          OffsetRect(R2, 0, -1);
       if Horz then
       begin
         Inc(R2.Top, 4);
@@ -1599,7 +1618,7 @@ begin
       FillRectEx(Canvas.Handle, R2, BtnItemColors[BtnItemState, ipBody]);
       DrawButtonBitmap(Canvas, R2, BtnItemColors[BtnItemState, ipText]);
     end;
-  end;
+end;
 end;
 
 procedure TTBXWhidbeyTheme.PaintDockPanelNCArea(Canvas: TCanvas; R: TRect;
@@ -1760,8 +1779,20 @@ end;
 
 procedure TTBXWhidbeyTheme.PaintDock(Canvas: TCanvas; const ClientRect,
   DockRect: TRect; DockPosition: Integer);
+var
+  R: TRect;
 begin
-  GradientFill(Canvas, DockRect, gradCol2, clBtnFace, TGLeftRight);
+  if ClientRect.Bottom - ClientRect.Top > 2 then
+    GradientFill(Canvas, DockRect, gradCol2, clBtnFace, TGLeftRight)
+  else
+  begin
+    Canvas.Pen.Width := 0;
+    Canvas.Brush.Style := bsSolid;
+    Canvas.Brush.Color := clBtnFace;
+    R := DockRect;
+    InFlateRect(R, 1, 1);
+    Canvas.Rectangle(R);
+  end;
 end;
 
 procedure TTBXWhidbeyTheme.SetupColorCache;
@@ -1802,7 +1833,7 @@ begin
   gradHandle1 := gradCol1;
   gradHandle2 := clBtnShadow;
   gradHandle3 := clBtnHighlight;
-  gradBL := blend(clBtnShadow, gradCol1, 95);
+  gradBL := Blend(clBtnShadow, gradCol1, 95);
 
   MenubarColor := Blend(gradCol1, gradCol2, 50);
   ToolbarColor := Blend(gradCol1, gradCol2, 50);
@@ -1868,7 +1899,8 @@ begin
   BtnItemColors[bisSelectedHot, ipFrame] := clHighlight;
   SetContrast(BtnItemColors[bisSelectedHot, ipFrame],
     BtnItemColors[bisSelectedHot, ipBody], 100);
-  BtnItemColors[bisPopupParent, ipBody] := Blend(clBtnFace, clWindow, 183);//ToolbarColor;
+  BtnItemColors[bisPopupParent, ipBody] := Blend(clBtnFace, clWindow, 183);
+  //ToolbarColor;
   BtnItemColors[bisPopupParent, ipText] := BtnItemColors[bisNormal, ipText];
   BtnItemColors[bisPopupParent, ipFrame] := PopupFrameColor;
 

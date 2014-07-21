@@ -1,8 +1,12 @@
 unit uincex;
 
+
 //ver 0.3
 
 interface
+
+uses dialogs,forms,StdCtrls;
+
   //David Grünewald 01.04.2005
   //undeadking@gmx.de
   procedure IncEx(var X: integer; max: integer; min: integer = 0); forward;
@@ -10,6 +14,10 @@ interface
   function  CopyEx(SourceString:string;Start,Stop:integer):string;
   //Clg 29.12.2005  by xaromz@DP
   function  NatCompare(const Item1, Item2: WideString): Integer;
+  //http://www.swissdelphicenter.ch/de/showcode.php?id=1241
+  //08.08.2010
+  function MyMessageDialog(const Msg: string; DlgType: TMsgDlgType;
+  Buttons: TMsgDlgButtons; Captions: array of string): Integer;
 implementation
 
 uses sysutils;
@@ -96,6 +104,37 @@ begin
   until (Result <> 0) or 
         (Start1 > Length(Item1)) or 
         (Start2 > Length(Item2)); 
+end;
+
+function MyMessageDialog(const Msg: string; DlgType: TMsgDlgType;
+  Buttons: TMsgDlgButtons; Captions: array of string): Integer;
+var
+  aMsgDlg: TForm;
+  i: Integer;
+  dlgButton: TButton;
+  CaptionIndex: Integer;
+begin
+  { Create the Dialog }
+  { Dialog erzeugen }
+  aMsgDlg := CreateMessageDialog(Msg, DlgType, Buttons);
+  captionIndex := 0;
+  { Loop through Objects in Dialog }
+  { Über alle Objekte auf dem Dialog iterieren}
+  for i := 0 to aMsgDlg.ComponentCount - 1 do
+  begin
+   { If the object is of type TButton, then }
+   { Wenn es ein Button ist, dann...}
+    if (aMsgDlg.Components[i] is TButton) then
+    begin
+      dlgButton := TButton(aMsgDlg.Components[i]);
+      if CaptionIndex > High(Captions) then Break;
+      { Give a new caption from our Captions array}
+      { Schreibe Beschriftung entsprechend Captions array}
+      dlgButton.Caption := Captions[CaptionIndex];
+      Inc(CaptionIndex);
+    end;
+  end;
+  Result := aMsgDlg.ShowModal;
 end;
 
 
