@@ -26,11 +26,18 @@ jobs:
         run: |
           # Das chocolatey-Paket bringt keinen i386-win32-Compiler mit; der
           # offizielle 32-Bit-Installer legt C:\lazarus und C:\FPC\3.2.2 an.
-          # downloads.sourceforge.net liefert die Datei direkt aus (die
-          # /projects/.../download-URL liefert nur eine HTML-Zwischenseite).
+          # SourceForge liefert fuer PowerShell-artige User-Agents nur eine
+          # HTML-Zwischenseite (152 KB) - curl mit curl-UA bekommt die Datei.
           $url = 'https://downloads.sourceforge.net/project/lazarus/Lazarus%20Windows%2032%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win32.exe'
           $exe = Join-Path $env:RUNNER_TEMP 'lazarus-setup.exe'
-          Invoke-WebRequest -Uri $url -OutFile $exe -MaximumRedirection 10
+          if (Test-Path $exe) { Remove-Item $exe -Force }
+
+          & curl.exe -L --fail --retry 3 --retry-delay 5 --max-time 1800 `
+                     -A 'curl/8.5.0' -o $exe $url
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $exe)) {
+            Write-Host "curl Exitcode $LASTEXITCODE - Fallback auf Invoke-WebRequest"
+            Invoke-WebRequest -Uri $url -OutFile $exe -UserAgent 'curl/8.5.0' -MaximumRedirection 10
+          }
           $len = (Get-Item $exe).Length
           Write-Host ("Download: {0:N0} Bytes" -f $len)
           if ($len -lt 50MB) {
