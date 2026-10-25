@@ -1,0 +1,6 @@
+# Zeilenenden: Ressourcen und Binaries nie konvertieren,
+# sonst zerlegt Git die Icon-Ressource in Emat.res.
+*.res binary
+*.dll binary
+*.exe binary
+*.ico binary

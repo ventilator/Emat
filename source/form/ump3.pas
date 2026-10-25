@@ -50,7 +50,15 @@ uses
 
 
 const
+  { Release-Builds lesen die Version aus source/form/emversion.inc, das
+    build-release.bat aus dem Git-Tag erzeugt. Normale Builds nutzen den
+    Fallback hier - so bleibt der Arbeitsbaum sauber. }
+{$IFDEF EMAT_USE_VERSION_INC}
+{$I emversion.inc}
+  Version     = EMAT_VERSION;
+{$ELSE}
   Version     = '0.90-dev-freepascal-port';
+{$ENDIF}
   extendedDebugLogInfo = False;
   FormCaption = '';
   maxVolume   = 100;

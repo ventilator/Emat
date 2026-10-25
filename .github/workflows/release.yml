@@ -1,0 +1,79 @@
+name: release
+
+# Baut Emat unter Windows (Lazarus/FPC, i386-win32) und haengt das Zip an
+# ein GitHub-Release. Ausgeloest von einem Tag-Push (v*), sonst nur Artefakt.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Quellen holen
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # git describe braucht die Tags
+
+      - name: Lazarus und FPC installieren
+        shell: pwsh
+        run: |
+          choco install lazarus -y --no-progress
+          # chocolatey legt Lazarus unter C:\tools\lazarus ab
+          Get-ChildItem -Path C:\tools\lazarus -Filter lazbuild.exe -Recurse -ErrorAction SilentlyContinue |
+            Select-Object -First 3 FullName
+          Get-ChildItem -Path C:\tools\lazarus -Filter ppc386.exe -Recurse -ErrorAction SilentlyContinue |
+            Select-Object -First 3 FullName
+
+      - name: Werkzeuge in den PATH
+        shell: pwsh
+        run: |
+          $laz = Get-ChildItem -Path C:\tools\lazarus -Filter lazbuild.exe -Recurse -ErrorAction Stop |
+                   Select-Object -First 1
+          echo "LAZBUILD=$($laz.FullName)" >> $env:GITHUB_ENV
+          $ppc = Get-ChildItem -Path C:\tools\lazarus -Filter ppc386.exe -Recurse -ErrorAction Stop |
+                   Select-Object -First 1
+          echo "PPC386=$($ppc.FullName)" >> $env:GITHUB_ENV
+          echo "Lazarus: $($laz.FullName)"
+          echo "FPC i386: $($ppc.FullName)"
+
+      - name: Release bauen
+        shell: cmd
+        env:
+          NOPAUSE: '1'
+        run: build-release.bat
+
+      - name: Zip pruefen
+        shell: pwsh
+        run: |
+          Get-ChildItem release | Format-Table Name, Length
+          if (-not (Test-Path release\*.zip)) { throw 'Kein Zip erzeugt' }
+
+      - name: GitHub-Release anlegen
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.zip
+            release/*.sha256
+          generate_release_notes: true
+          prerelease: true
+          body: |
+            Portierung von Emat auf Lazarus/FPC (Windows, 32 Bit).
+
+            Enthalten: Emat.exe, bass.dll, basswma.dll, Lizenzhinweise.
+            BASS steht nicht unter der GPL - siehe LICENSE-NOTICE.txt im Zip.
+
+      - name: Artefakt fuer manuelle Laeufe
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emat-win32
+          path: release/*
+          if-no-files-found: error

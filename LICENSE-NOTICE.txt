@@ -1,0 +1,35 @@
+EMAT - Lizenzhinweise / License notice
+======================================
+
+Emat selbst steht unter der GNU General Public License, Version 2.
+Der vollstaendige Lizenztext liegt in COPYING.txt.
+
+Emat is free software under the GNU General Public License, version 2.
+See COPYING.txt for the full text.
+
+
+BASS - nicht unter GPL (BASS is not GPL)
+----------------------------------------
+
+Dieses Paket enthaelt unveraenderte Kopien der Audio-Bibliotheken von
+un4seen developments:
+
+  bass.dll      - BASS audio library 2.4
+  basswma.dll   - BASS WMA add-on
+
+Copyright (c) un4seen developments - https://www.un4seen.com/
+
+Diese DLLs stehen NICHT unter der GPL. Sie werden hier unveraendert
+beigelegt; ihre Nutzung und Weitergabe richtet sich ausschliesslich nach
+der Lizenz von un4seen developments (kostenlos fuer nicht-kommerzielle
+Nutzung, siehe https://www.un4seen.com/). Die GPL von Emat erstreckt sich
+nicht auf diese Dateien und sie sind kein Teil des GPL-lizenzierten
+Quellcodes.
+
+Diese DLLs stehen NICHT unter der GPL. They are redistributed unmodified
+under un4seen's own license terms, which are independent of the GPL of
+Emat. See https://www.un4seen.com/ for details.
+
+Wer die DLLs nicht mitliefern will, kann Emat auch ohne sie betreiben:
+bass.dll wird beim Start aus dem Programmverzeichnis geladen und kann dort
+durch eine eigene, rechtmaessig erworbene Kopie ersetzt werden.

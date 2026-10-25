@@ -22,3 +22,8 @@ tests/new/
 tests/test_bass.compiled
 epldump.py
 osdwatch.py
+
+# Release-Build
+source/form/emversion.inc
+dist/
+release/
