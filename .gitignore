@@ -35,4 +35,5 @@ release/
 # Altlasten aus der Delphi-Zeit: bleiben auf der Platte, aber nicht im Repo
 /Emat.dsm
 /release Ordner/
-/source/TBASSPlayer/Demo/BASSPlay.exe
+/source/TBASSPlayer/Demo/
+*.dcu
