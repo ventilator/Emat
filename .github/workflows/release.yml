@@ -26,10 +26,17 @@ jobs:
         run: |
           # Das chocolatey-Paket bringt keinen i386-win32-Compiler mit; der
           # offizielle 32-Bit-Installer legt C:\lazarus und C:\FPC\3.2.2 an.
-          $url = 'https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2032%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win32.exe/download'
+          # downloads.sourceforge.net liefert die Datei direkt aus (die
+          # /projects/.../download-URL liefert nur eine HTML-Zwischenseite).
+          $url = 'https://downloads.sourceforge.net/project/lazarus/Lazarus%20Windows%2032%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win32.exe'
           $exe = Join-Path $env:RUNNER_TEMP 'lazarus-setup.exe'
           Invoke-WebRequest -Uri $url -OutFile $exe -MaximumRedirection 10
-          Write-Host ("Download: {0:N0} Bytes" -f (Get-Item $exe).Length)
+          $len = (Get-Item $exe).Length
+          Write-Host ("Download: {0:N0} Bytes" -f $len)
+          if ($len -lt 50MB) {
+            Get-Content $exe -TotalCount 5
+            throw "Download zu klein ($len Bytes) - vermutlich eine HTML-Seite statt des Installers"
+          }
           Start-Process -FilePath $exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-' -Wait
           Get-ChildItem 'C:\lazarus\lazbuild.exe', 'C:\FPC\3.2.2\bin\i386-win32\ppc386.exe' -ErrorAction SilentlyContinue |
             Format-Table FullName, Length
