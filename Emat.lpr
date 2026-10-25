@@ -29,8 +29,6 @@ uses
   Ustart,
   UStatus,
   Mp3FileUtils,
-  UnitWDBIPCObjects,
-  UnitWDBIPCDemoObj,
   BASSPlayer,
   TBXZezioTheme,
   rmkThemes,
