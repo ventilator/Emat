@@ -1,6 +1,8 @@
 # Emat-Port — offene Punkte
 
-Stand: 0.90 (EmAIt), Lazarus 4.8 / FPC 3.2.2 i386, BASS 2.4.17.
+Stand: 0.90-dev-freepascal-port, Lazarus 4.8 / FPC 3.2.2 i386, BASS 2.4.17.
+Release-Build: `build-release.bat` bzw. `.github/workflows/release.yml`
+(Tag `v0.90-dev-freepascal-port`, Zip mit Exe + bass.dll + basswma.dll).
 Erledigt: Oberfläche mit TBX-Themes, Playlist laden/speichern, MP3 **und** WMA
 über bass.dll + basswma, OSD, Equalizer-FX-Kette, Winamp-Input-Plugins aus.
 
@@ -10,6 +12,7 @@ dem, was dafür konkret zu tun ist.
 ## 1. Milkdrop / Visualisierung (groß, ~1–2 Tage)
 
 > Details, Aufrufketten und Risiken: `docs/recherche-milkdrop-und-docking.md`
+> Alternative dazu (und Voraussetzung für 64 Bit): Punkt 9, projectM.
 
 Der Host ist noch da: `source/TBASSPlayer/VisDrive2.pas` ist ein vollständiger
 Winamp-Vis-Host (inkl. Milkdrop-2-Sonderfällen über `wa_ipc.pas`), und
@@ -83,7 +86,61 @@ also erst nach dessen Entscheidung.
 - `bbass_fx.dll` (Equalizer/Echo/Reverb/Flanger) wird geladen, Echo/Reverb/
   Flanger sind aber nirgends in der Oberfläche erreichbar.
 
-## 8. Dockable Panels durch LCL-Docking ersetzen (optional, ~2–3 Tage)
+## 9. projectM evaluieren — Milkdrop-Ersatz und 64-Bit-Frage (nächste Session)
+
+**Ziel:** Prüfen, ob **projectM** (Open-Source-Nachfolger von Milkdrop) anstelle
+des Winamp-Plugins `vis_milk2.dll` integriert werden kann — und ob daraus ein
+64-Bit-Port von Emat folgen kann. Erst bewerten, nicht implementieren.
+
+### projectM — Eignung
+
+* Lizenz: projectM ist **LGPL-2.1**, Emat ist GPLv2 — das passt (anders als
+  BASS), also keine Lizenzblockade wie bei `bass.dll`.
+* Rendering: **OpenGL** statt DirectX 9, d. h. es braucht ein GL-Kontext im
+  Fenster. In Lazarus: `LazOpenGLContext` (`TOpenGLControl`) bzw.
+  `TglWidget`; prüfen, wie sich das mit dem TBX-Dockpanel/Tab-Verhalten
+  verträgt (eigenes Child-Fenster vs. Handle-Injektion).
+* API: C-Interface (`projectm_create`, `projectm_load_preset`,
+  `projectm_pcm_add_float`, `projectm_render_frame`,
+  `projectm_set_window_size`) — Anbindung per `external`/`cdecl`, kein C++-Wrapper
+  nötig, wenn die DLL/`.lib` gebaut wird.
+* **Preset-Kompatibilität:** liest `.milk`-Presets — die 949 Presets in
+  `Plugins/Milkdrop2.2/presets` wären also weiter nutzbar. Das ist der
+  Hauptgewinn gegenüber einem Verlust des Milkdrop-Ordners.
+* Audioweg: braucht PCM-Float-Frames. Vorhanden ist der FFT-Weg über
+  `TVisDataThread`/`FOnNewFFTData` (`VisDrive2.pas`) — beides gegeneinander
+  abwägen: projectM will Samples, nicht FFT.
+* Zu klären: gibt es fertige **Windows-Binaries (32 Bit)**? Sonst selbst bauen
+  (CMake + MSVC/MinGW, Abhängigkeiten: GLEW, GLM, SDL2 optional). Aufwand für
+  Build und DLL-Deployment mit einkalkulieren.
+* Alternativweg: Winamp-Vis-Host (`VisDrive2.pas`) gangbar machen (Punkt 1) —
+  kostet weniger, bleibt aber 32-Bit-only und DX9-gebunden.
+
+### 64-Bit-Port — was blockiert
+
+Konkrete Kandidaten, die geprüft werden müssen:
+
+* `third_party/TB2_TBX/Source/TBXUtils.pas` enthält **Assembler-Blöcke** —
+  der einzige `asm`-Einsatz im kompilierten Code. Muss für x86_64 neu
+  geschrieben oder durch Pascal/GDI-Aufrufe ersetzt werden.
+* `third_party/TB2_TBX/Source/tb2/windelphi.pas` (≈30 000 Zeilen) deklariert
+  Windows-APIs selbst, u. a. `GlobalAllocPtr`, `LONG_PTR`, `GetWindowLongPtr` —
+  Pointer/`Longint`-Vermischungen, die unter x64 stillschweigend abschneiden.
+* `-dDELPHI_2007_BELOW` (AnsiString-Semantik) projektweit — unter x64 weiter
+  gültig, aber zusammen mit `PChar`/`UTF8ToSys`-Umwegen erneut zu prüfen.
+* BASS: 64-Bit-`bass.dll` existiert (un4seen), ebenso `basswma` — muss nur
+  mitgeliefert werden. `bass_fx`/`bassflac` ebenfalls als x64 verfügbar.
+* Ziel: erst ein **Build-Versuch mit `--cpu=x86_64`** (ohne Vis), Liste der
+  Fehlerstellen als Aufwandsgrundlage. Wenn TB2_TBX der einzige Blocker ist:
+  Aufwand gegen „UI auf LCL-Standardwidgets umbauen" (Punkt 8) abwägen.
+
+### Ergebnis der Session
+
+Kurzbericht in `docs/recherche-milkdrop-und-docking.md` ergänzen: Integrations-
+variante (Winamp-Host vs. projectM), 64-Bit-Blockerliste mit Aufwandsschätzung,
+Empfehlung. Keine Umsetzung ohne Rückfrage.
+
+## 10. Dockable Panels durch LCL-Docking ersetzen (optional, ~2–3 Tage)
 
 Die TBX-Panels laufen im Port; ein Ersatz ist reine Architektur-/Optikfrage.
 `AnchorDocking` (`C:/lazarus/components/anchordocking/anchordocking.lpk`) ist
