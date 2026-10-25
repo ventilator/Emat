@@ -37,3 +37,7 @@ release/
 /release Ordner/
 /source/TBASSPlayer/Demo/
 *.dcu
+*.identcache
+*.dproj.local
+*.dsk
+*.rsj
