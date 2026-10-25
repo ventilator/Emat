@@ -32,3 +32,7 @@ release/
 # Units geladen; ohne sie bricht schon der Paket-Build ab.
 !third_party/TB2_TBX/Source/*.res
 !third_party/TB2_TBX/Source/tb2/*.res
+# Altlasten aus der Delphi-Zeit: bleiben auf der Platte, aber nicht im Repo
+/Emat.dsm
+/release Ordner/
+/source/TBASSPlayer/Demo/BASSPlay.exe
