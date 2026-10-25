@@ -21,41 +21,18 @@ jobs:
         with:
           fetch-depth: 0        # git describe braucht die Tags
 
-      - name: Lazarus und FPC installieren
+      - name: Lazarus 4.8 mit FPC 3.2.2 installieren
         shell: pwsh
         run: |
-          choco install lazarus -y --no-progress
-          # chocolatey legt Lazarus unter C:\tools\lazarus ab
-          Get-ChildItem -Path C:\tools\lazarus -Filter lazbuild.exe -Recurse -ErrorAction SilentlyContinue |
-            Select-Object -First 3 FullName
-          Get-ChildItem -Path C:\tools\lazarus -Filter ppc386.exe -Recurse -ErrorAction SilentlyContinue |
-            Select-Object -First 3 FullName
-
-      - name: Werkzeuge in den PATH
-        shell: pwsh
-        run: |
-          $roots = @('C:\tools\lazarus', 'C:\Program Files\Lazarus', 'C:\lazarus', "$env:LOCALAPPDATA\lazarus")
-          $laz = $null
-          foreach ($r in $roots) {
-            if (-not (Test-Path $r)) { continue }
-            $laz = Get-ChildItem -Path $r -Filter lazbuild.exe -Recurse -ErrorAction SilentlyContinue |
-                     Select-Object -First 1
-            if ($laz) { break }
-          }
-          if (-not $laz) {
-            $cmd = Get-Command lazbuild.exe -ErrorAction SilentlyContinue
-            if ($cmd) { $laz = Get-Item $cmd.Source }
-          }
-          if (-not $laz) { throw 'lazbuild.exe nicht gefunden' }
-          echo "LAZBUILD=$($laz.FullName)" >> $env:GITHUB_ENV
-
-          $ppc = Get-ChildItem -Path (Split-Path -Parent (Split-Path -Parent $laz.FullName)) -Filter ppc386.exe -Recurse -ErrorAction SilentlyContinue |
-                   Select-Object -First 1
-          if (-not $ppc) { $ppc = Get-ChildItem -Path C:\ -Filter ppc386.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue | Select-Object -First 1 }
-          if (-not $ppc) { throw 'ppc386.exe nicht gefunden' }
-          echo "PPC386=$($ppc.FullName)" >> $env:GITHUB_ENV
-          echo "Lazarus: $($laz.FullName)"
-          echo "FPC i386: $($ppc.FullName)"
+          # Das chocolatey-Paket bringt keinen i386-win32-Compiler mit; der
+          # offizielle 32-Bit-Installer legt C:\lazarus und C:\FPC\3.2.2 an.
+          $url = 'https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2032%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win32.exe/download'
+          $exe = Join-Path $env:RUNNER_TEMP 'lazarus-setup.exe'
+          Invoke-WebRequest -Uri $url -OutFile $exe -MaximumRedirection 10
+          Write-Host ("Download: {0:N0} Bytes" -f (Get-Item $exe).Length)
+          Start-Process -FilePath $exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-' -Wait
+          Get-ChildItem 'C:\lazarus\lazbuild.exe', 'C:\FPC\3.2.2\bin\i386-win32\ppc386.exe' -ErrorAction SilentlyContinue |
+            Format-Table FullName, Length
 
       - name: Release bauen
         shell: cmd
