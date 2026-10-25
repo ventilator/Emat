@@ -2,7 +2,7 @@
 {*******************************************************}
 {                                                       }
 {                 Delphi TKnob Component                }
-{       Copyright © 1999, Gary Bradley Hardman.         }
+{       Copyright Â© 1999, Gary Bradley Hardman.         }
 {                 Written 29th May 1997                 }
 {                     Version 1.0                       }
 {              Released November 29th 1999              }

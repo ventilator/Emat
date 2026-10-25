@@ -1,0 +1,495 @@
+object MPEGFileInfoForm: TMPEGFileInfoForm
+  Left = 433
+  Top = 215
+  BorderStyle = bsDialog
+  Caption = 'MPEG file info box + ID3 tag editor'
+  ClientHeight = 399
+  ClientWidth = 570
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label19: TLabel
+    Left = 12
+    Top = 13
+    Width = 54
+    Height = 15
+    Caption = 'File/URL :'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ParentFont = False
+  end
+  object fFileName: TLabel
+    Left = 71
+    Top = 13
+    Width = 486
+    Height = 15
+    AutoSize = False
+    Caption = 'fFileName'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clPurple
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ParentFont = False
+  end
+  object GroupBox1: TGroupBox
+    Left = 8
+    Top = 35
+    Width = 248
+    Height = 162
+    Caption = ' ID3v1 '
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 169
+      Top = 15
+      Width = 38
+      Height = 13
+      Caption = 'Track #'
+    end
+    object Label2: TLabel
+      Left = 34
+      Top = 41
+      Width = 20
+      Height = 13
+      Caption = 'Title'
+    end
+    object Label3: TLabel
+      Left = 29
+      Top = 64
+      Width = 23
+      Height = 13
+      Caption = 'Artist'
+    end
+    object Label4: TLabel
+      Left = 26
+      Top = 87
+      Width = 29
+      Height = 13
+      Caption = 'Album'
+    end
+    object Label5: TLabel
+      Left = 29
+      Top = 110
+      Width = 22
+      Height = 13
+      Caption = 'Year'
+    end
+    object Label6: TLabel
+      Left = 10
+      Top = 137
+      Width = 44
+      Height = 13
+      Caption = 'Comment'
+    end
+    object Genre: TLabel
+      Left = 112
+      Top = 110
+      Width = 29
+      Height = 13
+      Caption = 'Genre'
+    end
+    object cbID3v1Tag: TCheckBox
+      Left = 60
+      Top = 14
+      Width = 75
+      Height = 17
+      Caption = 'ID3v&1 Tag'
+      TabOrder = 0
+      OnClick = cbID3v1TagClick
+    end
+    object Tag1_TrackNo: TEdit
+      Left = 212
+      Top = 11
+      Width = 26
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 1
+    end
+    object Tag1_Title: TEdit
+      Left = 60
+      Top = 36
+      Width = 178
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 2
+    end
+    object Tag1_Artist: TEdit
+      Left = 60
+      Top = 60
+      Width = 178
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 3
+    end
+    object Tag1_Album: TEdit
+      Left = 60
+      Top = 83
+      Width = 178
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 4
+    end
+    object Tag1_Year: TEdit
+      Left = 60
+      Top = 107
+      Width = 42
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 5
+    end
+    object Tag1_Genre: TComboBox
+      Left = 144
+      Top = 107
+      Width = 95
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      ItemHeight = 13
+      Sorted = True
+      TabOrder = 6
+      OnKeyPress = Tag1_GenreKeyPress
+    end
+    object Tag1_Comment: TEdit
+      Left = 60
+      Top = 132
+      Width = 178
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 7
+    end
+  end
+  object GroupBox2: TGroupBox
+    Left = 260
+    Top = 35
+    Width = 303
+    Height = 357
+    Caption = ' ID3v2 '
+    TabOrder = 1
+    object Label7: TLabel
+      Left = 224
+      Top = 15
+      Width = 38
+      Height = 13
+      Caption = 'Track #'
+    end
+    object Label8: TLabel
+      Left = 44
+      Top = 41
+      Width = 20
+      Height = 13
+      Caption = 'Title'
+    end
+    object Label9: TLabel
+      Left = 39
+      Top = 64
+      Width = 23
+      Height = 13
+      Caption = 'Artist'
+    end
+    object Label10: TLabel
+      Left = 36
+      Top = 87
+      Width = 29
+      Height = 13
+      Caption = 'Album'
+    end
+    object Label11: TLabel
+      Left = 41
+      Top = 110
+      Width = 22
+      Height = 13
+      Caption = 'Year'
+    end
+    object Label12: TLabel
+      Left = 125
+      Top = 110
+      Width = 29
+      Height = 13
+      Caption = 'Genre'
+    end
+    object Label13: TLabel
+      Left = 20
+      Top = 137
+      Width = 44
+      Height = 13
+      Caption = 'Comment'
+    end
+    object Label14: TLabel
+      Left = 18
+      Top = 194
+      Width = 47
+      Height = 13
+      Caption = 'Composer'
+    end
+    object Label15: TLabel
+      Left = 18
+      Top = 217
+      Width = 48
+      Height = 13
+      Caption = 'Orig. Artist'
+    end
+    object Label16: TLabel
+      Left = 21
+      Top = 240
+      Width = 44
+      Height = 13
+      Caption = 'Copyright'
+    end
+    object Label17: TLabel
+      Left = 39
+      Top = 266
+      Width = 22
+      Height = 13
+      Caption = 'URL'
+    end
+    object Label18: TLabel
+      Left = 8
+      Top = 287
+      Width = 57
+      Height = 13
+      Caption = 'Encoded by'
+    end
+    object cbID3v2Tag: TCheckBox
+      Left = 69
+      Top = 14
+      Width = 75
+      Height = 17
+      Caption = 'ID3v&2 Tag'
+      TabOrder = 0
+      OnClick = cbID3v2TagClick
+    end
+    object Tag2_TrackNo: TEdit
+      Left = 267
+      Top = 11
+      Width = 26
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 1
+    end
+    object Tag2_Title: TEdit
+      Left = 69
+      Top = 36
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 2
+    end
+    object Tag2_Artist: TEdit
+      Left = 69
+      Top = 60
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 3
+    end
+    object Tag2_Album: TEdit
+      Left = 69
+      Top = 83
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 4
+    end
+    object Tag2_Year: TEdit
+      Left = 69
+      Top = 107
+      Width = 42
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 5
+    end
+    object Tag2_Genre: TComboBox
+      Left = 156
+      Top = 107
+      Width = 138
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      ItemHeight = 13
+      Sorted = True
+      TabOrder = 6
+    end
+    object Tag2_Comment: TMemo
+      Left = 69
+      Top = 132
+      Width = 224
+      Height = 53
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 7
+    end
+    object Tag2_Composer: TEdit
+      Left = 69
+      Top = 189
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 8
+    end
+    object Tag2_OrigArtist: TEdit
+      Left = 69
+      Top = 213
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 9
+    end
+    object Tag2_Copyright: TEdit
+      Left = 69
+      Top = 236
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 10
+    end
+    object Tag2_URL: TEdit
+      Left = 69
+      Top = 260
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 11
+    end
+    object Tag2_Encodedby: TEdit
+      Left = 69
+      Top = 283
+      Width = 224
+      Height = 21
+      ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+      TabOrder = 12
+    end
+    object btnCopyTo: TButton
+      Left = 8
+      Top = 325
+      Width = 88
+      Height = 25
+      Caption = 'Copy &to ID3v1'
+      TabOrder = 13
+      OnClick = btnCopyToClick
+    end
+    object btnCopyFrom: TButton
+      Left = 109
+      Top = 325
+      Width = 88
+      Height = 25
+      Caption = 'Copy &from ID3v1'
+      TabOrder = 14
+      OnClick = btnCopyFromClick
+    end
+  end
+  object GroupBox3: TGroupBox
+    Left = 8
+    Top = 201
+    Width = 248
+    Height = 157
+    Caption = ' MPEG info '
+    TabOrder = 2
+    object lbSize: TLabel
+      Left = 18
+      Top = 15
+      Width = 28
+      Height = 13
+      Caption = 'lbSize'
+    end
+    object lbHeaderPos: TLabel
+      Left = 18
+      Top = 29
+      Width = 61
+      Height = 13
+      Caption = 'lbHeaderPos'
+    end
+    object lbLength: TLabel
+      Left = 18
+      Top = 42
+      Width = 41
+      Height = 13
+      Caption = 'lbLength'
+    end
+    object lbType: TLabel
+      Left = 18
+      Top = 56
+      Width = 32
+      Height = 13
+      Caption = 'lbType'
+    end
+    object lbBitFrame: TLabel
+      Left = 18
+      Top = 70
+      Width = 49
+      Height = 13
+      Caption = 'lbBitFrame'
+    end
+    object lbFreq_Channels: TLabel
+      Left = 18
+      Top = 83
+      Width = 79
+      Height = 13
+      Caption = 'lbFreq_Channels'
+    end
+    object lbCRC: TLabel
+      Left = 18
+      Top = 97
+      Width = 30
+      Height = 13
+      Caption = 'lbCRC'
+    end
+    object lbCopyrighted: TLabel
+      Left = 18
+      Top = 111
+      Width = 64
+      Height = 13
+      Caption = 'lbCopyrighted'
+    end
+    object lbOriginal: TLabel
+      Left = 18
+      Top = 124
+      Width = 43
+      Height = 13
+      Caption = 'lbOriginal'
+    end
+    object lbEmphasis: TLabel
+      Left = 18
+      Top = 138
+      Width = 53
+      Height = 13
+      Caption = 'lbEmphasis'
+    end
+  end
+  object btnUpdate: TButton
+    Left = 13
+    Top = 363
+    Width = 65
+    Height = 25
+    Caption = '&Update'
+    TabOrder = 3
+    OnClick = btnUpdateClick
+  end
+  object btnCancel: TButton
+    Left = 83
+    Top = 363
+    Width = 65
+    Height = 25
+    Caption = '&Cancel'
+    TabOrder = 4
+    OnClick = btnCancelClick
+  end
+  object btnUndo: TButton
+    Left = 162
+    Top = 363
+    Width = 84
+    Height = 25
+    Caption = 'Undo Changes'
+    TabOrder = 5
+    OnClick = btnUndoClick
+  end
+end

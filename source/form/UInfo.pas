@@ -5,7 +5,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, jpeg, ump3, shellapi, ImgList, TBXDkPanels,
+  Dialogs, StdCtrls, ExtCtrls, ump3, shellapi, ImgList, TBXDkPanels,
   Ulang, ComCtrls;
 
 type
@@ -22,7 +22,7 @@ var
 
 implementation
 
-{$R *.dfm}
+{$R *.lfm}
 
 
 end.

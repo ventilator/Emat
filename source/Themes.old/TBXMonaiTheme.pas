@@ -4,7 +4,7 @@ unit TBXMonaiTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Monai' TBX theme © 2004 Roy Magne Klever
+// 'Monai' TBX theme Â© 2004 Roy Magne Klever
 //
 //  Last updated: 28.08.2004
 

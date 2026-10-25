@@ -849,8 +849,10 @@ function BASS_ChannelSet3DAttributes(handle: DWORD; mode: Integer; min, max: FLO
 function BASS_ChannelGet3DAttributes(handle: DWORD; var mode: DWORD; var min, max: FLOAT; var iangle, oangle, outvol: DWORD): BOOL; stdcall; external bassdll;
 function BASS_ChannelSet3DPosition(handle: DWORD; var pos, orient, vel: BASS_3DVECTOR): BOOL; stdcall; external bassdll;
 function BASS_ChannelGet3DPosition(handle: DWORD; var pos, orient, vel: BASS_3DVECTOR): BOOL; stdcall; external bassdll;
-function BASS_ChannelGetLength(handle: DWORD): QWORD; stdcall; external bassdll;
-function BASS_ChannelSetPosition(handle: DWORD; pos: QWORD): BOOL; stdcall; external bassdll;
+// BASS 2.4.17: beide Funktionen haben einen 'mode'-Parameter. Default 0 =
+// BASS_POS_BYTE, damit die vorhandenen Aufrufe mit einem Argument weiter stimmen.
+function BASS_ChannelGetLength(handle: DWORD; mode: DWORD = 0): QWORD; stdcall; external bassdll;
+function BASS_ChannelSetPosition(handle: DWORD; pos: QWORD; mode: DWORD = 0): BOOL; stdcall; external bassdll;
 function BASS_ChannelGetPosition(handle: DWORD): QWORD; stdcall; external bassdll;
 function BASS_ChannelGetLevel(handle: DWORD): DWORD; stdcall; external bassdll;
 function BASS_ChannelGetData(handle: DWORD; buffer: Pointer; length: DWORD): DWORD; stdcall; external bassdll;

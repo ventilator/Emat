@@ -54,8 +54,8 @@ interface
 {$INCLUDE Delphi_Ver.inc}
 
 uses
-  Classes, Windows, SysUtils, UniCodeUtils, TntCollection
-  {$IFNDEF DELPHI_2007_BELOW}, Types, AnsiStrings{$ENDIF}, CommonATL;
+  Classes, Windows, SysUtils, UniCodeUtils, TntCollection,
+  Types, CommonATL;
 
 
 const
@@ -203,7 +203,7 @@ uses StrUtils;
 procedure TID3v1.FSetTitle(const NewTitle: AnsiString);
 begin
  {$IFNDEF DELPHI_2007_BELOW}
-  FTitle := AnsiStrings.TrimRight(NewTitle);
+  FTitle := TrimRight(NewTitle);
  {$ELSE}
   FTitle := TrimRight(NewTitle);
  {$ENDIF}
@@ -218,7 +218,7 @@ end;
 procedure TID3v1.FSetArtist(const NewArtist: AnsiString);
 begin
  {$IFNDEF DELPHI_2007_BELOW}
-  FArtist := Ansistrings.TrimRight(NewArtist);
+  FArtist := TrimRight(NewArtist);
  {$ELSE}
   FArtist := TrimRight(NewArtist);
  {$ENDIF}
@@ -232,7 +232,7 @@ end;
 procedure TID3v1.FSetAlbum(const NewAlbum: AnsiString);
 begin
  {$IFNDEF DELPHI_2007_BELOW}
-  FAlbum := Ansistrings.TrimRight(NewAlbum);
+  FAlbum := TrimRight(NewAlbum);
  {$ELSE}
   FAlbum := TrimRight(NewAlbum);
  {$ENDIF}
@@ -246,7 +246,7 @@ end;
 procedure TID3v1.FSetYear(const NewYear: String04);
 begin
  {$IFNDEF DELPHI_2007_BELOW}
-  FYear := Ansistrings.TrimRight(NewYear);
+  FYear := TrimRight(NewYear);
  {$ELSE}
   FYear := TrimRight(NewYear);
  {$ENDIF}
@@ -255,7 +255,7 @@ end;
 procedure TID3v1.FSetComment(const NewComment: AnsiString);
 begin
   {$IFNDEF DELPHI_2007_BELOW}
-  FComment := Ansistrings.TrimRight(NewComment);
+  FComment := TrimRight(NewComment);
  {$ELSE}
   FComment := TrimRight(NewComment);
  {$ENDIF}
@@ -283,7 +283,7 @@ begin
   FGenreID := 255;
   for i := 0 to MAX_MUSIC_GENRES - 1 do begin
      {$IFNDEF DELPHI_2007_BELOW}
-      if AnsiStrings.UpperCase( aTAG_MusicGenre[ i ] ) = AnsiStrings.UpperCase( NewGenre ) then begin
+      if UpperCase( aTAG_MusicGenre[ i ] ) = UpperCase( NewGenre ) then begin
      {$ELSE}
       if UpperCase( aTAG_MusicGenre[ i ] ) = UpperCase( NewGenre ) then begin
      {$ENDIF}
@@ -364,7 +364,7 @@ end;
 function TID3v1.FGetHasLyrics: boolean;
 begin
  {$IFNDEF DELPHI_2007_BELOW}
-  result := (AnsiStrings.Trim( Lyrics ) <> '' );
+  result := (Trim( Lyrics ) <> '' );
  {$ELSE}
   result := (Trim( Lyrics ) <> '' );
  {$ENDIF}
@@ -403,10 +403,10 @@ begin
           end;
 
          {$IFNDEF DELPHI_2007_BELOW}
-          Title  := Ansistrings.TrimRight( TagData.Title );
-          Artist := Ansistrings.TrimRight( TagData.Artist );
-          Album  := Ansistrings.TrimRight( TagData.Album );
-          Year   := Ansistrings.TrimRight( TagData.Year );
+          Title  := TrimRight( TagData.Title );
+          Artist := TrimRight( TagData.Artist );
+          Album  := TrimRight( TagData.Album );
+          Year   := TrimRight( TagData.Year );
          {$ELSE}
           Title  := TrimRight( TagData.Title );
           Artist := TrimRight( TagData.Artist );
@@ -416,13 +416,13 @@ begin
 
           if FVersionID = TAG_VERSION_1_0 then begin
             {$IFNDEF DELPHI_2007_BELOW}
-             Comment := Ansistrings.TrimRight( TagData.Comment )
+             Comment := TrimRight( TagData.Comment )
             {$ELSE}
              Comment := TrimRight( TagData.Comment )
             {$ENDIF}
           end else begin
             {$IFNDEF DELPHI_2007_BELOW}
-             Comment := Ansistrings.TrimRight( Copy( TagData.Comment, 1, 28 ) );
+             Comment := TrimRight( Copy( TagData.Comment, 1, 28 ) );
             {$ELSE}
              Comment := TrimRight( Copy( TagData.Comment, 1, 28 ) );
             {$ENDIF}
@@ -469,28 +469,28 @@ begin
 
                    end else if Field.ID = 'LYR' then begin
                      {$IFNDEF DELPHI_2007_BELOW}
-                      Lyrics := Ansistrings.Trim(AnsiString( aBuff ) );
+                      Lyrics := Trim(AnsiString( aBuff ) );
                      {$ELSE}
                       Lyrics := Trim(AnsiString( aBuff ) );
                      {$ENDIF}
                      {$IFNDEF DELPHI_2007_BELOW}
-                      Lyrics := AnsiStrings.StringReplace( Lyrics, #13, #13#10, [rfReplaceAll] );
-                      Lyrics := AnsiStrings.StringReplace( Lyrics, #13#10#10, #13#10, [rfReplaceAll] );
+                      Lyrics := StringReplace( Lyrics, #13, #13#10, [rfReplaceAll] );
+                      Lyrics := StringReplace( Lyrics, #13#10#10, #13#10, [rfReplaceAll] );
                      {$ELSE}
                       Lyrics := StringReplace( Lyrics, #13, #13#10, [rfReplaceAll] );
                       Lyrics := StringReplace( Lyrics, #13#10#10, #13#10, [rfReplaceAll] );
                      {$ENDIF}
                  {$IFNDEF DELPHI_2007_BELOW}
                    end else if Field.ID = 'INF' then begin
-                      Comment := AnsiStrings.Trim(AnsiString( aBuff ) );
+                      Comment := Trim(AnsiString( aBuff ) );
                    end else if Field.ID = 'AUT' then begin
-                      Writer := AnsiStrings.Trim(AnsiString( aBuff ) );
+                      Writer := Trim(AnsiString( aBuff ) );
                    end else if Field.ID = 'EAL' then begin
-                      Album := AnsiStrings.Trim(AnsiString( aBuff ) );
+                      Album := Trim(AnsiString( aBuff ) );
                    end else if Field.ID = 'EAR' then begin
-                      Artist := AnsiStrings.Trim(AnsiString( aBuff ) );
+                      Artist := Trim(AnsiString( aBuff ) );
                    end else if Field.ID = 'ETT' then begin
-                      Title := AnsiStrings.Trim(AnsiString( aBuff ) );
+                      Title := Trim(AnsiString( aBuff ) );
                  {$ELSE}
                    end else if Field.ID = 'INF' then begin
                       Comment := Trim(AnsiString( aBuff ) );
@@ -548,14 +548,14 @@ var
     iLen: integer;
   begin
    {$IFNDEF DELPHI_2007_BELOW}
-    if Ansistrings.Trim( sValue ) <> '' then begin
+    if Trim( sValue ) <> '' then begin
    {$ELSE}
     if Trim( sValue ) <> '' then begin
    {$ENDIF}
        iLen := Length( sValue );
 
      {$IFNDEF DELPHI_2007_BELOW}
-       sTmp := sID + AnsiStrings.DupeString( '0', 5 - Length( IntToStr( iLen ) ) ) + IntToStr( iLen ) + sValue;
+       sTmp := sID + DupeString( '0', 5 - Length( IntToStr( iLen ) ) ) + IntToStr( iLen ) + sValue;
      {$ELSE}
        sTmp := sID + DupeString( '0', 5 - Length( IntToStr( iLen ) ) ) + IntToStr( iLen ) + sValue;
      {$ENDIF}
@@ -601,7 +601,7 @@ begin
 
            iFilepos := SourceFile.Position - iFilePos;
          {$IFNDEF DELPHI_2007_BELOW}
-           sTmp := AnsiSTrings.DupeString( '0', 6 - Length( IntToStr( iFilepos ) ) ) + IntToStr( iFilepos ) + 'LYRICS200';
+           sTmp := DupeString( '0', 6 - Length( IntToStr( iFilepos ) ) ) + IntToStr( iFilepos ) + 'LYRICS200';
          {$ELSE}
            sTmp := DupeString( '0', 6 - Length( IntToStr( iFilepos ) ) ) + IntToStr( iFilepos ) + 'LYRICS200';
          {$ENDIF}
@@ -618,14 +618,14 @@ begin
     Tag.Header := 'TAG';
 
    {$IFNDEF DELPHI_2007_BELOW}
-    sTmp30 := Ansistrings.TrimRight( Title );
+    sTmp30 := TrimRight( Title );
     Move( sTmp30[1], Tag.Title  , Length( sTmp30 ) );
-    sTmp30 := Ansistrings.TrimRight( Artist );
+    sTmp30 := TrimRight( Artist );
     Move( sTmp30[1], Tag.Artist , Length( sTmp30 ) );
-    sTmp30 := Ansistrings.TrimRight( Album );
+    sTmp30 := TrimRight( Album );
     Move( sTmp30[1], Tag.Album  , Length( sTmp30 ) );
     Move( Year[1], Tag.Year   , Length( Year )  );
-    sTmp30 := Ansistrings.TrimRight( Comment );
+    sTmp30 := TrimRight( Comment );
    {$ELSE}
     sTmp30 := TrimRight( Title );
     Move( sTmp30[1], Tag.Title  , Length( sTmp30 ) );
@@ -779,10 +779,10 @@ begin
 
     { Fill properties with tag data }
      {$IFNDEF DELPHI_2007_BELOW}
-      MP3TagInfo.Title := Ansistrings.TrimRight(TagData.Title);
-      MP3TagInfo.Artist := Ansistrings.TrimRight(TagData.Artist);
-      MP3TagInfo.Album := Ansistrings.TrimRight(TagData.Album);
-      MP3TagInfo.Year := Ansistrings.TrimRight(TagData.Year);
+      MP3TagInfo.Title := TrimRight(TagData.Title);
+      MP3TagInfo.Artist := TrimRight(TagData.Artist);
+      MP3TagInfo.Album := TrimRight(TagData.Album);
+      MP3TagInfo.Year := TrimRight(TagData.Year);
      {$ELSE}
       MP3TagInfo.Title := TrimRight(TagData.Title);
       MP3TagInfo.Artist := TrimRight(TagData.Artist);
@@ -793,7 +793,7 @@ begin
       if VersionID = TAG_VERSION_1_0 then
       begin
         {$IFNDEF DELPHI_2007_BELOW}
-         MP3TagInfo.Comment := Ansistrings.TrimRight(TagData.Comment);
+         MP3TagInfo.Comment := TrimRight(TagData.Comment);
         {$ELSE}
          MP3TagInfo.Comment := TrimRight(TagData.Comment);
         {$ENDIF}
@@ -801,7 +801,7 @@ begin
       end else
       begin
         {$IFNDEF DELPHI_2007_BELOW}
-         MP3TagInfo.Comment := Ansistrings.TrimRight(Copy(TagData.Comment, 1, 28));
+         MP3TagInfo.Comment := TrimRight(Copy(TagData.Comment, 1, 28));
         {$ELSE}
          MP3TagInfo.Comment := TrimRight(Copy(TagData.Comment, 1, 28));
         {$ENDIF}

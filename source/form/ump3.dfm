@@ -229,181 +229,173 @@ object Fmp3: TFmp3
         Height = 162
         Align = alClient
         TabOrder = 0
-        object LMDFBinClock: TLMDFill
+        object LMDFBinClock: TPanel
+          BevelOuter = bvNone
           Left = 0
           Top = 0
           Width = 93
           Height = 162
           Align = alClient
-          Bevel.Mode = bmCustom
-          Caption.Font.Charset = DEFAULT_CHARSET
-          Caption.Font.Color = clWindowText
-          Caption.Font.Height = -11
-          Caption.Font.Name = 'Tahoma'
-          Caption.Font.Style = []
-          FillObject.Style = sfGradient
-          FillObject.Gradient.Color = clGray
-          FillObject.Gradient.ColorCount = 236
         end
-        object PH1: TLMDSimplePanel
+        object PH1: TPanel
+          BevelOuter = bvNone
           Left = 4
           Top = 34
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 0
         end
-        object PH3: TLMDSimplePanel
+        object PH3: TPanel
+          BevelOuter = bvNone
           Left = 4
           Top = 84
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 1
         end
-        object PH4: TLMDSimplePanel
+        object PH4: TPanel
+          BevelOuter = bvNone
           Left = 4
           Top = 109
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 2
         end
-        object PH5: TLMDSimplePanel
+        object PH5: TPanel
+          BevelOuter = bvNone
           Left = 4
           Top = 134
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 3
         end
-        object PM1: TLMDSimplePanel
+        object PM1: TPanel
+          BevelOuter = bvNone
           Left = 33
           Top = 7
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 4
         end
-        object PM2: TLMDSimplePanel
+        object PM2: TPanel
+          BevelOuter = bvNone
           Left = 33
           Top = 34
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 5
         end
-        object PM3: TLMDSimplePanel
+        object PM3: TPanel
+          BevelOuter = bvNone
           Left = 33
           Top = 60
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 6
         end
-        object PM4: TLMDSimplePanel
+        object PM4: TPanel
+          BevelOuter = bvNone
           Left = 33
           Top = 84
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 7
         end
-        object PM5: TLMDSimplePanel
+        object PM5: TPanel
+          BevelOuter = bvNone
           Left = 33
           Top = 109
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 8
         end
-        object PM6: TLMDSimplePanel
+        object PM6: TPanel
+          BevelOuter = bvNone
           Left = 33
           Top = 134
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 9
         end
-        object PS1: TLMDSimplePanel
+        object PS1: TPanel
+          BevelOuter = bvNone
           Left = 62
           Top = 7
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 10
         end
-        object PS2: TLMDSimplePanel
+        object PS2: TPanel
+          BevelOuter = bvNone
           Left = 62
           Top = 34
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 11
         end
-        object PS3: TLMDSimplePanel
+        object PS3: TPanel
+          BevelOuter = bvNone
           Left = 62
           Top = 60
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 12
         end
-        object PS4: TLMDSimplePanel
+        object PS4: TPanel
+          BevelOuter = bvNone
           Left = 62
           Top = 84
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 13
         end
-        object PS5: TLMDSimplePanel
+        object PS5: TPanel
+          BevelOuter = bvNone
           Left = 62
           Top = 109
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 14
         end
-        object PS6: TLMDSimplePanel
+        object PS6: TPanel
+          BevelOuter = bvNone
           Left = 62
           Top = 134
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 15
         end
-        object PH2: TLMDSimplePanel
+        object PH2: TPanel
+          BevelOuter = bvNone
           Left = 4
           Top = 60
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 16
         end
-        object PH0: TLMDSimplePanel
+        object PH0: TPanel
+          BevelOuter = bvNone
           Left = 5
           Top = 7
           Width = 20
           Height = 20
-          Bevel.Mode = bmCustom
           Color = clWhite
           TabOrder = 17
         end
@@ -1023,21 +1015,13 @@ object Fmp3: TFmp3
           Visible = False
           OnClick = IcoverClick
         end
-        object LMDFGradientCover: TLMDFill
+        object LMDFGradientCover: TPanel
+          BevelOuter = bvNone
           Left = 0
           Top = 0
           Width = 280
           Height = 32
           Align = alClient
-          Bevel.Mode = bmCustom
-          Caption.Font.Charset = DEFAULT_CHARSET
-          Caption.Font.Color = clWindowText
-          Caption.Font.Height = -11
-          Caption.Font.Name = 'Tahoma'
-          Caption.Font.Style = []
-          FillObject.Style = sfGradient
-          FillObject.Gradient.Color = clGray
-          FillObject.Gradient.ColorCount = 236
         end
       end
     end
@@ -1112,7 +1096,7 @@ object Fmp3: TFmp3
         Caption = 'nichts'
         Visible = False
       end
-      object HK_Next: THotKey
+      object HK_Next: THotKeyEdit
         Left = 8
         Top = 168
         Width = 121
@@ -1123,7 +1107,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HK_Back: THotKey
+      object HK_Back: THotKeyEdit
         Left = 8
         Top = 24
         Width = 121
@@ -1134,7 +1118,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HK_Play: THotKey
+      object HK_Play: THotKeyEdit
         Left = 8
         Top = 72
         Width = 121
@@ -1145,7 +1129,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HK_Pause: THotKey
+      object HK_Pause: THotKeyEdit
         Left = 8
         Top = 120
         Width = 121
@@ -1156,7 +1140,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HK_Lauter: THotKey
+      object HK_Lauter: THotKeyEdit
         Left = 152
         Top = 72
         Width = 121
@@ -1167,7 +1151,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HK_Shuffle: THotKey
+      object HK_Shuffle: THotKeyEdit
         Left = 152
         Top = 120
         Width = 121
@@ -1178,7 +1162,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HotKey6: THotKey
+      object HotKey6: THotKeyEdit
         Left = 152
         Top = 168
         Width = 121
@@ -1190,7 +1174,7 @@ object Fmp3: TFmp3
         OnChange = HK_PauseChange
         OnExit = HK_PauseExit
       end
-      object HK_Leiser: THotKey
+      object HK_Leiser: THotKeyEdit
         Left = 152
         Top = 24
         Width = 121
@@ -1732,19 +1716,6 @@ object Fmp3: TFmp3
         Height = 26
         Align = alClient
         TabOrder = 0
-        object I32_Vis: TImage32
-          Left = 0
-          Top = 0
-          Width = 227
-          Height = 26
-          Align = alClient
-          Bitmap.ResamplerClassName = 'TNearestResampler'
-          BitmapAlign = baTopLeft
-          PopupMenu = TBXPMVisualisierung
-          Scale = 1.000000000000000000
-          ScaleMode = smNormal
-          TabOrder = 0
-        end
       end
       object TBXVisPause: TTBXButton
         Left = 0
@@ -2381,11 +2352,6 @@ object Fmp3: TFmp3
       Hint = 'Aktuellen Titel wiederholen'
       ImageIndex = 37
       OnClick = TBX_repeatClick
-    end
-    object TBXI_StartVisPlugin: TTBXItem
-      Caption = 'Milkdrop'
-      Hint = 'Startet die Visualisierung'
-      OnClick = TBXI_StartVisPluginClick
     end
     object TBX_PartyMode: TTBXItem
       Caption = 'Party'
@@ -4510,9 +4476,7 @@ object Fmp3: TFmp3
     Left = 480
     Top = 288
   end
-  object TrayIcon: TCoolTrayIcon
-    IconList = ILanimation
-    CycleInterval = 0
+  object TrayIcon: TTrayIcon
     Icon.Data = {
       0000010001001010200000000000680400001600000028000000100000002000
       0000010020000000000000040000000000000000000000000000000000000000
@@ -4550,11 +4514,9 @@ object Fmp3: TFmp3
       000000000000000000000000000000000000000000000000000000000000FFFF
       0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF
       0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000}
-    IconVisible = True
-    IconIndex = 0
+    Visible = True
     OnDblClick = TrayIconDblClick
     OnMouseDown = TrayIconMouseDown
-    OnMinimizeToTray = TrayIconMinimizeToTray
     Left = 584
     Top = 344
   end
@@ -5152,21 +5114,21 @@ object Fmp3: TFmp3
       Caption = 'In Playlist markieren'
       OnExecute = AmarkinlistExecute
     end
-    object WindowTileHorizontal1: TWindowTileHorizontal
+    object WindowTileHorizontal1: TAction
       Category = 'Fenster'
       Caption = 'Hori&zontal anordnen'
       Enabled = False
       Hint = 'Horizontal anordnen'
       ImageIndex = 25
     end
-    object WindowTileVertical1: TWindowTileVertical
+    object WindowTileVertical1: TAction
       Category = 'Fenster'
       Caption = '&Vertikal anordnen'
       Enabled = False
       Hint = 'Vertikal anordnen'
       ImageIndex = 24
     end
-    object WindowCascade1: TWindowCascade
+    object WindowCascade1: TAction
       Category = 'Fenster'
       Caption = #220'&berlappend'
       Enabled = False
@@ -5390,51 +5352,11 @@ object Fmp3: TFmp3
       ShortCut = 16470
     end
   end
-  object dwTaskbarThumbnails: TdwTaskbarThumbnails
-    Images = ILSymbolleiste
-    Thumbnails = <
-      item
-        ImageIndex = 1
-        Hint = 'Vorheriger Titel'
-      end
-      item
-        ImageIndex = 4
-        Hint = 'Stopp'
-      end
-      item
-        ImageIndex = 3
-        Hint = 'Pause'
-      end
-      item
-        ImageIndex = 2
-        Hint = 'Play'
-      end
-      item
-        ImageIndex = 5
-        Hint = 'N'#228'chster Titel'
-      end
-      item
-        ImageIndex = 35
-        Hint = 'Leiser'
-      end
-      item
-        ImageIndex = 18
-        Hint = 'Lauter'
-      end>
-    OnThumbnailClick = dwTaskbarThumbnailsThumbnailClick
-    Left = 704
-    Top = 552
-  end
   object TMilkdropMover: TTimer
     Enabled = False
     Interval = 250
     OnTimer = TMilkdropMoverTimer
     Left = 704
     Top = 232
-  end
-  object XMLEqualizer: TXMLDocument
-    Left = 384
-    Top = 416
-    DOMVendorDesc = 'MSXML'
   end
 end

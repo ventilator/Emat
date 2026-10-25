@@ -81,8 +81,7 @@ interface
 {$INCLUDE Delphi_Ver.inc}
 
 uses
-  Classes, SysUtils, UniCodeUtils,
-  {$IFNDEF DELPHI_2007_BELOW}AnsiStrings, AnsiStringStream,{$ENDIF}
+  StrUtils, Classes, SysUtils, UniCodeUtils,
   TntCollection;
 
 const
@@ -340,7 +339,7 @@ begin
        {$IFDEF DELPHI_2007_BELOW}
         Info.Tag.FieldData[Index] := UTF8Decode(Trim(FieldData));
        {$ELSE}
-        Info.Tag.FieldData[Index] := UTF8ToWideString(Trim(FieldData));
+        Info.Tag.FieldData[Index] := UTF8Decode(Trim(FieldData));
        {$ENDIF}
         IsExtraTag := false;
         break;
@@ -350,13 +349,13 @@ begin
          {$IFDEF DELPHI_2007_BELOW}
           Info.ExtraTag := FieldId + '=' + UTF8Decode(Trim(FieldData))
          {$ELSE}
-          Info.ExtraTag := FieldId + '=' + UTF8ToWideString(Trim(FieldData))
+          Info.ExtraTag := FieldId + '=' + UTF8Decode(Trim(FieldData))
          {$ENDIF}
        else  // use chr(0) as seperator between tags
          {$IFDEF DELPHI_2007_BELOW}
           Info.ExtraTag := Info.ExtraTag + AnsiChar(0) + FieldId + '=' + UTF8Decode(Trim(FieldData));
          {$ELSE}
-          Info.ExtraTag := Info.ExtraTag + AnsiChar(0) + FieldId + '=' + UTF8ToWideString(Trim(FieldData));
+          Info.ExtraTag := Info.ExtraTag + AnsiChar(0) + FieldId + '=' + UTF8Decode(Trim(FieldData));
          {$ENDIF}
   end
   else
@@ -479,7 +478,7 @@ end;
 {$IFDEF DELPHI_2007_BELOW}
 function BuildTag(const Info: FileInfo): TStringStream;
 {$ELSE}
-function BuildTag(const Info: FileInfo): TAnsiStringStream;
+function BuildTag(const Info: FileInfo): TStringStream;
 {$ENDIF}
 var
   Index, Fields, Size: Integer;
@@ -499,8 +498,8 @@ begin
    Result := TStringStream.Create('');
   {$ELSE}
  // TStringStream of Delphi 2009 shows erroneous behaviour at handling ansistring.
- // So, use TAnsiStringStream instead of TStringStream for ansistring.
-   Result := TAnsiStringStream.Create('');
+ // So, use TStringStream instead of TStringStream for ansistring.
+   Result := TStringStream.Create('');
   {$ENDIF}
 
   Fields := 0;
@@ -834,7 +833,7 @@ var
  {$IFDEF DELPHI_2007_BELOW}
   Tag: TStringStream;
  {$ELSE}
-  Tag: TAnsiStringStream;
+  Tag: TStringStream;
  {$ENDIF}
 begin
   { Save Vorbis tag }

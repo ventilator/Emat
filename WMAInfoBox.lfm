@@ -1,0 +1,430 @@
+object WMAInfoForm: TWMAInfoForm
+  Left = 306
+  Top = 274
+  BorderStyle = bsDialog
+  Caption = 'WMA info + tag editor'
+  ClientHeight = 409
+  ClientWidth = 616
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label9: TLabel
+    Left = 15
+    Top = 214
+    Width = 26
+    Height = 13
+    Caption = 'Artist:'
+  end
+  object Label11: TLabel
+    Left = 15
+    Top = 257
+    Width = 23
+    Height = 13
+    Caption = 'Title:'
+  end
+  object Label13: TLabel
+    Left = 15
+    Top = 278
+    Width = 32
+    Height = 13
+    Caption = 'Album:'
+  end
+  object Label10: TLabel
+    Left = 15
+    Top = 300
+    Width = 25
+    Height = 13
+    Caption = 'Year:'
+  end
+  object Label14: TLabel
+    Left = 177
+    Top = 300
+    Width = 31
+    Height = 13
+    Caption = 'Track:'
+  end
+  object Label16: TLabel
+    Left = 326
+    Top = 29
+    Width = 52
+    Height = 13
+    Caption = 'Comments:'
+  end
+  object Label1: TLabel
+    Left = 15
+    Top = 192
+    Width = 32
+    Height = 13
+    Caption = 'Genre:'
+  end
+  object Label2: TLabel
+    Left = 326
+    Top = 166
+    Width = 30
+    Height = 13
+    Caption = 'Lyrics:'
+  end
+  object Label3: TLabel
+    Left = 15
+    Top = 169
+    Width = 43
+    Height = 13
+    Caption = 'Encoder:'
+  end
+  object Label5: TLabel
+    Left = 15
+    Top = 235
+    Width = 50
+    Height = 13
+    Caption = 'Composer:'
+  end
+  object Label6: TLabel
+    Left = 15
+    Top = 321
+    Width = 16
+    Height = 13
+    Caption = 'Url:'
+  end
+  object Label7: TLabel
+    Left = 15
+    Top = 343
+    Width = 47
+    Height = 13
+    Caption = 'Copyright:'
+  end
+  object Label18: TLabel
+    Left = 18
+    Top = 369
+    Width = 338
+    Height = 13
+    Caption = 'The original author : Philip Hadar - Israel  (modifications by Chris Tr?ken)'
+  end
+  object Label20: TLabel
+    Left = 19
+    Top = 386
+    Width = 269
+    Height = 13
+    Caption = 'Additional modification for TBASSPlayer by Silhwan Hyun'
+  end
+  object Label4: TLabel
+    Left = 12
+    Top = 13
+    Width = 54
+    Height = 15
+    Caption = 'File/URL :'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ParentFont = False
+  end
+  object fFileName: TLabel
+    Left = 72
+    Top = 13
+    Width = 529
+    Height = 15
+    AutoSize = False
+    Caption = 'fFileName'
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clPurple
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ParentFont = False
+  end
+  object fArtist: TEdit
+    Left = 67
+    Top = 210
+    Width = 234
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 1
+  end
+  object fTitle: TEdit
+    Left = 67
+    Top = 253
+    Width = 234
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 2
+  end
+  object fAlbum: TEdit
+    Left = 67
+    Top = 275
+    Width = 234
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 3
+  end
+  object fYear: TEdit
+    Left = 67
+    Top = 297
+    Width = 42
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 4
+  end
+  object fTrack: TEdit
+    Left = 216
+    Top = 297
+    Width = 30
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 5
+  end
+  object fComments: TMemo
+    Left = 324
+    Top = 45
+    Width = 281
+    Height = 112
+    Color = clWhite
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 6
+    WordWrap = False
+  end
+  object fGenre: TEdit
+    Left = 67
+    Top = 188
+    Width = 148
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 7
+  end
+  object btnUpdate: TButton
+    Left = 386
+    Top = 370
+    Width = 75
+    Height = 25
+    Caption = 'Update'
+    Enabled = False
+    TabOrder = 8
+    OnClick = btnUpdateClick
+  end
+  object btnCancel: TButton
+    Left = 482
+    Top = 370
+    Width = 75
+    Height = 25
+    Caption = 'Cancel'
+    TabOrder = 9
+    OnClick = btnCancelClick
+  end
+  object fLyrics: TMemo
+    Left = 324
+    Top = 183
+    Width = 281
+    Height = 177
+    Color = clWhite
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 10
+    WordWrap = False
+  end
+  object fEncoder: TEdit
+    Left = 67
+    Top = 166
+    Width = 148
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 0
+  end
+  object fComposer: TEdit
+    Left = 67
+    Top = 231
+    Width = 234
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 11
+  end
+  object fUrl: TEdit
+    Left = 67
+    Top = 318
+    Width = 234
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 12
+  end
+  object fCopyright: TEdit
+    Left = 67
+    Top = 340
+    Width = 234
+    Height = 20
+    AutoSize = False
+    Ctl3D = False
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clNavy
+    Font.Height = -12
+    Font.Name = 'Arial'
+    Font.Style = []
+    ImeName = #199#209#177#185#190#238' '#192#212#183#194' '#189#195#189#186#197#219' (IME 2000)'
+    ParentCtl3D = False
+    ParentFont = False
+    TabOrder = 13
+  end
+  object GroupBox3: TGroupBox
+    Left = 22
+    Top = 33
+    Width = 248
+    Height = 125
+    Caption = ' WMA info '
+    TabOrder = 14
+    object lbSize: TLabel
+      Left = 16
+      Top = 15
+      Width = 28
+      Height = 13
+      Caption = 'lbSize'
+    end
+    object lbLength: TLabel
+      Left = 16
+      Top = 30
+      Width = 41
+      Height = 13
+      Caption = 'lbLength'
+    end
+    object lbBitrate: TLabel
+      Left = 16
+      Top = 46
+      Width = 38
+      Height = 13
+      Caption = 'lbBitrate'
+    end
+    object lbChannels: TLabel
+      Left = 16
+      Top = 76
+      Width = 52
+      Height = 13
+      Caption = 'lbChannels'
+    end
+    object lbVBR: TLabel
+      Left = 16
+      Top = 92
+      Width = 30
+      Height = 13
+      Caption = 'lbVBR'
+    end
+    object lbSamplingrate: TLabel
+      Left = 16
+      Top = 61
+      Width = 69
+      Height = 13
+      Caption = 'lbSamplingrate'
+    end
+    object lbVersion: TLabel
+      Left = 16
+      Top = 107
+      Width = 43
+      Height = 13
+      Caption = 'lbVersion'
+    end
+  end
+end

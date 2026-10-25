@@ -7,7 +7,7 @@ unit TBXReliferTheme;
 //
 // 'SentimoX'
 //
-// 01.06.2004 - © Roy Magne Klever
+// 01.06.2004 - Â© Roy Magne Klever
 //              roymagne@rmklever.com
 //              First version.
 
@@ -15,7 +15,7 @@ unit TBXReliferTheme;
 interface
 
 uses
-  Windows, Messages, Graphics, TBXThemes, ImgList;
+  Windows, Messages, Graphics, TBXThemes, ImgList, rmkGradient;
 
 {$DEFINE ALTERNATIVE_DISABLED_STYLE} // remove the asterisk to change appearance of disabled images
 {*$DEFINE SMALL_CLOSE_BUTTON}// remove the asterisk for smaller close button size
@@ -128,7 +128,7 @@ var
 procedure InitializeStock;
 begin
   StockImgList := TImageList.Create(nil);
-  StockImgList.Handle := ImageList_LoadBitmap(HInstance, 'TBXGLYPHS', 16, 0, clWhite);
+  { StockImgList glyph strip (TBXGLYPHS resource) not ported }
   GradientBmp := TBitmap.Create;
   GradientBmp.PixelFormat := pf24bit;
 end;
@@ -612,7 +612,7 @@ begin
       Font.Color := C;
     end;
     if not Rotated then
-      Windows.DrawText(Handle, PChar(ACaption), Length(ACaption), R, AFormat)
+      DrawText(Handle, ACaption, -1, R, AFormat)
     else
       DrawRotatedText(Handle, ACaption, R, AFormat);
     Brush.Style := bsSolid;

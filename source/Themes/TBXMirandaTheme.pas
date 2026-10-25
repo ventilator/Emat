@@ -4,7 +4,7 @@ unit TBXMirandaTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Zezio' TBX theme © 2004 Roy Magne Klever
+// 'Zezio' TBX theme Â© 2004 Roy Magne Klever
 // roymagne@rmklever.com
 //
 // Version for TBX version 2.1
@@ -13,7 +13,7 @@ unit TBXMirandaTheme;
 interface
 
 uses
-  Windows, Messages, Graphics, TBXThemes, ImgList;
+  Windows, Messages, Graphics, TBXThemes, ImgList, rmkGradient;
 
 {$DEFINE ALTERNATIVE_DISABLED_STYLE}
 
@@ -145,8 +145,7 @@ implementation
 {.$R tbx_glyphs.res}
 
 uses
-  TBXUtils, TB2Common, TB2Item, Classes, Controls, Commctrl, Forms, rmkThemes,
-  TBXUxThemes, TBX;
+  TB2Common, TB2Item, Classes, Controls, Commctrl, Forms, rmkThemes, TBXUxThemes, TBX, TBXUtils;
 
 {$IFDEF DTM_Package}
 exports
@@ -179,8 +178,7 @@ var
 procedure InitializeStock;
 begin
   StockImgList := TImageList.Create(nil);
-  StockImgList.Handle := ImageList_LoadBitmap(HInstance, 'TBXGLYPHS', 16, 0,
-    clWhite);
+  { StockImgList glyph strip (TBXGLYPHS resource) not ported }
 end;
 
 procedure FinalizeStock;
@@ -562,7 +560,7 @@ var
   procedure _Draw(Color: TColor);
   begin
     Canvas.Font.Color := Color;
-    if not Rotated then Windows.DrawText(Canvas.Handle, PChar(ACaption), Length(ACaption), R, AFormat)
+    if not Rotated then DrawText(Canvas.Handle, ACaption, -1, R, AFormat)
     else DrawRotatedText(Canvas.Handle, ACaption, R, AFormat);
   end;
 
@@ -691,7 +689,7 @@ begin
       begin
         if BtnPressed then
         begin
-          GradientFill(Canvas, R, Blend(clBtnHigHlight, clBtnFace, 60),
+          rmkGradient.GradientFill(Canvas, R, Blend(clBtnHigHlight, clBtnFace, 60),
             Blend(clBtnFace, clBtnShadow, 60), TGTopBottom);
           InflateRect(R, 1, 1);
           Pen.Color := Blend(clBtnFace, clBtnShadow, 45);
@@ -701,7 +699,7 @@ begin
         end
         else if BtnHot then
         begin
-          GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
+          rmkGradient.GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
           InflateRect(R, 1, 1);
           Pen.Color := EditFrameColor;
         end
@@ -744,7 +742,7 @@ begin
           BR.Bottom := BR.Bottom - 1;
           if BtnPressed then
           begin
-            GradientFill(Canvas, BR, Blend(clBtnHigHlight, clBtnFace, 60),
+            rmkGradient.GradientFill(Canvas, BR, Blend(clBtnHigHlight, clBtnFace, 60),
               Blend(clBtnFace, clBtnShadow, 60), TGTopBottom);
             InflateRect(BR, 1, 1);
             Pen.Color := Blend(clBtnFace, clBtnShadow, 45);
@@ -754,7 +752,7 @@ begin
           end
           else if BtnHot then
           begin
-            GradientFill(Canvas, BR, clBtnFace, clBtnHighLight, TGTopBottom);
+            rmkGradient.GradientFill(Canvas, BR, clBtnFace, clBtnHighLight, TGTopBottom);
             InflateRect(BR, 1, 1);
             Pen.Color := EditFrameColor;
           end;
@@ -791,7 +789,7 @@ begin
         begin
           if BtnPressed then
           begin
-            GradientFill(Canvas, BR, Blend(clBtnHigHlight, clBtnFace, 60),
+            rmkGradient.GradientFill(Canvas, BR, Blend(clBtnHigHlight, clBtnFace, 60),
               Blend(clBtnFace, clBtnShadow, 60), TGTopBottom);
             InflateRect(BR, 1, 1);
             Pen.Color := Blend(clBtnFace, clBtnShadow, 45);
@@ -801,7 +799,7 @@ begin
           end
           else if BtnHot then
           begin
-            GradientFill(Canvas, BR, clBtnFace, clBtnHighLight, TGTopBottom);
+            rmkGradient.GradientFill(Canvas, BR, clBtnFace, clBtnHighLight, TGTopBottom);
             InflateRect(BR, 1, 1);
             Pen.Color := EditFrameColor;
           end
@@ -995,7 +993,7 @@ begin
       begin
         if HoverKind = hkNone then
         begin
-          GradientFill(Canvas, R, clBtnHighLight, clBtnFace, TGTopBottom);
+          rmkGradient.GradientFill(Canvas, R, clBtnHighLight, clBtnFace, TGTopBottom);
           InflateRect(R, 1, 1);
           SmartFrame(Canvas, R, RL, RR, clBtnShadow, Blend(clBtnShadow,
             clBtnFace, 50));
@@ -1005,14 +1003,14 @@ begin
         end
         else
         begin
-          GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
+          rmkGradient.GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
           InflateRect(R, 1, 1);
           SmartFrame(Canvas, R, RL, RR, GetBtnColor(ItemInfo, ipFrame), clNone);
         end;
       end
       else
       begin
-        GradientFill(Canvas, R, Blend(clBtnHigHlight, clBtnFace, 60),
+        rmkGradient.GradientFill(Canvas, R, Blend(clBtnHigHlight, clBtnFace, 60),
           Blend(clBtnFace, clBtnShadow, 60), TGTopBottom);
         InflateRect(R, 1, 1);
         SmartFrame(Canvas, R, RL, RR, clBtnShadow, Blend(clBtnShadow, clBtnFace,
@@ -1025,7 +1023,7 @@ begin
     else if ShowHover or ((ItemOptions and IO_DESIGNING) <> 0) then
     begin
       InflateRect(R, -1, -1);
-      GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
+      rmkGradient.GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
       InflateRect(R, 1, 1);
       SmartFrame(Canvas, R, RL, RR, GetBtnColor(ItemInfo, ipFrame), clNone);
     end;
@@ -1520,7 +1518,7 @@ begin
           Inc(R2.Left, 4);
           Dec(R2.Right, 4);
         end;
-        GradientFill(Canvas, R2, clBtnFace, clBtnShadow, TGLeftRight);
+        rmkGradient.GradientFill(Canvas, R2, clBtnFace, clBtnShadow, TGLeftRight);
         DrawLineEx(Canvas.Handle, R2.Left, R2.Top + 1, R2.Left, R2.Bottom - 1,
           Blend(clBtnFace, clBtnHighLight, 50));
       end
@@ -1535,7 +1533,7 @@ begin
           Dec(R2.Bottom, 4);
         end;
         R2.Bottom := R2.Bottom - 1;
-        GradientFill(Canvas, R2, clBtnFace, clBtnShadow, TGTopBottom);
+        rmkGradient.GradientFill(Canvas, R2, clBtnFace, clBtnShadow, TGTopBottom);
         DrawLineEx(Canvas.Handle, R2.Left + 1, R2.Top, R2.Right - 1, R2.Top,
           Blend(clBtnFace, clBtnHighLight, 50));
       end;
@@ -1991,7 +1989,7 @@ begin
             InflateRect(R, -1, -1);
             if Boolean(State and PFS_PUSHED) then
             begin
-              GradientFill(Canvas, R, Blend(clBtnHigHlight, clBtnFace, 60),
+              rmkGradient.GradientFill(Canvas, R, Blend(clBtnHigHlight, clBtnFace, 60),
                 Blend(clBtnFace, clBtnShadow, 60), TGTopBottom);
               Pen.Color := Blend(clBtnShadow, clBtnFace, 25);
               MoveTo(R.Left, R.Top);
@@ -2000,12 +1998,12 @@ begin
             end
             else if Boolean(State and (PFS_CHECKED or PFS_MIXED)) then
             begin
-              GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
+              rmkGradient.GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
               Pen.Color := BtnItemColors[bisHot, ipFrame];
             end
             else
             begin
-              GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
+              rmkGradient.GradientFill(Canvas, R, clBtnFace, clBtnHighLight, TGTopBottom);
               Pen.Color := BtnItemColors[bisHot, ipFrame];
             end;
             InflateRect(R, 1, 1);
@@ -2016,7 +2014,7 @@ begin
             if Boolean(State and (PFS_CHECKED or PFS_MIXED)) then
             begin
               InflateRect(R, -1, -1);
-              GradientFill(Canvas, R, clBtnHighLight, clBtnFace, TGTopBottom);
+              rmkGradient.GradientFill(Canvas, R, clBtnHighLight, clBtnFace, TGTopBottom);
               Pen.Color := Blend(clBtnShadow, clBtnFace, 25);
               MoveTo(R.Left, R.Top);
               LineTo(R.Right, R.Top);

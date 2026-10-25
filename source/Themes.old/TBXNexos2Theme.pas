@@ -4,7 +4,7 @@ unit TBXNexos2Theme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Nexos2' TBX theme © 2004 Roy Magne Klever
+// 'Nexos2' TBX theme Â© 2004 Roy Magne Klever
 //
 
 interface

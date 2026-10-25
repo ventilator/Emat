@@ -4,7 +4,7 @@ unit TBXRomaTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Roma' TBX theme © 2004 Roy Magne Klever
+// 'Roma' TBX theme Â© 2004 Roy Magne Klever
 //
 //  Last updated: 28.08.2004
 

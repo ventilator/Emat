@@ -81,7 +81,7 @@ type
 
 implementation
 
-{$R *.DFM}
+{$R *.lfm}
 
 const
    PREDEFINED_NUM = 9;

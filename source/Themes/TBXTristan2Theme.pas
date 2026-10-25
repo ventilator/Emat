@@ -4,7 +4,7 @@ unit TBXTristan2Theme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Tristan2' TBX theme ©2004 Roy Magne Klever
+// 'Tristan2' TBX theme Â©2004 Roy Magne Klever
 // roymagne@rmklever.com
 //
 // Version for TBX version 2.1
@@ -13,7 +13,7 @@ unit TBXTristan2Theme;
 interface
 
 uses
-  Windows, Messages, Graphics, TBXThemes, ImgList;
+  Windows, Messages, Graphics, TBXThemes, ImgList, rmkGradient;
 
 {$DEFINE ALTERNATIVE_DISABLED_STYLE}
 
@@ -144,8 +144,7 @@ var
 procedure InitializeStock;
 begin
   StockImgList := TImageList.Create(nil);
-  StockImgList.Handle := ImageList_LoadBitmap(HInstance, 'TBXGLYPHS', 16, 0,
-    clWhite);
+  { StockImgList glyph strip (TBXGLYPHS resource) not ported }
 end;
 
 procedure FinalizeStock;
@@ -657,7 +656,7 @@ begin
     if C = clNone then C := GetItemTextColor(ItemInfo);
     Font.Color := C;
     if not Rotated then
-      Windows.DrawText(Handle, PChar(ACaption), Length(ACaption), R, AFormat)
+      DrawText(Handle, ACaption, -1, R, AFormat)
     else
       DrawRotatedText(Handle, ACaption, R, AFormat);
     Brush.Style := bsSolid;

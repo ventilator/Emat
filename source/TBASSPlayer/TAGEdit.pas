@@ -27,7 +27,7 @@ type
 
 implementation
 
-{$R *.DFM}
+{$R *.lfm}
 
 
 procedure TTAGEditForm.btnOKClick(Sender: TObject);

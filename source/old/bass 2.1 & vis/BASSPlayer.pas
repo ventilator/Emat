@@ -1,7 +1,7 @@
 // Component TBASSPlayer
 //
 //    written by Silhwan Hyun,  hyunsh@hanafos.com
-//    //clgMOD für 2.1
+//    //clgMOD fÃ¼r 2.1
 //
 // Revision history
 //
@@ -2546,7 +2546,7 @@ begin
 //      Application.MessageBox(pchar('Invalid stream file (' + StreamName + ') !'),
 //                                                               'Confirm', MB_OK);
    if Assigned(OnAbspielfehler) then OnAbspielfehler;
-      exit;                    //ich nutze überhaupt keine Streams. sinnlos...
+      exit;                    //ich nutze Ã¼berhaupt keine Streams. sinnlos...
    end;
 
    ExtCode := UpperCase(ExtractFileExt(StreamName));

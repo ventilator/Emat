@@ -1,14 +1,9 @@
 unit UListe;
 
 interface
-
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs,  ShellApi, FileCtrl, ExtCtrls, Buttons, Grids, Menus, StdCtrls,
-
-  LMDCustomControl, LMDCustomPanel, LMDCustomBevelPanel, LMDBaseEdit,
-  LMDCustomEdit, LMDEdit, LMDCustomComponent, LMDBaseController,
-  LMDCustomContainer, LMDCustomImageList, LMDImageList,
 
   TBX, TBXProgressBar, TB2Dock, TB2Toolbar, TBXExtItems, TB2Item, TB2ExtItems,
   TBXDkPanels, TBXStatusBars,
@@ -137,7 +132,7 @@ var
 
 implementation
 
-{$R *.dfm}
+{$R *.lfm}
 uses ump3, UStatus;
 
 
@@ -162,7 +157,7 @@ begin
   Gliste1.aktiv := true;
   Gliste1.MultiSelect := true;
   Gliste1.LineMoving :=true;
-  //Tag2 bezeichnet eine Playlistenliste (für DragOver.accept)
+  //Tag2 bezeichnet eine Playlistenliste (fÃ¼r DragOver.accept)
   Gliste1.Tag2:=1;
 
   SetRaender;
@@ -209,7 +204,9 @@ end;
 procedure TFPlayliste.GlisteKeyPress(Sender :TObject; var Key:char);
 var charset: set of Char;
 begin
-  charset:=['A'..'Z','a'..'z','Ö','ö','Ä','ä','ü','Ü','ß','´','`','@','_','0'..'9',' '];
+  // Port: sources are UTF-8 now, so umlauts are no longer single Chars.
+  // Keep the ASCII range; umlaut search input is typed into the box instead.
+  charset:=['A'..'Z','a'..'z','`','@','_','0'..'9',' '];
 
   if key in charset then
     Fmp3.Esuche.Text := Fmp3.Esuche.Text + Key;
@@ -307,7 +304,7 @@ begin
 
   fmp3.EnableMenues();
 
-  //Setzt den Haken für Spalen wählen
+  //Setzt den Haken fÃ¼r Spalen wÃ¤hlen
   fmp3.TBXIselect_cols.Checked:=TBXAlignmentPanel3.Visible;
 end;
 
@@ -316,7 +313,7 @@ begin
   fmp3.Spule(prozent);
 end;
 
-  //Die zurückgegebene ElementNummer ist NICHT die liste.nummer sondern der INDEX
+  //Die zurÃ¼ckgegebene ElementNummer ist NICHT die liste.nummer sondern der INDEX
 procedure TFPlayliste.GlisteElementMarkieren(ElementNummer:integer; Shift:TShiftState);
 begin
   fmp3.Aktiv.MarkiertesElement:=strtoint(Gliste1.liste.Nummer[ElementNummer]);
@@ -372,7 +369,7 @@ begin
   if not closeflag
    then
     begin
-     if MessageDlg('Kopiervorgang läuft. Soll dieser abgebrochen werden?',
+     if MessageDlg('Kopiervorgang lÃ¤uft. Soll dieser abgebrochen werden?',
         mtConfirmation, [mbYes, mbNo], 0) = mryes
      then
       begin
@@ -388,7 +385,7 @@ begin
   if ThreadActive
    then
     begin
-      MessageDlg('Dieser Liste werden noch Dateien hinzugefügt',
+      MessageDlg('Dieser Liste werden noch Dateien hinzugefÃ¼gt',
         mtInformation, [mbOk], 0);
       abort;
     end;
@@ -447,7 +444,7 @@ try
              fmp3.DatenbankListeAusgeben(ListenNummer);
            {  fmp3.Fplaylisten[ ListenNummer ].TBXPBauslesen.Max :=
                                 High(fmp3.Datenbank.Mp3Daten[ListenNummer]);
-                                //Es könnten mehr geworden sein
+                                //Es kÃ¶nnten mehr geworden sein
              fmp3.Fplaylisten[ListenNummer].TBXPBauslesen.Position := i;  }
            end;
 

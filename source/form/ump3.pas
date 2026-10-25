@@ -3,67 +3,54 @@ unit ump3;
 {
   EMAT - Einfaches Mp3 Ausmist Tool
 
-  (c) 2004-2010 Clemens & David Grünewald
+  (c) 2004-2010 Clemens & David GrÃ¼newald
 
   Compilierbar mit Delphi 2010
   +TB2000 2.2.2 und TBX 2.2 (aus den CVS/SVN Repos) + TBX-Progressbar
-  +LMD FreeEdition für Delphi 2010
+  +LMD FreeEdition fÃ¼r Delphi 2010
   +CoolTrayIcon
   +Image32 1.8
   +Windows 7 Controls for Delphi
   +alle weiteren Komponenten befinden sich im Ordner "source"
 
-  in_mad Plugin für mp3 (GPL):
+  in_mad Plugin fÃ¼r mp3 (GPL):
   http://www.underbit.com/products/mad/
 
-  Version <=0.80.17 compilierbar mit Delphi 2005 PE und den zusätzlichen Komponenten
+  Version <=0.80.17 compilierbar mit Delphi 2005 PE und den zusÃ¤tzlichen Komponenten
    -TB2k 2.0.15 und TBX 2.1 incl TBXProgressBar und dem Skinmanager
-   -LMD FreeEdition 9.0 für D2k5
+   -LMD FreeEdition 9.0 fÃ¼r D2k5
    -CoolTrayIcon 1.0
    -Image32 1.6
    -Windows 7 Controls for Delphi" (D2006 Version)
     http://www.gumpi.com/Blog/2009/01/20/Alpha1OfWindows7ControlsForDelphi.aspx
-  Danke für die Unterstützung von delphi-praxis.net
+  Danke fÃ¼r die UnterstÃ¼tzung von delphi-praxis.net
 }
 
 
 
 interface
-
 uses
-  Windows, Messages, FileCtrl, SysUtils, Variants, Classes, Graphics, Controls,
-  Dialogs, ToolWin, ActnList, clipbrd, jpeg, StdCtrls, StdActns, ExtCtrls,
+  LMessages,
+  ComboEx, HotKeyEdit, Windows, Messages, FileCtrl, SysUtils, Variants, Classes, Graphics, Controls,
+  Dialogs, ToolWin, ActnList, clipbrd, StdCtrls, StdActns, ExtCtrls,
   ImgList, ComCtrls, Grids, mmsystem, registry,  Menus, shellapi, Forms,
-  Buttons,  ExtDlgs, strutils, XPMan, TlHelp32,
+  Buttons,  ExtDlgs, strutils,
 
   TBX, TB2Dock, TBXDkPanels, TB2Toolbar, TB2Item, TBXExtItems, TB2Common,
   TB2ExtItems, TBXLists, TBXToolPals, TBXSwitcher, TBXThemes, TBXMDI,
   TBXProgressBar, TBXStatusBars,
 
-  LMDControl, LMDBaseControl, LMDBaseGraphicControl, LMDBaseLabel,
-  LMDCustomLabel, LMDLabel, LMDContainerComponent, LMDBaseDialog,
-  LMDCustomComponent, LMDCustomControl, LMDCustomPanel,
-  LMDCustomBevelPanel, LMDSimplePanel, LMDGraphicControl, LMDShadowFill,
-  LMDWndProcComponent,
-
-  CoolTrayIcon, GR32_Image, UnitWDBIPCDemoObj,
   bass,
 
   u_bassplayer,
 
-  vispluginctrl,
 
   udatenbank, usave, uspieler, ulang, uincex, uliste, GListe2, ustatus,
-
-
-  LMDOneInstance, LMDBaseEdit, LMDCustomEdit, LMDCustomBrowseEdit,
-  LMDCustomFileEdit, LMDFileOpenEdit, LMDFill, LMDCustomComboBox,
-  dwTaskbarComponents, dwTaskbarThumbnails, xmldom, XMLIntf, msxmldom, XMLDoc,
-  Spin;
+  UOSD, Spin;
 
 
 const
-  Version     = '0.82';
+  Version     = '0.90-dev-freepascal-port';
   extendedDebugLogInfo = False;
   FormCaption = '';
   maxVolume   = 100;
@@ -146,7 +133,8 @@ type
     ILSymbolleiste: TImageList;
     SaveD: TSaveDialog;
     OpenD: TOpenDialog;
-    TrayIcon: TCoolTrayIcon;
+    TrayIcon: TTrayIcon;
+    FOSD: TEmatOSD;            // Port: layered click-through OSD window
     TBXMultiDock1: TTBXMultiDock;
     TBXMultiDock2: TTBXMultiDock;
     TBXMultiDock3: TTBXMultiDock;
@@ -233,9 +221,9 @@ type
     Action1: TAction;
     Acopypath: TAction;
     Amarkinlist: TAction;
-    WindowTileHorizontal1: TWindowTileHorizontal;
-    WindowTileVertical1: TWindowTileVertical;
-    WindowCascade1: TWindowCascade;
+    WindowTileHorizontal1: TAction;
+    WindowTileVertical1: TAction;
+    WindowCascade1: TAction;
     TBXItem1: TTBXItem;
     TBXItem2: TTBXItem;
     TBXItem3: TTBXItem;
@@ -349,46 +337,33 @@ type
     Label1: TLabel;
     TBXAlignmentPanel18: TTBXAlignmentPanel;
     Mpath: TMemo;
-    I32_Vis: TImage32;
     TBXAPclock0: TTBXAlignmentPanel;
-    PH1: TLMDSimplePanel;
-    PH3: TLMDSimplePanel;
-    PH4: TLMDSimplePanel;
-    PH5: TLMDSimplePanel;
-    PM1: TLMDSimplePanel;
-    PM2: TLMDSimplePanel;
-    PM3: TLMDSimplePanel;
-    PM4: TLMDSimplePanel;
-    PM5: TLMDSimplePanel;
-    PM6: TLMDSimplePanel;
-    PS1: TLMDSimplePanel;
-    PS2: TLMDSimplePanel;
-    PS3: TLMDSimplePanel;
-    PS4: TLMDSimplePanel;
-    PS5: TLMDSimplePanel;
-    PS6: TLMDSimplePanel;
-    PH2: TLMDSimplePanel;
+    PH1: TPanel;
+    PH3: TPanel;
+    PH4: TPanel;
+    PH5: TPanel;
+    PM1: TPanel;
+    PM2: TPanel;
+    PM3: TPanel;
+    PM4: TPanel;
+    PM5: TPanel;
+    PM6: TPanel;
+    PS1: TPanel;
+    PS2: TPanel;
+    PS3: TPanel;
+    PS4: TPanel;
+    PS5: TPanel;
+    PS6: TPanel;
+    PH2: TPanel;
     TBinClock: TTimer;
     TBXDockablePanel12: TTBXDockablePanel;
     TBXDockablePanel13: TTBXDockablePanel;
     TBXAlignmentPanel19: TTBXAlignmentPanel;
-    PH0: TLMDSimplePanel;
+    PH0: TPanel;
     TBXSubmenuItem3: TTBXSubmenuItem;
     TBXItem10: TTBXItem;
     TBXI_RemoveDir: TTBXItem;
     TBXI_DelInvalideItems: TTBXItem;
-    TBXDockablePanel15: TTBXDockablePanel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    TBXButton1: TTBXButton;
-    TBXButton2: TTBXButton;
-    TBXCheckBox1: TTBXCheckBox;
-    TBXLabel9: TTBXLabel;
-    BitBtn1: TBitBtn;
-    Edit1: TEdit;
     TBXI_Queue_Items: TTBXItem;
     TBXPM_Favorit: TTBXPopupMenu;
     TBXI_Queue_Item_Fav: TTBXItem;
@@ -398,11 +373,11 @@ type
     TBXSeparatorItem3: TTBXSeparatorItem;
     TBXMDIWindowItem1: TTBXMDIWindowItem;
     ScreenText_refresher: TTimer;
-    LMDFGradientCover: TLMDFill;
+    LMDFGradientCover: TPanel;
     TBXPMcover: TTBXPopupMenu;
     TBXIopencover: TTBXItem;
     TBXIopencoverdir: TTBXItem;
-    LMDFBinClock: TLMDFill;
+    LMDFBinClock: TPanel;
     TBXDockablePanel14: TTBXDockablePanel;
     TBXTdeloptions: TTBXToolbar;
     TBXItem13: TTBXItem;
@@ -430,33 +405,30 @@ type
     TBXCheckBox2: TTBXCheckBox;
     TBXCBAutoSave: TTBXCheckBox;
     TBXItem24: TTBXItem;
-    HK_Next: THotKey;
+    HK_Next: THotKeyEdit;
     Label7: TLabel;
-    HK_Back: THotKey;
-    HK_Play: THotKey;
-    HK_Pause: THotKey;
-    HK_Lauter: THotKey;
-    HK_Shuffle: THotKey;
-    HotKey6: THotKey;
+    HK_Back: THotKeyEdit;
+    HK_Play: THotKeyEdit;
+    HK_Pause: THotKeyEdit;
+    HK_Lauter: THotKeyEdit;
+    HK_Shuffle: THotKeyEdit;
+    HotKey6: THotKeyEdit;
     Label8: TLabel;
     Label9: TLabel;
     Label10: TLabel;
-    HK_Leiser: THotKey;
+    HK_Leiser: THotKeyEdit;
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
     TBXCBSysHKey: TTBXCheckBox;
-    dwTaskbarThumbnails: TdwTaskbarThumbnails;
     B_Vis_Config: TTBXButton;
-    TBXI_StartVisPlugin: TTBXItem;
     TBX_PartyMode: TTBXItem;
     TMilkdropMover: TTimer;
     TBXButton6: TTBXButton;
     MLog: TMemo;
     TBXItem25: TTBXItem;
     TBXItem26: TTBXItem;
-    XMLEqualizer: TXMLDocument;
     cbEQPresets: TComboBoxEx;
     TBX_repeat: TTBXItem;
     seTrimStart: TSpinEdit;
@@ -466,8 +438,6 @@ type
     TBXLabel3: TTBXLabel;
     TBXLabel8: TTBXLabel;
     tbxtm_themetest: TTBXItem;
-    procedure dwTaskbarThumbnailsThumbnailClick(
-      Sender: TdwTaskbarThumbnailItem);
     procedure TBXItem24Click(Sender: TObject);
     procedure TBXPB_shuffleMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -561,7 +531,6 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TrayIconDblClick(Sender: TObject);
     procedure TBXIBeenden1Click(Sender: TObject);
-    procedure TrayIconMinimizeToTray(Sender: TObject);
 
     procedure GHK_pauseKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -643,7 +612,6 @@ type
     procedure GStyleDoppelClick(Index :integer; Shift: TShiftState);
     procedure GHistory_KeyDown(Key:word;Shift:tshiftstate);
     procedure B_Vis_ConfigClick(Sender: TObject);
-    procedure TBXI_StartVisPluginClick(Sender: TObject);
     procedure TBX_PartyModeClick(Sender: TObject);
     procedure TMilkdropMoverTimer(Sender: TObject);
     procedure TBXButton6Click(Sender: TObject);
@@ -661,7 +629,7 @@ type
     procedure EsucheKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     HotkeyIDs           : THotKeyIDs;
-    //Zählt wie oft versucht wurde, das Milkdropfenster zu verschieben
+    //ZÃ¤hlt wie oft versucht wurde, das Milkdropfenster zu verschieben
     MilkDropMoverCount  : integer;
 
     procedure WMBassPlayerStop(var Message: TMessage); message WM_BASSPLAYERSTOPPED;
@@ -709,7 +677,7 @@ type
     procedure ClearScreenText;
 
     //HotKeymessages abfangen
-    procedure WMHotKey(var Msg: TWMHotKey); message WM_HOTKEY;
+    procedure WMHotKey(var Msg: TLMessage); message WM_HOTKEY;
     function ChangeSize(Handle: Hwnd; dHeight, dWidth: Integer;
       ScreenCenter: Boolean): Boolean;
     procedure LoadEQ_Presets;
@@ -781,20 +749,20 @@ type
     procedure InitFStatus;
     //Zeigt auch die Progressbar
     procedure StartFStatus(FileCount: integer);
-    //Ändert nur den Text (ohne Prograssbar)
+    //Ã„ndert nur den Text (ohne Prograssbar)
     procedure UpdateTextFStatus(ShowText:string; ShowCaption:string='');
     //Reaktiviert die Hauptform
     procedure HideFStatus;
-    //Erhöht die Lautstärke um 5%
+    //ErhÃ¶ht die LautstÃ¤rke um 5%
     procedure IncVolume;
-    //Vermindert die Lautstärke um 5%
+    //Vermindert die LautstÃ¤rke um 5%
     procedure DecVolume;
     //Verschiebt Dateien und auch Verzeichnisse in den Papierkorb
     function DeleteFileToRecycleBin(const AFile: string): boolean;
-    //Rechnet die Shufflestärke aus und speichert sie in Aktiv.Shufflerange
+    //Rechnet die ShufflestÃ¤rke aus und speichert sie in Aktiv.Shufflerange
     procedure CalculateAndShowShufflerange;
 
-    //Ruft einen Orderauswahldialog auf. Achtung: Braucht noch Fehlerbehandlung wenn abbruch gedrückt wird
+    //Ruft einen Orderauswahldialog auf. Achtung: Braucht noch Fehlerbehandlung wenn abbruch gedrÃ¼ckt wird
     function SelDirectory(startverzeichnis:string):string;
 
     //Setzt den Shuffelstatus
@@ -809,7 +777,7 @@ type
     //Log in Memo ausgeben
     procedure Log(Text: string);
 
-    //Hinzufügegeschwindigkeit aktualisieren
+    //HinzufÃ¼gegeschwindigkeit aktualisieren
     procedure UpdateFStatusSpeed(Speed: integer);
 end;
 
@@ -828,9 +796,9 @@ var
 implementation
 
 
-uses Ustart, Ulaut, UInfo;
+uses DOM, XMLRead, Ustart, Ulaut, UInfo;
 
-{$R *.dfm}
+{$R *.lfm}
 
 var
   noTBXsave  : boolean = false;
@@ -1074,10 +1042,6 @@ begin
  close;
 end;
 
-procedure TFmp3.TrayIconMinimizeToTray(Sender: TObject);
-begin
-minimiert:=true;
-end;
 
 
 procedure TFmp3.GHK_leiserKeyDown(Sender: TObject; var Key: Word;
@@ -1164,7 +1128,7 @@ begin
   if Datenbank.GetMediumFullFileName( ListenNummer, ElementNummer , Medium)
     then
       begin
-      //  Spieler.SetVolume(Tbvolume.Position);   //Bassplayer behält Volume
+      //  Spieler.SetVolume(Tbvolume.Position);   //Bassplayer behÃ¤lt Volume
         if Spieler.Spiele( Medium )
           then
             begin
@@ -1200,7 +1164,7 @@ begin
 
 
 
-                  Fmp3.Caption := Aktiv.SpielenderTitel + ' — ' + FORMTITLE+Version+FormCaption;
+                  Fmp3.Caption := Aktiv.SpielenderTitel + ' â€” ' + FORMTITLE+Version+FormCaption;
 
                   MinimizeETitelPath(Medium);
                   ETitel.Hint:=Medium;
@@ -1251,9 +1215,9 @@ begin
                       Esuche.Strings.Add(Esuche.Text);
                   end;
 
-                  //seit .97 unnötig [evtl id3Tag auslesen]
+                  //seit .97 unnÃ¶tig [evtl id3Tag auslesen]
                   if Datenbank.GetMediumPlayLength(ListenNummer,ElementNummer)=''
-                  then    //Dann müsste auch id3 undefiniert sein
+                  then    //Dann mÃ¼sste auch id3 undefiniert sein
                    begin
                     Datenbank.SetMediumPlayLength(ListenNummer,ElementNummer,
                                             DauerZuString(Spieler.GetDauer(Medium)));
@@ -1303,14 +1267,14 @@ if Datenbank.ListeExists(Aktiv.Liste)
       Datenbank.OrdnerAnListeAnhaengen(dir,Aktiv.Liste);
 
       fmp3.FPlaylisten[Aktiv.Liste].TBXStatusBar1.Panels[4].Caption:=
-        'Hinzufügezeit: '+inttostr(round(fmp3.Zeitmessung2Stopp/1000))+' s';
+        'HinzufÃ¼gezeit: '+inttostr(round(fmp3.Zeitmessung2Stopp/1000))+' s';
 
       DatenbankListeAusgeben(Aktiv.Liste);
 
       HideFStatus;
     end
     else
-      Fehler('Ein ungültiges Verzeichnis wurde angegeben.');
+      Fehler('Ein ungÃ¼ltiges Verzeichnis wurde angegeben.');
    end;
   end;
 end;
@@ -1336,7 +1300,7 @@ begin
   FStatus.LName.Caption:=ShowText;
   if ShowCaption = ''
   then
-    FStatus.LTitel.Caption:='Es werden Medien der Playliste hinzugefügt...'
+    FStatus.LTitel.Caption:='Es werden Medien der Playliste hinzugefÃ¼gt...'
   else
     FStatus.LTitel.Caption:=ShowCaption;
   Application.ProcessMessages;
@@ -1348,7 +1312,7 @@ begin
   FStatus.TBXPB.Max := FileCount;
   FStatus.TBXPB.PosTextSuffix := ' / ' + inttostr(FileCount);
   FStatus.TBXPB.Show;
-  FStatus.LTitel.Caption:='Es werden Medien der Playliste hinzugefügt...';
+  FStatus.LTitel.Caption:='Es werden Medien der Playliste hinzugefÃ¼gt...';
   Application.ProcessMessages;
 end;
 
@@ -1535,7 +1499,7 @@ begin
   begin
     Aktiv.Shuffelrange := round(fplaylisten[Aktiv.Liste].Gliste1.liste.l0.Count*
                           TBXPB_shuffle.Position/100);
-    TBXLI_ShuffleRange.Caption := 'Shufflestärke: '+ char(177) + ' ' +
+    TBXLI_ShuffleRange.Caption := 'ShufflestÃ¤rke: '+ char(177) + ' ' +
                                    inttostr(Aktiv.Shuffelrange) + ' Titel';
   end;
 end;
@@ -1574,7 +1538,7 @@ begin
 
   Result:=inttostr(SpielDauer div 60)+':'+(format('%.2d',[SpielDauer mod 60]));
 
-  //Spieldauer wird in Minten übergeben
+  //Spieldauer wird in Minten Ã¼bergeben
   if NurStundenUndMinuten then
    begin
      SpielDauer:=SpielDauer div 60;
@@ -1718,7 +1682,7 @@ begin
       then ZeichneFortschritt(Spieler.Getposition/Spieler.Getlength,
                                                   round(Spieler.GetPosition*1000));
 
-    if (Spieler.FKBassPlayer.Bassplayer.getstatus=0)
+    if (Spieler.Bassplayer1.getstatus=0)
     then Weiterschalten;
 
     except //showmessage('[Fehler: SpielerTimer]');     }
@@ -1735,7 +1699,7 @@ begin
 
          ZeichneFortschritt(RelativePosition,AktuellePosition);
 
-         //Wenn ich die Titel beschneiden möchte
+         //Wenn ich die Titel beschneiden mÃ¶chte
          if TBXCBTrimActive.Checked then
          begin
            try
@@ -1763,9 +1727,9 @@ begin
       fmp3.Log('Zugriffsverletzung im SpielerTimer. SpielerTimer deaktiviert');
       SpielerTimer.Enabled:=False;
     end;
-//Sichheitsmaßname zum Weiterschalten
+//SichheitsmaÃŸname zum Weiterschalten
 {
-    if (Spieler.FKBassPlayer.Bassplayer.getstatus=0)
+    if (Spieler.Bassplayer1.getstatus=0)
     then Weiterschalten;               }
 
  //   except //showmessage('[Fehler: SpielerTimer]');
@@ -1801,7 +1765,7 @@ begin
         end
      else
      begin
-     //Wenn keines geplant ist, suche nächstes oder zufälliges Element 
+     //Wenn keines geplant ist, suche nÃ¤chstes oder zufÃ¤lliges Element 
      if (not Datenbank.GetNextElementNummer(Aktiv.SpielendeListe,zuspielendes))
      then
      if (FPlaylisten[aktiv.SpielendeListe].Gliste1.liste.l0.count = 0)
@@ -1915,6 +1879,8 @@ begin
   if EQtaste
     then
       begin
+        // Port: bei 0-Hoehe war 30*y/ieq.height = x/0 -> FPU-Fehler
+        if (ieq.width < 20) or (ieq.height < 10) then Exit;
         schrittweite:=ieq.width div 11;
 
 
@@ -1929,7 +1895,7 @@ begin
               if neuerEQwert>15 then neuerEQwert:=15;
               if neuerEQwert<-15 then neuerEQwert:=-15;
 
-              if (i>=0) and (i<=9)
+              if (i>=0) and (i<=MAX_EQ_GAINS)
               then Spieler.eqwert[i]:=neuerEQwert;
               EQdraw;
             end;
@@ -1969,6 +1935,10 @@ begin
       mass := Rect.Right - Rect.Left
     else
       mass := Rect.Bottom - Rect.Top;
+
+    // Port: bei 0 px Hoehe/Breite (kleines Panel) war das x/0 -> Invalid
+    // floating point operation. Nichts zeichnen ist hier richtig.
+    if mass <= 0 then Exit;
     SetLength(b, mx + 1);
     for x := 0 to mx do
     begin
@@ -1992,8 +1962,8 @@ begin
       for x := 0 to bis do
       begin
         Stelle := x + y * faColorsh;
-        faktor := x / bis;
-        for z := 0 to 3 do
+        if bis > 0 then faktor := x / bis else faktor := 0;
+        for z := 0 to 2 do   // Port: RGBArray hat 0..2, vorher lief z bis 3
           a[z] := Trunc(b[y][z] + ((b[y + 1][z] - b[y][z]) * Faktor));
         ACanvas.Pen.Color := RGB(a[0], a[1], a[2]);
         if Horicontal then
@@ -2015,7 +1985,7 @@ begin
   end
   else
     // Please specify at least two colors
-    raise EMathError.Create('Es müssen mindestens zwei Farben angegeben werden.');
+    raise EMathError.Create('Es mÃ¼ssen mindestens zwei Farben angegeben werden.');
 end;
 
 begin
@@ -2023,13 +1993,20 @@ begin
   puffer.Width:=IEQ.Width;
   puffer.Height:=IEQ.Height;
 
+  // Port: bei einem winzigen/leeren Panel nichts zeichnen (Div durch 0)
+  if (puffer.Width < 40) or (puffer.Height < 30) then
+  begin
+    puffer.Free;
+    Exit;
+  end;
+
 
 
   puffer.Canvas.Brush.Color := aktiv.GradientColorBottom;
   puffer.Canvas.Pen.Color   := aktiv.GradientColorBottom;
   puffer.Canvas.Rectangle(0,0,puffer.width,puffer.height);
 
-  puffer.Canvas.TextOut(10,10,'Maustaste drücken,');
+  puffer.Canvas.TextOut(10,10,'Maustaste drÃ¼cken,');
   puffer.Canvas.TextOut(10,22,'seitlich ziehen');
   puffer.Canvas.TextOut(10,34,'und loslassen');
 
@@ -2043,7 +2020,7 @@ begin
     bar.Right:=(i+1)*schrittweite+(schrittweite div 2)-2;
     bar.Bottom:=puffer.height;
 
-    //Benutze Gradient2, weil eins eine Bug bei nicht Vollflächen hat
+    //Benutze Gradient2, weil eins eine Bug bei nicht VollflÃ¤chen hat
     DrawGradient2(puffer.Canvas,bar,false,[aktiv.GradientColorTop,aktiv.GradientColorBottom]);
     { //Zeichnet einfarbiges Rechteck
     puffer.Canvas.Rectangle(i*schrittweite+(schrittweite div 2)+2,
@@ -2147,7 +2124,7 @@ begin
   Datenbank.GetMediumFullFileName(ListenNummer, ElementNummer, FullFileName);
 
 
-    //Was sollen diese blöde ifs? Einfach direkt zuweisen...
+    //Was sollen diese blÃ¶de ifs? Einfach direkt zuweisen...
   if id3tag.Titel<>''
     then LEtitle.Text := id3tag.Titel
     else LEtitle.Text :='';
@@ -2296,7 +2273,6 @@ if TBXCBtrayicon.Checked then
  begin
 (* ^^ uk Damit das Trayicon unsichtbar belibt, wenn man es in den Einstellungen
 abgestellt hat ;-)  *)
-  Trayicon.IconIndex:=iconnummer;
   inc(iconnummer);
   if iconnummer=ILanimation.Count
     then
@@ -2440,13 +2416,11 @@ begin
     PH5.Color:=BinClockColor;
 
 
-    LMDFBinClock.FillObject.Gradient.Color :=  CurrentTheme.GetItemImageBackground(tbxinfo);
-    LMDFBinClock.FillObject.Gradient.EndColor := CurrentTheme.GetItemTextColor(tbxinfo);
+    LMDFBinClock.Color :=  CurrentTheme.GetItemImageBackground(tbxinfo);
 
 
 
-    LMDFGradientCover.FillObject.Gradient.Color :=  CurrentTheme.GetItemImageBackground(tbxinfo);
-    LMDFGradientCover.FillObject.Gradient.EndColor := CurrentTheme.GetItemTextColor(tbxinfo);
+    LMDFGradientCover.Color :=  CurrentTheme.GetItemImageBackground(tbxinfo);
 
  {   with BmpGradient_Clock do
     begin
@@ -2543,10 +2517,8 @@ procedure TFmp3.TBXCBtaskbutttonChange(Sender: TObject);
 begin
   if TBXCBtaskbuttton.Checked then
   begin
-    Trayicon.ShowTaskbarIcon;
   end else
   begin
-    Trayicon.HideTaskbarIcon;
     TBXCBtrayicon.Checked := true;
     TBXCBmintotray.Checked := true;
     TBXCBscrolltitle.Checked := false;
@@ -2565,7 +2537,7 @@ begin
 
       Save.L_Einstellungen;
 
-      AllowDatenbankListeAusgeben:=True; //Macht aber eh erst ab hier Sinn und wird später auch noch gebraucht, daher in Dantenbanklisteausgeben nicht ausgewertet
+      AllowDatenbankListeAusgeben:=True; //Macht aber eh erst ab hier Sinn und wird spÃ¤ter auch noch gebraucht, daher in Dantenbanklisteausgeben nicht ausgewertet
 
       Save.L_OffenePlaylisten;
       SetColor;
@@ -2598,12 +2570,6 @@ begin
    //     fmp3.ListeAnfuegenOrdner;
       end;
 
-      //Visualisierung laden
-  try
-    VisControlForm.FormShow(fmp3);
-  except
-    Fehler('Die Visualisierungen konnten nicht geladen werden');
-  end;
 
     //EQ laden
     LoadEQ_Presets;
@@ -2621,11 +2587,11 @@ procedure TFMp3.ParameterOpen(var Parameter:TStringlist);
 var newlist : boolean;
     i,count    : integer;
 begin
-//Count zählt die geöffneten Playlisten
+//Count zÃ¤hlt die geÃ¶ffneten Playlisten
   count:=0;
   for i:=0 to parameter.Count-1 do
   begin
-    //Playlisten öffnen
+    //Playlisten Ã¶ffnen
     if ExtractFileExt(Parameter[i])=PlayListExt
     then
       begin
@@ -2638,13 +2604,13 @@ begin
   if count<parameter.Count then
 
   begin
- // newlist:=MessageDlg('Sollen die Titel der aktuellen Playliste hinzugefügt werden?'+#13+#10+
+ // newlist:=MessageDlg('Sollen die Titel der aktuellen Playliste hinzugefÃ¼gt werden?'+#13+#10+
   //  'Bei "Nein" wird eine neue Playliste erstellt.', mtConfirmation, [mbYes, mbNo], 0)=mryes;
 
 
 
-  newlist:=MyMessageDialog('Möchten Sie Titel der aktive Playliste hinzufügen oder eine neue Playliste erstellen?',
-           mtConfirmation, mbOKCancel,['Hinzufügen', 'Erstellen']) = mrOk;
+  newlist:=MyMessageDialog('MÃ¶chten Sie Titel der aktive Playliste hinzufÃ¼gen oder eine neue Playliste erstellen?',
+           mtConfirmation, mbOKCancel,['HinzufÃ¼gen', 'Erstellen']) = mrOk;
 
 
 
@@ -2682,207 +2648,49 @@ begin
   then
     DatenbankListeAusgeben(Aktiv.Liste)
   else
-    //Aus unbekanntem Grund werden beim DragDrop leere, ungültige Einträge erzeugt
+    //Aus unbekanntem Grund werden beim DragDrop leere, ungÃ¼ltige EintrÃ¤ge erzeugt
     Datenbank.DeleteInvalidItems(aktiv.liste);
 
   end;
 end;
 
 procedure TFmp3.WriteText(TransText: string);
-
+{ Port: das OSD zeichnet nicht mehr in den Desktop-DC, sondern in ein
+  layered, klick-durchlaessiges Fenster (UOSD). }
 var
-  MyHand: HWND;
-  MyDc: HDC;
-  MyCanvas: TCanvas;
-  FONTDIVISOR, FontSize_Text, FontSize_Titellaenge : integer;
-  Textposition, Rahmendicke : Tpoint;
-  Album_Year  : string;
-  Write_AlbumYear : boolean;
+  Album_Year: string;
 begin
-try
-  MyHand := GetDesktopWindow;
-  MyDc := GetWindowDC(MyHand);
-  MyCanvas := TCanvas.Create;
-  MyCanvas.Handle := MyDC;
-  BeginPath(MyCanvas.Handle);
-  SetBkMode(MyCanvas.Handle,TRANSPARENT);
-  EndPath(MyCanvas.Handle);
-
-  FONTDIVISOR:=15;
-
-
-  MyCanvas.Font.Color := clLime;
-  MyCanvas.Font.Name := 'Arial'; //Fmp3.Font.Name;
-  MyCanvas.Font.Size := Screen.Height div FONTDIVISOR;
-
-  // Schriftgröße festlegen
-  FontSize_Text := round(MyCanvas.Font.Size * ( (Screen.Width * 0.9) / MyCanvas.TextWidth(Transtext) ));
-
-  if(FontSize_Text > Screen.Height div FONTDIVISOR)
-   then FontSize_Text := Screen.Height div FONTDIVISOR;
-
-  FontSize_Titellaenge:=Screen.Height div (FONTDIVISOR*2);
-  //
-
-
-
-  //Bestimmen ob Album_Year existiert
+  if FOSD = nil then FOSD := TEmatOSD.CreateNewOSD(Self);
+  Album_Year := '';
   if Aktiv.ScreenText_isTitle then
-  begin
-    Write_AlbumYear:=true;
-    Album_Year:='';
-    if Aktiv.ScreenText_isTitle
-    then
-      if Aktiv.ScreenText_Album=''
-      then
-        if Aktiv.ScreenText_Jahr=''
-        then Write_AlbumYear:=false
-        else Album_Year:=Aktiv.ScreenText_Jahr
+    if Aktiv.ScreenText_Album <> '' then
+      if Aktiv.ScreenText_Jahr <> '' then
+        Album_Year := Aktiv.ScreenText_Album + ' (' + Aktiv.ScreenText_Jahr + ')'
       else
-        if Aktiv.ScreenText_Jahr=''
-        then Album_Year := Aktiv.ScreenText_Album
-        else Album_Year := Aktiv.ScreenText_Album + ' ('+ Aktiv.ScreenText_Jahr + ')';
-  end
-  else Write_AlbumYear:=false;
-  //
-
-  MyCanvas.Font.Size:=FontSize_Text;
-
-  Aktiv.ScreenText_TextWidth := MyCanvas.TextWidth(Transtext);
-  Aktiv.ScreenText_TextHeight := MyCanvas.TextHeight(Transtext);
-
-
-  //Überprüfen ob Album oder Text länger ist
-  if  Write_AlbumYear then
-  begin
-    MyCanvas.Font.Size:=FontSize_Titellaenge;
-
-    if Aktiv.ScreenText_TextWidth < MyCanvas.TextWidth(Album_Year)
-    then  Aktiv.ScreenText_TextWidth := MyCanvas.TextWidth(Album_Year);
-
-    MyCanvas.Font.Size:=FontSize_Text;
-  end;
-
-
-  Textposition.X:=Screen.Width div 2 - Aktiv.ScreenText_TextWidth div 2;
-  Textposition.Y:=round(Screen.Height * 0.8)-Aktiv.ScreenText_TextHeight div 2;
-
-  Rahmendicke.X:=15;
-  Rahmendicke.Y:=10;
-
-  //Schwarzer Ramen
-  MyCanvas.Brush.Color:=clblack;
-  if (Aktiv.ScreenText_isTitle) and (Write_AlbumYear)
-  then
-  MyCanvas.RoundRect(Textposition.X - Rahmendicke.X,
-                     Textposition.Y - Rahmendicke.Y,
-                     Textposition.X
-                       +Aktiv.ScreenText_TextWidth+Rahmendicke.X,
-                     Textposition.Y
-                       +Aktiv.ScreenText_TextHeight+Rahmendicke.Y+50,
-                     40,40 )
-
-  else
-  MyCanvas.RoundRect(Textposition.X - Rahmendicke.X,
-                     Textposition.Y - Rahmendicke.Y,
-                     Textposition.X
-                       +Aktiv.ScreenText_TextWidth+Rahmendicke.X,
-                     Textposition.Y
-                       +Aktiv.ScreenText_TextHeight+Rahmendicke.Y,
-                     40,40 );
-  //
-
-  //Schwarzer Rahmen für die Zeit
-  if Aktiv.ScreenText_isTitle then
-    begin
-      MyCanvas.RoundRect(Textposition.X
-                       +Aktiv.ScreenText_TextWidth+Rahmendicke.X - 20,
-                     Textposition.Y - 50,
-                     Textposition.X
-                       +Aktiv.ScreenText_TextWidth+Rahmendicke.X - 168,
-                     Textposition.Y + 20,
-                     40,40 );
-    end;
-
-  //Titel schreiben
-  MyCanvas.Font.Color := clLime;
-
-  MyCanvas.TextOut(Textposition.X,
-                   Textposition.Y,
-                   TransText);
-
-
-  if Aktiv.ScreenText_isTitle then
-    begin
-      MyCanvas.Font.Size := Screen.Height div (FONTDIVISOR*2);
-
-      MyCanvas.TextOut(Textposition.X - Rahmendicke.X
-                       +Aktiv.ScreenText_TextWidth-Rahmendicke.X - 20 -  MyCanvas.TextWidth(aktiv.ScreenText_Dauer),
-                   Textposition.Y - MyCanvas.TextHeight(aktiv.ScreenText_Dauer),
-                   aktiv.ScreenText_Dauer);
-
-      if Write_AlbumYear
-      then
-      MyCanvas.TextOut(Textposition.X,
-                       Textposition.Y+Aktiv.ScreenText_TextHeight+8,
-                       Album_Year);
-    end;
-
-
-  ReleaseDC(handle, MyDC);
-except
-  ScreenText_refresher.Enabled:=false;
-  Fehler('Es ist ein Fehler beim Zeichnen des OSD aufgetreten'+#13+'Bei anhaltenden Problemen bitte das OSD deaktivieren');
-end;
+        Album_Year := Aktiv.ScreenText_Album
+    else
+      Album_Year := Aktiv.ScreenText_Jahr;
+  FOSD.ShowOSD(TransText, Album_Year, Aktiv.ScreenText_Dauer,
+               TBXI_ScreenText.Checked, 5000);
 end;
 
 
-procedure TFmp3.ScreenText(Text: string; isTitle:boolean=false);   //uk
+procedure TFmp3.ScreenText(Text: string; isTitle:boolean=false);
 begin
   if TBXCBhud.Checked then
   begin
-    if ScreenText_refresher.Enabled then
-    begin
-      ScreenText_refresher.Enabled := false;
-      ClearScreenText;
-    end;
-
     Aktiv.ScreenText_Text := Text;
     Aktiv.ScreenText_isTitle := isTitle;
-    ScreenText_refresher.Tag := GetTickCount;
-    ScreenText_refresher.Enabled := true;
+    WriteText(Text);
   end;
 end;
+
 
 procedure TFmp3.ClearScreenText;
-var
-  PMyRect: PRect;
-  MyRect: TRect;
 begin
-  MyRect.Left:=200;
-  myRect.Top:=200;
-  myrect.Bottom:=750;
-  myrect.Right:=500;
-  pmyrect:=@myrect;
-
-  //redrawwindow(0,pmyrect,0,0);
-  {
-  MyRect.TopLeft.X := 5;
-  MyRect.TopLeft.Y := 6;
-  MyRect.BottomRight.X := 300;
-  MyRect.BottomRight.Y := 300;
-  MyRect.Left := Screen.Width div 2 - Aktiv.ScreenText_TextWidth div 2;
-  MyRect.Top  :=   Screen.Height - Aktiv.ScreenText_TextHeight * 4;
-  MyRect.Right := Screen.Width div 2 + Aktiv.ScreenText_TextWidth div 2;
-  MyRect.Bottom := Screen.Height - Aktiv.ScreenText_TextHeight * 4;  }
- // InvalidateRect(0, pMyRect, false);
-
-  try
-    if InvalidateRect(0, PMyRect, false)=false then Fehler('InvalidateRect returns ErrorCode');
-  except
-    Fehler('Es ist ein Fehler beim Zeichnen des OSD aufgetreten'+#13+'Bei anhaltenden Problemen bitte das OSD deaktivieren');
-  end;
+  if FOSD <> nil then FOSD.HideOSD;
 end;
+
 
 procedure TFmp3.WMDROPFILES (var Msg: TMessage);
 var i, anzahl, size: integer;
@@ -3379,12 +3187,12 @@ end;
 
 procedure TFmp3.LMDpathMouseEnter(Sender: TObject);
 begin
- (Sender as TLMDLabel).Font.Style := [fsunderline];
+ (Sender as TLabel).Font.Style := [fsunderline];
 end;
 
 procedure TFmp3.LMDpathMouseExit(Sender: TObject);
 begin
- (Sender as TLMDLabel).Font.Style := [];
+ (Sender as TLabel).Font.Style := [];
 end;
 
 procedure TFmp3.LMDpathClick(Sender: TObject);
@@ -3399,7 +3207,7 @@ end;
 
 procedure TFmp3.TBXItem13Click(Sender: TObject);
 begin
-  //markiertes Element löschen
+  //markiertes Element lÃ¶schen
   DeleteSelectedItems;
 end;
 
@@ -3412,7 +3220,7 @@ end;
 
 procedure TFmp3.TBX_del_play_itemClick(Sender: TObject);
 begin
-  //spielendes Element löschen
+  //spielendes Element lÃ¶schen
   fmp3.ElementLoeschen(Aktiv.SpielendeListe,Aktiv.SpielendesElement);
 end;
 
@@ -3559,12 +3367,12 @@ begin
   Flaut.TBXPBVolume_Tray.Position := TBXPBVolume.Position;
   Flaut.TBXPBVolume_Tray.PosTextPrefix := TBXPBVolume.PosTextPrefix;
 
-  ScreenText('Lautstärke: '+inttostr(TBXPBVolume.Position)+'%');
+  ScreenText('LautstÃ¤rke: '+inttostr(TBXPBVolume.Position)+'%');
 
   Spieler.SetVolume(TBXPBVolume.Position);
 end;
 
-function TFmp3.GetVolume: real; //uk | Lautstärke in Prozent
+function TFmp3.GetVolume: real; //uk | LautstÃ¤rke in Prozent
 begin
   Result := TBXPBVolume.Position / maxVolume;
 end;
@@ -3643,7 +3451,7 @@ procedure TFmp3.TBXItem16Click(Sender: TObject);
 var Quellliste:integer;
 begin           
   if (Datenbank.ListeExists(Aktiv.Liste)) and
-     (MessageDlg('Das Suchen nach doppelten Musikdateien kann unter Umständen sehr lange dauern und Emat könnte den Anschein erwecken, abgestürzt zu sein. Bitte auf Festplattenaktivität achten.'+#13+#10+''+#13+#10+'Vorgang fortsetzen?', mtConfirmation, [mbYes, mbNo], 0)=mrYes)
+     (MessageDlg('Das Suchen nach doppelten Musikdateien kann unter UmstÃ¤nden sehr lange dauern und Emat kÃ¶nnte den Anschein erwecken, abgestÃ¼rzt zu sein. Bitte auf FestplattenaktivitÃ¤t achten.'+#13+#10+''+#13+#10+'Vorgang fortsetzen?', mtConfirmation, [mbYes, mbNo], 0)=mrYes)
   then
   begin
     Quellliste:= Aktiv.Liste;
@@ -3748,7 +3556,7 @@ begin
   FPlaylisten[Aktiv.Liste].Close;
 end;
 
-//Folgender Code wird auch beim MultiSelected Löschen verwendet
+//Folgender Code wird auch beim MultiSelected LÃ¶schen verwendet
 procedure TFmp3.TBXButton1Click(Sender: TObject);
 var Items : TStringList;
     i     : integer;
@@ -3901,7 +3709,7 @@ try
              fmp3.DatenbankListeAusgeben(ListenNummer);
 //ukuk             fmp3.Fplaylisten[ ListenNummer ].TBXPBauslesen.Max :=
 //ukuk                                High(fmp3.Datenbank.Mp3Daten[ListenNummer]);
-                                //Es könnten mehr geworden sein
+                                //Es kÃ¶nnten mehr geworden sein
 //ukuk             fmp3.Fplaylisten[ListenNummer].TBXPBauslesen.Position := i;
            end;
 
@@ -4047,7 +3855,7 @@ end;
 procedure TFmp3.WMQueryEndSession (var M: TWMQueryEndSession);  //Wenn Shutdown
 begin
   inherited;
-  M.Result := 1; //Damit wird das Herunterfahren bestätigt
+  M.Result := 1; //Damit wird das Herunterfahren bestÃ¤tigt
   close;
 end;
 
@@ -4063,7 +3871,7 @@ begin
   begin
     TBXCBmintotray.Checked := true;
   end;
-  Trayicon.IconVisible := TBXCBtrayicon.Checked;
+  Trayicon.Visible := TBXCBtrayicon.Checked;
 end;
 
 procedure TFmp3.TBXCBmintotrayChange(Sender: TObject);
@@ -4073,14 +3881,13 @@ begin
     TBXCBtaskbuttton.Checked
   end;
   TBXCBtrayicon.Checked := true;
-  Trayicon.MinimizeToTray := TBXCBmintotray.Checked;
 end;
 
 procedure TFmp3.TBXCBscrolltitleChange(Sender: TObject);
 begin
   if not TBXCBscrolltitle.Checked then
   begin
-    Application.Title := Aktiv.SpielenderTitel + ' — ';
+    Application.Title := Aktiv.SpielenderTitel + ' â€” ';
   end else
   begin
     TBXCBtaskbuttton.Checked := true;
@@ -4204,7 +4011,7 @@ begin
       Datenbank.Mp3DatenMeta[Aktiv.Liste].historyposition:=index;
       Spiele(Aktiv.Liste,strtoint(GHistory.liste.Nummer[index]),false,true);
       //DatenbankListeAusgeben wird von Spiele aufgerufen
-      //DatenbankListeAusgeben(aktiv.liste);    //Könnte eingespart werden
+      //DatenbankListeAusgeben(aktiv.liste);    //KÃ¶nnte eingespart werden
     end;
 end;
 
@@ -4355,11 +4162,23 @@ end;
 
 procedure Tfmp3.Log(Text:string);
 var time: cardinal;
+    F: TextFile;
+    FN: string;
 begin
   time:= Gettickcount - ematstarttickcount;
 
-  MLog.Lines.Add(Format('[ %d ] ',[time])+Text)
+  MLog.Lines.Add(Format('[ %d ] ',[time])+Text);
 
+  { Port: dieselben Meldungen zusaetzlich in eine Datei (debug.log), damit man
+    beim Debuggen nicht auf das Log-Fenster schauen muss. }
+  FN := ExtractFilePath(ParamStr(0)) + 'debug.log';
+  try
+    AssignFile(F, FN);
+    if FileExists(FN) then Append(F) else Rewrite(F);
+    WriteLn(F, Format('[ %d ] ',[time]) + Text);
+    CloseFile(F);
+  except
+  end;
 end;
 
 
@@ -4470,7 +4289,7 @@ begin
 
 end;
 
-//Ähnlicher Code wie beim Speichern des id3-tags (ohne Medium.Stopp)
+//Ã„hnlicher Code wie beim Speichern des id3-tags (ohne Medium.Stopp)
 procedure TFmp3.DeleteSelectedItems;
 var Items : TStringList;
     i,markiert,markiert_id,ListenNummer  : integer;
@@ -4554,7 +4373,7 @@ zahlen: array[0..15] of Char =
    '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
 begin
 If (Bas>16) OR (bas<2) Then Begin
-   MessageDlg('Unzulässige Zahlenbasis:'+IntToStr(bas),mtWarning,[mbOK],0);
+   MessageDlg('UnzulÃ¤ssige Zahlenbasis:'+IntToStr(bas),mtWarning,[mbOK],0);
    Abort; // Damit auch nachfolgende Routinen abgebrochen werden
 End;
 if dez <> 0 then
@@ -4664,7 +4483,7 @@ procedure TFmp3.LETitleKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if key = vk_return then
-    //Änderungen Speichern Knopf
+    //Ã„nderungen Speichern Knopf
     TBXButton1Click(fmp3);
 end;
 
@@ -4719,7 +4538,7 @@ begin
   else Priorclass:= NORMAL_PRIORITY_CLASS;
 
   if not SetPriorityClass(GetCurrentProcess,PriorClass)
-    then Fehler('Das System konnte zeitkritische Änderungen nicht übernehmen');
+    then Fehler('Das System konnte zeitkritische Ã„nderungen nicht Ã¼bernehmen');
 end;
 
 procedure TFmp3.TBXI_ScreenTextChange(Sender: TObject);
@@ -4995,24 +4814,6 @@ begin
   LoadEQ_Presets;
 end;
 
-procedure TFmp3.TBXI_StartVisPluginClick(Sender: TObject);
-var old_top  : integer;
-begin
-
-  VisControlForm.btnStartClick(fmp3);
-
-
-
-  //Timer kann Fenster rumschieben, ist aber nicht mehr nötig
-  //Counter zählt die Verschiebeversuche, erst nach ein paar Sekunden reagiert das Fenster
-  MilkDropMoverCount:=0;
-  //TMilkdropMover.Enabled := True;
-
-  //ChangeSize(spieler.BassPlayer1.VisWindowHandle,600,600,true);
-  //ChangeSize(VisControlForm.CurVisWindowAttr.VisHandle,100,100,true);
-
-end;
-
 
 function tfmp3.ChangeSize(Handle: Hwnd; dHeight, dWidth: Integer; ScreenCenter: Boolean): Boolean;
 var
@@ -5020,7 +4821,7 @@ var
 begin
   Result := False;
   try
-  GetWindowRect(Handle, P); {Der TRect var die Positions daten des Fenster übergeben}
+  GetWindowRect(Handle, P); {Der TRect var die Positions daten des Fenster Ã¼bergeben}
   if ScreenCenter then
   MoveWindow(Handle, (Screen.Width-dWidth) div 2, (Screen.Height-dHeight) div 2, dHeight, dWidth, True)
   else
@@ -5044,15 +4845,15 @@ begin
   else TBX_repeat.ImageIndex:=37;
 end;
 
-procedure TFMp3.WMHotKey(var Msg: TWMHotKey);
+procedure TFMp3.WMHotKey(var Msg: TLMessage);
 begin
-  if Msg.HotKey = HotkeyIDs.Next    then ANextExecute(fmp3);
-  if Msg.HotKey = HotkeyIDs.Back    then Zurueckschalten;
-  if Msg.HotKey = HotkeyIDs.Play    then AplayExecute(fmp3);
-  if Msg.HotKey = HotkeyIDs.Pause   then Pause;
-  if Msg.HotKey = HotkeyIDs.Shuffle then AshuffleExecute(fmp3);
-  if Msg.HotKey = HotkeyIDs.Lauter  then IncVolume;
-  if Msg.HotKey = HotkeyIDs.Leiser  then DecVolume;
+  if Msg.WParam = HotkeyIDs.Next    then ANextExecute(fmp3);
+  if Msg.WParam = HotkeyIDs.Back    then Zurueckschalten;
+  if Msg.WParam = HotkeyIDs.Play    then AplayExecute(fmp3);
+  if Msg.WParam = HotkeyIDs.Pause   then Pause;
+  if Msg.WParam = HotkeyIDs.Shuffle then AshuffleExecute(fmp3);
+  if Msg.WParam = HotkeyIDs.Lauter  then IncVolume;
+  if Msg.WParam = HotkeyIDs.Leiser  then DecVolume;
 
 end;
 
@@ -5062,7 +4863,7 @@ end;
 procedure TFmp3.RegisterHotKeys;
 
 // Transform TShortCut to use for RegisterHotKey
-// TShortCut für RegisterHotKey umwandeln
+// TShortCut fÃ¼r RegisterHotKey umwandeln
 procedure ShortCutToHotKey(HotKey: TShortCut; var Key : Word; var Modifiers: Uint);
 var
   Shift: TShiftState;
@@ -5077,7 +4878,7 @@ begin
   Modifiers := Modifiers or MOD_CONTROL;
 end;
 
-procedure RegisterSingeHotkey(Hotkey:THotkey;var HotkeyID:integer);
+procedure RegisterSingeHotkey(Hotkey:THotKeyEdit;var HotkeyID:integer);
 var
   Key : Word;
   Modifiers: UINT;
@@ -5126,21 +4927,44 @@ begin
   Spieler.VisConfig;
 end;
 
-procedure TFmp3.dwTaskbarThumbnailsThumbnailClick(
-  Sender: TdwTaskbarThumbnailItem);
-begin
-  case Sender.Index of
-  4:  ANextExecute(fmp3);
-  0:  APrevExecute(fmp3);
-  3:  AplayExecute(fmp3);
-  2:  APauseExecute(fmp3);
-  1:  AstopExecute(fmp3);
-  5:  DecVolume;
-  6:  IncVolume;
-  end;
 
+// Child element helpers: DOM also yields whitespace text nodes, so only
+// element children are counted (the original Delphi XML API did the same).
+function EQElemCount(N: TDOMNode): Integer;
+var
+  C: TDOMNode;
+begin
+  Result := 0;
+  C := N.FirstChild;
+  while C <> nil do
+  begin
+    if C.NodeType = ELEMENT_NODE then Inc(Result);
+    C := C.NextSibling;
+  end;
 end;
 
+function EQElemAt(N: TDOMNode; Idx: Integer): TDOMElement;
+var
+  C: TDOMNode;
+  k: Integer;
+begin
+  Result := nil;
+  k := -1;
+  C := N.FirstChild;
+  while C <> nil do
+  begin
+    if C.NodeType = ELEMENT_NODE then
+    begin
+      Inc(k);
+      if k = Idx then
+      begin
+        Result := TDOMElement(C);
+        Exit;
+      end;
+    end;
+    C := C.NextSibling;
+  end;
+end;
 
 procedure TFmp3.LoadEQ_Presets;
 var
@@ -5149,77 +4973,66 @@ var
   j: Integer;
   EQGain: Double;
   myFormat : TFormatSettings;
+  Doc: TXMLDocument;
+  EqRoot, Preset, GainNode: TDOMElement;
 begin
 try
   if fileexists(aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS) then
   begin
+    ReadXMLFile(Doc, aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS);
+    try
+      EqRoot := Doc.DocumentElement;
 
-  XMLEqualizer.FileName:=aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS;
-  XMLEqualizer.Active:=true;
+      CountPresets := EQElemCount(EqRoot);
+      fmp3.Log('Anzahl EQ Presets '+inttostr(CountPresets));
 
-  fmp3.Log('Anzahl EQ Presets '+inttostr(XMLEqualizer.ChildNodes['equalizers'].ChildNodes.count));
+      myFormat := DefaultFormatSettings;
+      myFormat.DecimalSeparator:='.';
 
-  myFormat.DecimalSeparator:='.';
+      SetLength(EQPresets,CountPresets);
 
-  CountPresets:=XMLEqualizer.ChildNodes['equalizers'].ChildNodes.count;
-
-  SetLength(EQPresets,CountPresets);
-
-  for i := 0 to CountPresets - 1 do
-  begin
-    EQPresets[i].name:=XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].Attributes['name'];
-
-    //Wortanfang (Winamp) weglöschen
-    if '(WinAmp) '=Copy(EQPresets[i].name,0,Length('(WinAmp) ') )
-     then EQPresets[i].name:=Copy(EQPresets[i].name,Length('(WinAmp) '),Length(EQPresets[i].name));
-
-    cbEQPresets.Items.Add(EQPresets[i].name);
-
-     //Preamp wird ignoriert, nur die einzelnen Reglerstellungen ausgelesen
-    for j := 1 to XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].ChildNodes.Count-1  do
+      for i := 0 to CountPresets - 1 do
       begin
-        if j<=(MAX_EQ_GAINS+1) then
+        Preset := EQElemAt(EqRoot, i);
+        EQPresets[i].name := Preset.GetAttribute('name');
 
-   // for j := 1 to MAX_EQ_GAINS +1 do
+        //Wortanfang (Winamp) wegloeschen
+        if '(WinAmp) '=Copy(EQPresets[i].name,0,Length('(WinAmp) ') )
+         then EQPresets[i].name:=Copy(EQPresets[i].name,Length('(WinAmp) ')+1,Length(EQPresets[i].name));
 
+        cbEQPresets.Items.Add(EQPresets[i].name);
+
+        //Preamp wird ignoriert, nur die einzelnen Reglerstellungen ausgelesen
+        for j := 1 to EQElemCount(Preset) - 1 do
         begin
-
-        //log(XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].ChildNodes[j].Text);
-
-        EQGain:=strtofloat(XMLEqualizer.ChildNodes['equalizers'].ChildNodes[i].ChildNodes[j].text,myFormat);
-
-        if EQGain> 15 then EQGain:=15;
-        if EQGain<-15 then EQGain:=-15;
-
-
-        EQPresets[i].EQGains[j-1]:=round(EQGain);
-
-        //log(inttostr(round(EQGain)));
+          if j<=(MAX_EQ_GAINS+1) then
+          begin
+            GainNode := EQElemAt(Preset, j);
+            EQGain := StrToFloat(GainNode.TextContent, myFormat);
+            if EQGain> 15 then EQGain:=15;
+            if EQGain<-15 then EQGain:=-15;
+            EQPresets[i].EQGains[j-1]:=round(EQGain);
+          end;
         end;
       end;
-
-
-    //log(EQPresets[i].name);
-
-  end;
-
-
-  //XMLEqualizer.ChildNodes['equalizers'].ChildNodes.Count
+    finally
+      Doc.Free;
+    end;
   end
   else
   begin
     fmp3.log('Equalizer-Presets wurden nicht gefunden: '+aktiv.Arbeitsverzeichnis+FILE_EQ_PRESETS);
   end;
 except
-  fmp3.Fehler('Fehler beim Laden der Equalizer-Presets. Datei beschädigt?');
+  fmp3.Fehler('Fehler beim Laden der Equalizer-Presets. Datei beschaedigt?');
 end;
 end;
 
 
 
 initialization //uk | Um zu verhindern, dass Emat mehrmals gestartet wird,
-               //aber es trozdem möglich ist, wenn Delphi läuft, um auch während
-               //des Programmierens mit Emat Musik hören zu können.
+               //aber es trozdem mÃ¶glich ist, wenn Delphi lÃ¤uft, um auch wÃ¤hrend
+               //des Programmierens mit Emat Musik hÃ¶ren zu kÃ¶nnen.
 
   if FindWindow('TAppBuilder', nil) <= 0 then
   begin

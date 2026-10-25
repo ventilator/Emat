@@ -5,7 +5,7 @@
 //
 // Don't blame me for the clumsy, ungrammatical expressions, I am not a native speaker.
 //
-// Modifiziert f¸r Emat
+// Modifiziert f√ºr Emat
 // - MUTE_FADING_TIME
 
 // Abbreviations
@@ -364,12 +364,12 @@ interface
 {$INCLUDE Delphi_Ver.inc}
 
 uses
-  Windows, Messages, SysUtils, Classes, Forms, Controls, StdCtrls, ExtCtrls, syncobjs,
+  LclIntf, LazUTF8, StrUtils, Windows, Messages, SysUtils, Classes, Forms, Controls, StdCtrls, ExtCtrls, syncobjs,
   Dynamic_BASS, RT_BASSWMA, RT_basscd, RT_bassmidi, bass_aac, RT_bassmix, ioplug, PluginCtrl,
   MPEGAudio, OggVorbis, AACfile, WMAFile, WAVFile, PluginConfig,
   MPEGInfoBox, OGGInfoBox, WMAInfoBox, wa_ipc, WasabiAPI, Dialogs, MMSystem, VisDrive2,
   PlayListUtils, TntCollection, UniCodeUtils, GPPDrive
-  {$IFNDEF DELPHI_2007_BELOW}, AnsiStrings{$ENDIF}
+
   {, EmbededBrowser, TestMB};
 
 const
@@ -1012,6 +1012,7 @@ type
       //  The output volume range is from 0 to 255.
 
     property SoundEffects : TSoundEffects read FSoundEffects write SetSoundEffect;
+    function EQDebugInfo : string;   // port: diagnostics for the equalizer
       //  Specifies sound effects to be applied.
       //  The 4 different sound effects can be applied according to the value of SoundEffects.
       //  ex) BASSPlayer1.SoundEffects := [Echo] + [Reverb];  {apply echo and reverb}
@@ -1558,7 +1559,11 @@ begin
       end;
    end;
 
-   Application.MessageBox(pChar(localStr), typeStr, MB_OK + MB_ICONERROR);
+   // Port: keine modalen Fehlerdialoge (blockieren Start/Tests) - ins Log schreiben
+   if Assigned(fmp3) then
+      fmp3.Log('[' + typeStr + '] ' + localStr)
+   else
+      Application.MessageBox(pChar(localStr), typeStr, MB_OK + MB_ICONERROR);
 end;
 
 
@@ -2069,7 +2074,7 @@ begin
         {$IFDEF DELPHI_2007_BELOW}
          tmpStr2 := UTF8Decode(StreamTitle);
         {$ELSE}
-         tmpStr2 := UTF8ToWideString(StreamTitle);
+         tmpStr2 := UTF8Decode(StreamTitle);
         {$ENDIF}
          tmpPChar := ToPMultiByte(PWideChar(tmpStr2));
          StreamTitle := ansistring(tmpPChar);
@@ -2083,7 +2088,7 @@ begin
       while StrLen(TagP) > 0 do
       begin
         {$IFNDEF DELPHI_2007_BELOW}
-         if PosEX('TITLE=', Ansistrings.upperCase(ansistring(TagP)), 1) <> 0 then
+         if PosEX('TITLE=', upperCase(ansistring(TagP)), 1) <> 0 then
         {$ELSE}
          if pos('TITLE=', upperCase(ansistring(TagP))) <> 0 then
         {$ENDIF}
@@ -2219,8 +2224,9 @@ begin
       FSingleChannel := true
    else if FPluginReady then         // buffer for dual channel mode is ready ?
       FSingleChannel := false
-   else
-      ShowErrorMsgBox('Cannot support dual channel mode. (Failed to get buffer)' );
+   else if Assigned(fmp3) then
+      // Port: ohne Winamp-Input-Host gibt es keinen zweiten Kanal - nur loggen.
+      fmp3.Log('Dual-Channel nicht moeglich (kein Plugin-Host) - Einzelkanal bleibt aktiv');
 end;
 
 procedure TBASSPlayer.ClearEffectHandle;
@@ -2596,6 +2602,17 @@ begin
    end;
 end;
 
+function TBASSPlayer.EQDebugInfo: string;
+var i: integer;
+begin
+  Result := 'DX8=' + BoolToStr(FDX8EffectReady, True) +
+            ' eq=' + BoolToStr(Equalizer in FSoundEffects, True) +
+            ' bands=' + IntToStr(FEQBands.Bands);
+  for i := 0 to FEQBands.Bands - 1 do
+    Result := Result + ' [' + IntToStr(i) + ']h=' + IntToStr(EQHandle[i]) +
+              ' g=' + FloatToStrF(FEQGains[i], ffFixed, 6, 1);
+end;
+
 procedure TBASSPlayer.SetEchoLevel(Value : word);
 begin
    if Value > MaxDX8Effect then
@@ -2760,6 +2777,9 @@ begin
             if BASS_ChannelRemoveFX(PlayChannel, EQHandle[i]) then
                EQHandle[i] := 0;
       end;
+
+   if Assigned(fmp3) then
+      fmp3.Log('EQ attached: ' + EQDebugInfo);   // port: verify the FX chain
 
    if Echo in Value then
    begin
@@ -3151,7 +3171,7 @@ begin
    begin
      ParentHWND := (AOwner as TWinControl).Handle;
      AppHWND := Application.Handle;
-     MessageHandle := AllocateHWnd(ProcMessage);
+     MessageHandle := LclIntf.AllocateHWnd(ProcMessage);
    //  MessageHandle := MakeObjectInstance(ProcMessage);
 
      FOrgWndProc := Pointer(GetWindowLong(MessageHandle, GWL_WNDPROC));
@@ -3242,26 +3262,25 @@ begin
          if FMBHandle <> 0 then
          begin
             FMiniBrowserReady := true;
-            FMagneticSubProc := pointer(GetSubClass_Proc);
+            // FMagneticSubProc not set: MiniBrowser/magnetic window is not ported
          end else
             Unload_MBDrawerDLL;
       end;
 
-      FPluginReady := InitPluginCtrl(MessageHandle, ParentHWND, FMBHandle, DataReadyMsg);
-      if not FPluginReady then
-      begin
-         FSingleChannel := true;
-         ShowErrorMsgBox('Failed to get buffer.'#10 + ' - Cannot run Winamp input plug-ins.'
-                                              + #10' - Cannot support dual channel mode.' )
-      end;
+      // Port: der Winamp-Input-Plugin-Host wird nicht mehr gestartet.
+      // MP3/OGG/FLAC/WMA/AAC laufen ueber bass.dll und die BASS-Addons.
+      FPluginReady := False; // InitPluginCtrl(...) siehe PluginCtrl.pas
+      // Port: der Winamp-Input-Plugin-Host ist abgeschaltet, also immer
+      // Ein-Kanal-Betrieb - und keine Fehlermeldung mehr dafuer.
+      FSingleChannel := true;
 
       fn := GetProgDir + 'basswma.dll';
       if FileExists(fn) then  // * Changed at Ver 2.00
       begin
         {$IFDEF DELPHI_2007_BELOW}
-         HBASSWMA := BASS_PluginLoad(pChar(fn), 0);
+         HBASSWMA := BASS_PluginLoad(PChar(UTF8ToSys(fn)), 0);
         {$ELSE}
-         HBASSWMA := BASS_PluginLoad(pChar(fn), BASS_UNICODE);
+         HBASSWMA := BASS_PluginLoad(PChar(UTF8ToSys(fn)), 0);
         {$ENDIF}
          if HBASSWMA <> 0 then
             FBASSWMAReady := true;
@@ -3541,9 +3560,9 @@ begin
             if AAC.MPEGVersionID = AAC_MPEG_VERSION_4 then
             begin
              {$IFDEF DELPHI_2007_BELOW}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, 0);
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
              {$ELSE}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, BASS_UNICODE);
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
              {$ENDIF}
                if tmpChannel <> 0 then
                begin
@@ -3696,9 +3715,9 @@ begin
             Duration := round(WAV.Duration * 1000);
             Channels := WAV.ChannelModeID;
            {$IFDEF DELPHI_2007_BELOW}
-            tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, 0);
+            tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
            {$ELSE}
-            tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, BASS_UNICODE);
+            tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
            {$ENDIF}
             if tmpChannel <> 0 then
             begin
@@ -3833,9 +3852,9 @@ begin
             if AAC.MPEGVersionID = AAC_MPEG_VERSION_4 then
             begin
               {$IFDEF DELPHI_2007_BELOW}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, 0);
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
               {$ELSE}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, BASS_UNICODE);
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
               {$ENDIF}
                if tmpChannel <> 0 then
                begin
@@ -3935,9 +3954,9 @@ begin
 
          CloseFile(f);
         {$IFDEF DELPHI_2007_BELOW}
-         tmpChannel := BASS_MusicLoad(FALSE, PChar(StreamName), 0, 0, BASS_MUSIC_PRESCAN, 0);
+         tmpChannel := BASS_MusicLoad(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_MUSIC_PRESCAN or BASS_UNICODE, 0);
         {$ELSE}
-         tmpChannel := BASS_MusicLoad(FALSE, PChar(StreamName), 0, 0, BASS_MUSIC_PRESCAN or BASS_UNICODE, 0);
+         tmpChannel := BASS_MusicLoad(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_MUSIC_PRESCAN or BASS_UNICODE, 0);
         {$ENDIF}
          if tmpChannel <> 0 then
          begin
@@ -3970,9 +3989,9 @@ begin
 
          if FMIDISoundReady then
           {$IFDEF DELPHI_2007_BELOW}
-            tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(StreamName), 0, 0, 0, 44100);
+            tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE, 44100);
           {$ELSE}
-            tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(StreamName), 0, 0, BASS_UNICODE, 44100);
+            tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE, 44100);
           {$ENDIF}
          if tmpChannel <> 0 then
          begin
@@ -4002,9 +4021,9 @@ begin
       if pos(s2, s) > 0 then
       begin
         {$IFDEF DELPHI_2007_BELOW}
-         tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, 0);
+         tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
         {$ELSE}
-         tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName), 0, 0, BASS_UNICODE);
+         tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName)), 0, 0, BASS_UNICODE);
         {$ENDIF}
          if tmpChannel <> 0 then
          begin
@@ -4587,7 +4606,7 @@ begin
       if pos(ExtCode, MIDIFileExt) = 0 then  // not a MIDI file ?
       begin
         {$IFDEF DELPHI_2007_BELOW}
-         tmpChannel := BASS_StreamCreateURL(pChar(URL), 0, OpenFlag, nil, nil);
+         tmpChannel := BASS_StreamCreateURL(PChar(UTF8ToSys(URL)), 0, OpenFlag, nil, nil);
         {$ELSE}
          tmpChannel := BASS_StreamCreateURL(ToPMultiByte(pWideChar(URL)), 0, OpenFlag, nil, nil);
         {$ENDIF}
@@ -4609,7 +4628,7 @@ begin
       begin
          FGetHTTPHeader := false;
         {$IFDEF DELPHI_2007_BELOW}
-         tmpChannel := BASS_MIDI_StreamCreateURL(pChar(URL), 0,
+         tmpChannel := BASS_MIDI_StreamCreateURL(PChar(UTF8ToSys(URL)), 0,
                                                  OpenFlag + BASS_STREAM_STATUS,
                                                  @DownProc, @MessageHandle, 44100);
         {$ELSE}
@@ -4748,7 +4767,7 @@ begin
               {$IFDEF DELPHI_2007_BELOW}
                tmpStr2 := UTF8Decode(tmpStr1);
               {$ELSE}
-               tmpStr2 := UTF8ToWideString(tmpStr1);
+               tmpStr2 := UTF8Decode(tmpStr1);
               {$ENDIF}
                tmpPChar := ToPMultiByte(PWideChar(tmpStr2));
                tmpStr1 := ansistring(tmpPChar);
@@ -4763,7 +4782,7 @@ begin
               {$IFDEF DELPHI_2007_BELOW}
                tmpStr2 := UTF8Decode(tmpStr1);
               {$ELSE}
-               tmpStr2 := UTF8ToWideString(tmpStr1);
+               tmpStr2 := UTF8Decode(tmpStr1);
               {$ENDIF}
 
                tmpPChar := ToPMultiByte(PWideChar(tmpStr2));
@@ -5114,15 +5133,15 @@ begin
          if FBASSCDReady then
             if FSingleChannel then
              {$IFDEF DELPHI_2007_BELOW}
-               tmpChannel := BASS_CD_StreamCreateFile(PChar(StreamName_), 0)
+               tmpChannel := BASS_CD_StreamCreateFile(PChar(UTF8ToSys(StreamName_)), 0)
              {$ELSE}
-               tmpChannel := BASS_CD_StreamCreateFile(PChar(StreamName_), BASS_UNICODE)
+               tmpChannel := BASS_CD_StreamCreateFile(PChar(UTF8ToSys(StreamName_)), 0)
              {$ENDIF}
             else
              {$IFDEF DELPHI_2007_BELOW}
-               tmpChannel := BASS_CD_StreamCreateFile(PChar(StreamName_), BASS_STREAM_DECODE)
+               tmpChannel := BASS_CD_StreamCreateFile(PChar(UTF8ToSys(StreamName_)), BASS_STREAM_DECODE)
              {$ELSE}
-               tmpChannel := BASS_CD_StreamCreateFile(PChar(StreamName_), BASS_STREAM_DECODE or BASS_UNICODE)
+               tmpChannel := BASS_CD_StreamCreateFile(PChar(UTF8ToSys(StreamName_)), BASS_STREAM_DECODE)
              {$ENDIF}
          else
             tmpChannel := 0;
@@ -5137,9 +5156,9 @@ begin
             else
                OpenFlag := BASS_MUSIC_PRESCAN + BASS_MUSIC_POSRESET + BASS_MUSIC_RAMPS + BASS_STREAM_DECODE;
           {$IFDEF DELPHI_2007_BELOW}
-            tmpChannel := BASS_MusicLoad(FALSE, PChar(StreamName_), 0, 0, OpenFlag, 0);
+            tmpChannel := BASS_MusicLoad(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, OpenFlag or BASS_UNICODE, 0);
           {$ELSE}
-            tmpChannel := BASS_MusicLoad(FALSE, PChar(StreamName_), 0, 0, OpenFlag or BASS_UNICODE, 0);
+            tmpChannel := BASS_MusicLoad(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, OpenFlag or BASS_UNICODE, 0);
           {$ENDIF}
             if (tmpChannel <> 0) then
             begin
@@ -5152,15 +5171,15 @@ begin
             if FMIDISoundReady then
                if FSingleChannel then
                  {$IFDEF DELPHI_2007_BELOW}
-                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(StreamName_), 0, 0, 0, 44100)
+                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_UNICODE, 44100)
                  {$ELSE}
-                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(StreamName_), 0, 0, BASS_UNICODE, 44100)
+                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_UNICODE, 44100)
                  {$ENDIF}
                else
                  {$IFDEF DELPHI_2007_BELOW}
-                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(StreamName_), 0, 0, BASS_STREAM_DECODE, 44100)
+                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_STREAM_DECODE or BASS_UNICODE, 44100)
                  {$ELSE}
-                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(StreamName_), 0, 0, BASS_STREAM_DECODE or BASS_UNICODE, 44100)
+                  tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_STREAM_DECODE or BASS_UNICODE, 44100)
                  {$ENDIF}
             else begin
                tmpChannel := 0;
@@ -5177,15 +5196,15 @@ begin
          begin
             if FSingleChannel then
               {$IFDEF DELPHI_2007_BELOW}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName_), 0, 0, 0)
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_UNICODE)
               {$ELSE}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName_), 0, 0, BASS_UNICODE)
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_UNICODE)
               {$ENDIF}
             else
               {$IFDEF DELPHI_2007_BELOW}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName_), 0, 0, BASS_STREAM_DECODE);
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_STREAM_DECODE or BASS_UNICODE);
               {$ELSE}
-               tmpChannel := BASS_StreamCreateFile(FALSE, PChar(StreamName_), 0, 0, BASS_STREAM_DECODE or BASS_UNICODE);
+               tmpChannel := BASS_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(StreamName_)), 0, 0, BASS_STREAM_DECODE or BASS_UNICODE);
               {$ENDIF}
             if (tmpChannel <> 0) then
             begin
@@ -5205,7 +5224,7 @@ begin
 
       if (tmpChannel = 0) then  // not a playable file
       begin
-         ShowErrorMsgBox('Invalid or unsupported stream file.'#10' -> ' + StreamName);
+         ShowErrorMsgBox('Invalid or unsupported stream file. (BASS error '+IntToStr(BASS_ErrorGetCode())+')'#10' -> ' + StreamName);
          //fmp3.Log();
          if tmpPaused then
             ResumePlay;
@@ -5273,6 +5292,8 @@ begin
    FStreamInfo := StreamInfo;
    InformPlayerStatus(InformStreamInfo);
    SetPlayerMode(plmReady);
+   if Assigned(fmp3) then
+     fmp3.Log('Open ok: ' + ExtractFileName(StreamName_) + ' via ' + FDecoderName);
    result := true;
 end;
 
@@ -5563,9 +5584,9 @@ begin
    for i := 0 to (NumFFTBands - 1) do
       BandOut[i] := 0;
 
- // * Fadeout, Fadein ±‚¥…¿ª √ﬂ∞°«— »ƒ Pause »ƒ ResumeΩ√ø° ∞£»§ ø¨¡÷¿Ω ¥ÎΩ≈ ¿‚¿Ω¿Ã √‚∑¬µ«¥¬
- //    πÆ¡¶∞° πﬂª˝µ .
- //   ¿Ã πÆ¡¶¥¬ ResumeΩ√ πˆ∆€∏¶ ≈¨∏ÆæÓ «œ∏È ≥™≈∏≥™¡ˆ æ ¿∏π«∑Œ NeedFlush ∞™¿ª True∑Œ ºº∆Æ«‘.
+ // * Fadeout, Fadein ¬±√¢¬¥√â√Ä¬ª √É√ü¬∞¬°√á√ë √à√Ñ Pause √à√Ñ Resume¬Ω√É¬ø¬° ¬∞¬£√à¬§ ¬ø¬¨√Å√ñ√Ä¬Ω ¬¥√´¬Ω√Ö √Ä√¢√Ä¬Ω√Ä√å √É√¢¬∑√Ç¬µ√á¬¥√Ç
+ //    ¬π¬Æ√Å¬¶¬∞¬° ¬π√ü¬ª√Ω¬µ√ä.
+ //   √Ä√å ¬π¬Æ√Å¬¶¬¥√Ç Resume¬Ω√É ¬π√∂√Ü√õ¬∏¬¶ √Ö¬¨¬∏¬Æ¬æ√Æ √á√è¬∏√© ¬≥¬™√Ö¬∏¬≥¬™√Å√∂ ¬æ√ä√Ä¬∏¬π√á¬∑√é NeedFlush ¬∞¬™√Ä¬ª True¬∑√é ¬º¬º√Ü¬Æ√á√î.
  //    2009-01-25
    NeedFlush := true;
 
@@ -6070,9 +6091,9 @@ begin
       exit;
 
   {$IFDEF DELPHI_2007_BELOW}
-   AddonHandle := BASS_PluginLoad(pChar(FilePath), 0);
+   AddonHandle := BASS_PluginLoad(PChar(UTF8ToSys(FilePath)), 0);
   {$ELSE}
-   AddonHandle := BASS_PluginLoad(pChar(FilePath), BASS_UNICODE);
+   AddonHandle := BASS_PluginLoad(PChar(UTF8ToSys(FilePath)), 0);
   {$ENDIF}
    if AddonHandle <> 0 then
    begin
@@ -6150,7 +6171,7 @@ begin
             {$IFDEF DELPHI_2007_BELOW}
              result := result + LowerCase(BASSAddonList[i].FormatP[j-1].exts) + ';';
             {$ELSE}
-             result := result + AnsiStrings.LowerCase(BASSAddonList[i].FormatP[j-1].exts) + ';';
+             result := result + LowerCase(BASSAddonList[i].FormatP[j-1].exts) + ';';
             {$ENDIF}
 end;
 
@@ -6169,7 +6190,7 @@ begin
            {$IFDEF DELPHI_2007_BELOW}
             s := s + LowerCase(BASSAddonList[i].FormatP[j-1].exts);
            {$ELSE}
-            s := s + AnsiStrings.LowerCase(BASSAddonList[i].FormatP[j-1].exts);
+            s := s + LowerCase(BASSAddonList[i].FormatP[j-1].exts);
            {$ENDIF}
 
          if pos(ExtCode, s) > 0 then
@@ -6194,9 +6215,9 @@ begin
 
    if FileExists(FontFilePath) then
     {$IFDEF DELPHI_2007_BELOW}
-      aFontHandle := BASS_MIDI_FontInit(pChar(FontFilePath), 0)
+      aFontHandle := BASS_MIDI_FontInit(PChar(UTF8ToSys(FontFilePath)), 0)
     {$ELSE}
-      aFontHandle := BASS_MIDI_FontInit(pChar(FontFilePath), BASS_UNICODE)
+      aFontHandle := BASS_MIDI_FontInit(PChar(UTF8ToSys(FontFilePath)), 0)
     {$ENDIF}
    else
       exit;
@@ -6281,7 +6302,7 @@ begin
       NameHeader2 := copy(FStreamName, 1, 6);
       if (NameHeader1 = 'http://') or (NameHeader2 = 'mms://') then
         {$IFDEF DELPHI_2007_BELOW}
-         tmpChannel := BASS_MIDI_StreamCreateURL(pChar(FStreamName), 0,
+         tmpChannel := BASS_MIDI_StreamCreateURL(PChar(UTF8ToSys(FStreamName)), 0,
                                                     BASS_STREAM_DECODE,
                                                     nil, nil, 44100)
         {$ELSE}
@@ -6291,7 +6312,7 @@ begin
         {$ENDIF}
       else
         {$IFDEF DELPHI_2007_BELOW}
-         tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, pChar(FStreamName), 0, 0,
+         tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, PWideChar(UTF8ToUTF16(FStreamName)), 0, 0,
                                                   BASS_STREAM_DECODE, 44100);
         {$ELSE}
          tmpChannel := BASS_MIDI_StreamCreateFile(FALSE, ToPMultiByte(pWideChar(FStreamName)), 0, 0,

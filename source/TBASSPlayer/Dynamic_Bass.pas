@@ -597,11 +597,6 @@ type
              the stream.
   }
 
-const
-  // special STREAMPROCs
-  STREAMPROC_DUMMY : STREAMPROC = STREAMPROC(0);  // "dummy" stream
-  STREAMPROC_PUSH  : STREAMPROC = STREAMPROC(-1); // push stream
-
 type
 
   DOWNLOADPROC = procedure(buffer: Pointer; length: DWORD; user: Pointer); stdcall;

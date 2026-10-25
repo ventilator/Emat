@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, AppEvnts, TB2Dock, TBXDkPanels, TBXProgressBar,
+  Dialogs, ComCtrls, ExtCtrls, TB2Dock, TBXDkPanels, TBXProgressBar,
   TB2Toolbar, TBX, TB2Item;
 
   type
@@ -51,7 +51,7 @@ implementation
 
 uses ump3;
 
-{$R *.dfm}
+{$R *.lfm}
 
 procedure TFlaut.TBXPBVolume_TrayMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);

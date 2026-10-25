@@ -1,17 +1,15 @@
 unit UStatus;
 
 interface
-
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, LMDControl, LMDBaseControl,
-  LMDBaseGraphicControl, LMDBaseLabel, LMDCustomLabel, LMDLabel, TB2Dock,
+  Dialogs, ExtCtrls, TB2Dock,
   TBXDkPanels, TBXProgressBar, ComCtrls, StdCtrls;
 
 type
   TFStatus = class(TForm)
-    LTitel: TLMDLabel;
-    LName: TLMDLabel;
+    LTitel: TLabel;
+    LName: TLabel;
     TBXPB: TTBXProgressBar;
     TBXMultiDock1: TTBXMultiDock;
     TBXDockablePanel1: TTBXDockablePanel;
@@ -27,6 +25,6 @@ var
 
 implementation
 
-{$R *.dfm}
+{$R *.lfm}
 
 end.

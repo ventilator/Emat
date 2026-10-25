@@ -14,7 +14,7 @@ type
   TFileDropped = procedure (Sender : TObject; FileName : string; var accept : boolean) of object;
   TDnDListBox = class(TListBox)
   private
-    { Déclarations privées }
+    { DÃ©clarations privÃ©es }
     FFileDropped : TFileDropped;
     FLbAddString, FLbInsertString, FLbDeleteString : TNotifyEvent;
     FAutoAdd : boolean;
@@ -25,7 +25,7 @@ type
     procedure SetBackgroundPicture(Value: TBitmap);     // * Added
     procedure SetUseBackgroundPicture(Value: Boolean);  // * Added
   protected
-    { Déclarations protégées }
+    { DÃ©clarations protÃ©gÃ©es }
     procedure WMDROPFILES(var msg : TMessage); message WM_DROPFILES;
     procedure LBADDSTRING(var msg : TMessage); message LB_ADDSTRING;
     procedure LBINSERTSTRING(var msg : TMessage); message LB_INSERTSTRING;
@@ -35,13 +35,13 @@ type
     procedure DrawBackground;                                     // * Added
     procedure WMPaint(var Message: TWMPaint); message WM_Paint;   // * Added
   public
-    { Déclarations publiques }
+    { DÃ©clarations publiques }
     constructor Create(AOwner : TComponent); override;  // * Changed
     destructor Destroy; override;       // * Added
     procedure CreateWnd; override;
     procedure CreateParams(var Params: TCreateParams); override;
   published
-    { Déclarations publiées }
+    { DÃ©clarations publiÃ©es }
     property AutoAdd : boolean read FAutoAdd write FAutoAdd;
     property BackgroundPicture: TBitmap read FBackgroundPicture write SetBackgroundPicture;     // * Added
     property UseBackgroundPicture: Boolean read FUseBackgroundPicture write SetUseBackgroundPicture default False;  // * Added
@@ -60,10 +60,10 @@ procedure TDnDListBox.DrawBackground;
 {var
    Y_Used : integer; }
 begin
-  // Item ÀÌ Â÷ÁöÇÑ ºÎºÐ¸¸ Á¦¿ÜÇÏ°í ¹é±×¶ó¿îµå ÀÌ¹ÌÁö¸¦ Ç¥½ÃÇÒ °æ¿ì´Â ¾Æ·¡ ¹®ÀåÀ» ÀÌ¿ë
+  // Item Ã€ÃŒ Ã‚Ã·ÃÃ¶Ã‡Ã‘ ÂºÃŽÂºÃÂ¸Â¸ ÃÂ¦Â¿ÃœÃ‡ÃÂ°Ã­ Â¹Ã©Â±Ã—Â¶Ã³Â¿Ã®ÂµÃ¥ Ã€ÃŒÂ¹ÃŒÃÃ¶Â¸Â¦ Ã‡Â¥Â½ÃƒÃ‡Ã’ Â°Ã¦Â¿Ã¬Â´Ã‚ Â¾Ã†Â·Â¡ Â¹Â®Ã€Ã¥Ã€Â» Ã€ÃŒÂ¿Ã«
   { Y_Used := Self.ItemHeight * Self.Items.Count;
    if Y_Used = 0 then
-      Y_Used := Self.ItemHeight;  // ¸Ç À§ ÇÑÁÙÀº ½Î¿ëÇÏÁö ¾Ê´Â´Ù.
+      Y_Used := Self.ItemHeight;  // Â¸Ã‡ Ã€Â§ Ã‡Ã‘ÃÃ™Ã€Âº Â½ÃŽÂ¿Ã«Ã‡ÃÃÃ¶ Â¾ÃŠÂ´Ã‚Â´Ã™.
    if Y_Used > Self.Height then
       exit;
 

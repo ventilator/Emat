@@ -5,9 +5,9 @@ unit U_BassPlayer;
 
   Orginal von Delphi-Praxis-User dizzy (Fabian)
 
-  Bearbeitet von Der_Ventilator für Emat
+  Bearbeitet von Der_Ventilator fÃ¼r Emat
 
-    - Unterstützung für bass.dll ver. 2.2
+    - UnterstÃ¼tzung fÃ¼r bass.dll ver. 2.2
     - Pluginsystem
     - (GetLength Abfragesicherung)
 }
@@ -101,8 +101,8 @@ function TBassPlayer.getRightPeak: dword;
 begin
  // result := HIWORD(BASS_ChannelGetLevel(channel));
   result := round(HIWORD(BASS_ChannelGetLevel(channel)));
- //wir teilen durch 256, weil bass 2.2 anscheinend den peak 256 mal so groß als 2.0
- // ausgibt (Schätzwert!)
+ //wir teilen durch 256, weil bass 2.2 anscheinend den peak 256 mal so groÃŸ als 2.0
+ // ausgibt (SchÃ¤tzwert!)
 end;
 
 function TBassPlayer.getLeftPeak: dword;
@@ -187,14 +187,14 @@ begin
   inherited create;
 
   // init bass
-  if BASS_GetVersion <> 33751042 then//33751042= bass.dll version 2.3  MAKELONG(2,2) = 2.2; k.A. was das heißt
+  if BASS_GetVersion <> 33751042 then//33751042= bass.dll version 2.3  MAKELONG(2,2) = 2.2; k.A. was das heiÃŸt
   begin
-    showmessage('Leider konnte Emat nicht gestartet werden, da es die bass.dll in Version 2.2 benötigt.');
+    showmessage('Leider konnte Emat nicht gestartet werden, da es die bass.dll in Version 2.2 benÃ¶tigt.');
     Halt;
   end;
 
   if not Bass_Init(-1, 44100, 0, mainwindowhandle, nil) then
-  begin    {das wird bei jedem Hinzufügen aufgerufen um Dateilänge mittels Bass.dll zu ermitteln
+  begin    {das wird bei jedem HinzufÃ¼gen aufgerufen um DateilÃ¤nge mittels Bass.dll zu ermitteln
     showmessage('Das Audiowiedergabesystem konnte leider nicht gestartet werden.'+#13+
                  'Emat wird sich jetzt beenden.');
     Halt;  }

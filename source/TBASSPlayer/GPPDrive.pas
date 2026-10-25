@@ -46,6 +46,10 @@ uses Windows, Classes, Messages, SysUtils, ioplug, PluginCtrl, Forms;
   function  Get_MBDrawerDLL_Handle : HWND;
   function  GetVisDrawerDLL2Handle : HWND;
 
+type
+  TSubClass_Proc = function(lng_hWnd: HWND; uMsg: Integer;
+                            var Msg: TMessage; var bHandled: Boolean) : boolean;
+
 var
   InitMiniBrowser: function(hDllInstance, MainHandle, MsgHandle, DataMsgId : HWND) : HWND; cdecl;
   ShowMiniBrowser: procedure(Loc_X, Loc_Y, Init_Width, Init_Height : integer; AllowDock : boolean); cdecl;

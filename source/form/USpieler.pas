@@ -4,14 +4,17 @@ interface
 
 uses  sysutils, ExtCtrls, dialogs, ShellAPI, forms, messages, classes, 
 
-      fkbassplayer, bass, u_bassplayer, GR32,
+      bass, u_bassplayer,
 
       //Bassplayer 2.10
-      bassplayer, vispluginctrl, PluginCtrl,
+      bassplayer,
 
       udatenbank;
 
 const
+  { Port: Winamp-Input-Plugins (in_mp3.dll u.s.w.) sind abgeschaltet.
+    Auf True setzen, um den alten Host wieder zu aktivieren. }
+  EMAT_WINAMP_INPUT = False;
   MAXVISMODE  =   8;
   BASS_RENDER =   0;
   MAX_VOLUME  = 255;
@@ -34,8 +37,8 @@ type
     BassInfo      : TBassInfo;
     SupportedExtensions : TStringlist;   
     Volume        : integer;
-    OldVolume     : integer; //fürs AutoVolumeIn/Decrease
-    ErrorCount    : integer; //Zählt erfolglose Abspielversuche
+    OldVolume     : integer; //fÃ¼rs AutoVolumeIn/Decrease
+    ErrorCount    : integer; //ZÃ¤hlt erfolglose Abspielversuche
    end;
 
 type
@@ -94,7 +97,7 @@ type
 
 implementation
 
-uses ump3;
+uses ump3, PluginCtrl;   // GetProgDir
 
 var
       Aktiv         : TAktiv;
@@ -108,22 +111,21 @@ var
   I: Integer;
   PluginEntryNumber: integer;
 
-  //Für Addonsuche
+  //FÃ¼r Addonsuche
   ADirectory: string;
   AMask: String;
   ARekursiv: Boolean;
   SR: TSearchRec;
 
   begin
-    //inherited Create;   nötig? nicht nötig?
+    //inherited Create;   nÃ¶tig? nicht nÃ¶tig?
 
     Aktiv.Pause := false;
     Aktiv.ErrorCount:=0;
 
-    fmp3.I32_Vis.Bitmap.SetSize(400,400);
-
     Bassplayer1:=TBassplayer.Create(fmp3);
-    Bassplayer1.PluginFirst:=true;
+    // Port: BASS dekodiert MP3/OGG selbst - keine Winamp-Input-Plugins im ersten Lauf
+    Bassplayer1.PluginFirst:=false;
     Bassplayer1.SingleChannel:=True;
 
     //Lade Plugins            1
@@ -171,7 +173,7 @@ var
            else fmp3.Log('bass_fx.dll nicht gefunden');
 
 
-         if BassPlayer1.CanUsePlugin
+         if EMAT_WINAMP_INPUT and BassPlayer1.CanUsePlugin
          then
            begin
 
@@ -193,7 +195,7 @@ var
                             PluginEntryNumber:=-1;
 
                             //PluginEntryNumber:=LoadWinampPlugin(GetProgDir + 'Plugins\winamp\in_mp3.dll');
-                            //Plugins müssen im Plugins-Ordner liegen
+                            //Plugins mÃ¼ssen im Plugins-Ordner liegen
                             PluginEntryNumber:=LoadWinampPlugin(sr.Name);
                             Fmp3.Log(sr.Name+'gefunden und geladen unter Referenz: '+inttostr(PluginEntryNumber));
                           end
@@ -203,7 +205,7 @@ var
                 until FindNext(SR)<>0;
                 sysutils.FindClose(SR);
               end;
-              { Plugins in unterordnern läd der Bassplayer eh nicht
+              { Plugins in unterordnern lÃ¤d der Bassplayer eh nicht
               if ARekursiv then
                 if (FindFirst(ADirectory+'*.*',faDirectory,SR)=0) then
                 begin
@@ -222,7 +224,7 @@ var
               then
               begin
                 //PluginEntryNumber:=LoadWinampPlugin(GetProgDir + 'Plugins\winamp\in_mp3.dll');
-                //Plugins müssen im Plugins-Ordner liegen
+                //Plugins mÃ¼ssen im Plugins-Ordner liegen
                 PluginEntryNumber:=LoadWinampPlugin('in_mad.dll');
                 Fmp3.Log('in_mp3.dll geladen unter Nummer: '+inttostr(PluginEntryNumber));
               end
@@ -233,14 +235,14 @@ var
              if FileExists(GetProgDir + 'Plugins\in_midi.dll')
               then
               begin
-                //Plugins müssen im Plugins-Ordner liegen
+                //Plugins mÃ¼ssen im Plugins-Ordner liegen
                 PluginEntryNumber:=LoadWinampPlugin('in_midi.dll');
                 Fmp3.Log('in_midi.dll geladen unter Nummer: '+inttostr(PluginEntryNumber));
               end
               else fmp3.Log('in_midi.dll nicht gefunden');
               }
-             //Benutze lieber das Winampplugin
-             BassPlayer1.PluginFirst:=true;
+             //Port: BASS dekodiert direkt (keine Winamp-Input-Plugins)
+             BassPlayer1.PluginFirst:=false;
            end
            else
            begin
@@ -256,7 +258,7 @@ var
   //Log  
   myBassAddonList:=Bassplayer1.GetBASSAddonList;
   for I := 0 to High(myBassAddonList) do
-    begin //Läuft in eine Zugriffsverletzung       
+    begin //LÃ¤uft in eine Zugriffsverletzung       
       //fmp3.log('Bassaddon "'+myBassAddonList[i].Name+'" geladen. Version: '+ inttostr(myBassAddonList[i].Version) );
     end;    }
 
@@ -277,9 +279,9 @@ var
     then fmp3.Log('MIDI Plugin geladen')
     else fmp3.Log('MIDI Plugin nicht geladen');
 
-    fmp3.Log('Verfügbare Erweiterungen durch Addons: '+Bassplayer1.BASSAddonExts);
-    fmp3.Log('Verfügbare Erweiterungen durch Plugins: '+Bassplayer1.PluginFileExts);
-    fmp3.Log('Verfügbare Erweiterungen durch Bass: '+Bassplayer1.NativeFileExts);
+    fmp3.Log('VerfÃ¼gbare Erweiterungen durch Addons: '+Bassplayer1.BASSAddonExts);
+    fmp3.Log('VerfÃ¼gbare Erweiterungen durch Plugins: '+Bassplayer1.PluginFileExts);
+    fmp3.Log('VerfÃ¼gbare Erweiterungen durch Bass: '+Bassplayer1.NativeFileExts);
     fmp3.Log('Version des Basssystems: '+Bassplayer1.BuildDateStr);
     //Log Ende
 
@@ -360,9 +362,9 @@ begin
   end;
   
 {
-Verfügbare Erweiterungen durch Addons: *.ac3;*.aac;*.m4a;*.mp4;*.flac;*.fla;*.oga;*.ogg;
-Verfügbare Erweiterungen durch Plugins: keine
-Verfügbare Erweiterungen durch Bass: *.wav;*.mp1;*.mp2;*.mp3;*.ogg;*.aiff*.mo3;*.it;*.xm;*.s3m;*.mtm;*.mod;*.umx;*.cda;*.wma;*.asf;
+VerfÃ¼gbare Erweiterungen durch Addons: *.ac3;*.aac;*.m4a;*.mp4;*.flac;*.fla;*.oga;*.ogg;
+VerfÃ¼gbare Erweiterungen durch Plugins: keine
+VerfÃ¼gbare Erweiterungen durch Bass: *.wav;*.mp1;*.mp2;*.mp3;*.ogg;*.aiff*.mo3;*.it;*.xm;*.s3m;*.mtm;*.mod;*.umx;*.cda;*.wma;*.asf;
 }
  { 
   //Kann kein Set verwenden wegen ".";
@@ -392,7 +394,7 @@ begin
          fmp3.stop;
          fmp3.log('Bassplayer ist nicht bereit');
          fmp3.fehler('Leider konnte der Titel nicht abgespielt werden.'+#13+#10+
-               'Überprüfen Sie bitte, ob der Datenträger oder die Soundkarte verfügbar ist.')
+               'ÃœberprÃ¼fen Sie bitte, ob der DatentrÃ¤ger oder die Soundkarte verfÃ¼gbar ist.')
        end;
 
        if FileExists(FileName) then
@@ -418,7 +420,7 @@ begin
                fmp3.Stop;
                MessageDlg('Leider konnten die letzten '+inttostr(MAX_ERROR_COUNT)+
                ' Titel (u.a. '+FileName+') nicht abgespielt werden und daher wird die Wiedergabe gestoppt.'+#13+#10+
-               'Überprüfen Sie bitte, ob der Datenträger oder die Soundkarte verfügbar ist.', mtError, [mbOK], 0);
+               'ÃœberprÃ¼fen Sie bitte, ob der DatentrÃ¤ger oder die Soundkarte verfÃ¼gbar ist.', mtError, [mbOK], 0);
                abort;
              end;
            inc(aktiv.errorcount);
@@ -581,8 +583,8 @@ begin
         //Result := GetBassPlayLength(Filename) div 1000;
         Result:=1;
       except
-        fmp3.Fehler('Die Länge des Mediums '+FileName+
-                    ' konnte nicht zuverlässig ermittelt werden');
+        fmp3.Fehler('Die LÃ¤nge des Mediums '+FileName+
+                    ' konnte nicht zuverlÃ¤ssig ermittelt werden');
       end;
     end;
   end;
@@ -595,7 +597,7 @@ var i:integer;
 begin
   myEqBands:=Bassplayer1.EQBands;
 
-  fmp3.log('EQ Bänder: '+inttostr(myEQBands.Bands));
+  fmp3.log('EQ BÃ¤nder: '+inttostr(myEQBands.Bands));
 
   Bassplayer1.SoundEffects:=Bassplayer1.SoundEffects+[Equalizer];
 
@@ -612,12 +614,14 @@ var i: integer;
 begin
 success:=true;
 if not Bassplayer1.DX8EffectReady
-then fmp3.Fehler('Equalizer benötigt mind. DirectX 8');
+then fmp3.Fehler('Equalizer benÃ¶tigt mind. DirectX 8');
 
 
 for i:=0 to MAX_EQ_GAINS do
   if not Bassplayer1.SetAEQGain(i,eqwert[i])
   then success:=false;// else showmessage('hurrawy');
+
+  fmp3.Log('EQ: '+Bassplayer1.EQDebugInfo);
 
 //if not success then fmp3.Fehler('EQ Werte konnten nicht gesetzt werden');
 
@@ -692,8 +696,7 @@ end;
 
 procedure TSpieler.VisConfig;
 begin
-  //Bassplayer1.ShowVisWindow;
-  VisControlForm.Show;
+  //Bassplayer1.ShowVisWindow;  (Winamp-Visualisierung entfernt)
 end;
 
 

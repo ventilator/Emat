@@ -17,6 +17,7 @@ type TSave = class (TObject)
     constructor Create(iniFileName:string);
     procedure S_OffenePlaylisten;
     procedure L_OffenePlaylisten;
+    procedure SpieleBeimStart(ListenNummer: integer);
     procedure S_Einstellungen;
     procedure L_Einstellungen;
     destructor CloseIniFile;
@@ -62,7 +63,7 @@ try
         end;
 
 
-       //Windowstate wird auf Normal gesetzt um Größe speichern zu können
+       //Windowstate wird auf Normal gesetzt um GrÃ¶ÃŸe speichern zu kÃ¶nnen
        fmp3.FPlaylisten[i].WindowState := wsNormal;
 
        ini.WriteInteger('OffenePlaylisten','Left'+inttostr(Anzahl),
@@ -98,11 +99,30 @@ try
   ini.WriteInteger('OffenePlaylisten','MaximizedList',maximized_list);
 
 except
- fmp3.Fehler('Die Position der geöffneten Listen konnte nicht fehlerfrei gespeichert werden.');
+ fmp3.Fehler('Die Position der geÃ¶ffneten Listen konnte nicht fehlerfrei gespeichert werden.');
  //Im Fehlerfall offene Listen verwerfen
  ini.WriteInteger('OffenePlaylisten','Anzahl',0);
 end;
 end;
+
+procedure TSave.SpieleBeimStart(ListenNummer: integer);
+{ Port: der Autostart beim Laden der offenen Listen lag im grossen try von
+  L_OffenePlaylisten; eine Access Violation im TBX-MDI-Grid (ChangeBounds)
+  brach damit das ganze Laden ab. Jetzt gekapselt und geloggt. }
+begin
+  try
+    fmp3.Log('Autostart: Liste=' + IntToStr(ListenNummer) + ' Element=' +
+              IntToStr(ini.ReadInteger('OffenePlaylisten','SpielendesElement',-1)));
+    if fmp3.Spiele(ListenNummer, ini.ReadInteger('OffenePlaylisten','SpielendesElement',-1)) then
+      if fmp3.Spieler.GetLength > 0.001 then
+        fmp3.Spule(ini.ReadInteger('OffenePlaylisten','SpielendesElementPosition',0)
+                   / fmp3.Spieler.GetLength);
+  except
+    on E: Exception do
+      fmp3.Log('Autostart: ' + E.ClassName + ': ' + E.Message);
+  end;
+end;
+
 
 procedure TSave.L_OffenePlaylisten;
 var i,j,anzahl,maximized_list:integer;
@@ -130,14 +150,10 @@ try
        then
         begin
          flag:=true;
-         if fmp3.Spiele(i,ini.ReadInteger
-                                    ('OffenePlaylisten','SpielendesElement',-1))
-         then
-           fmp3.Spule(ini.ReadInteger('OffenePlaylisten',
-                         'SpielendesElementPosition',0)/fmp3.Spieler.GetLength);
+         SpieleBeimStart(i);   // Port: eigener try-Block, siehe unten
         end;
-
-        //Aussehen
+        //Aussehen (eigenes try: TBX-MDI-Kindfenster kann in LCL keine Bounds setzen)
+        try
          fmp3.FPlaylisten[i].Left:=ini.ReadInteger('OffenePlaylisten','Left'
                                 +inttostr(i+1),fmp3.FPlaylisten[i].Left);
          fmp3.FPlaylisten[i].Top:=ini.ReadInteger('OffenePlaylisten','Top'
@@ -157,6 +173,10 @@ try
 
          fmp3.FPlaylisten[i].WindowState:=TWindowState(ini.ReadInteger
                          ('OffenePlaylisten','WindowState'+inttostr(i+1),0));
+        except
+          on E: Exception do
+            with TStringList.Create do try Add('Appearance['+IntToStr(i)+']: '+E.ClassName+': '+E.Message); SaveToFile(ExtractFilePath(ParamStr(0))+'startup_error.txt'); finally Free; end;
+        end;
          end;
       end;
 
@@ -165,11 +185,16 @@ try
       if (maximized_list<>-1) and (fmp3.datenbank.listeexists(maximized_list)) then
         fmp3.FPlaylisten[maximized_list].WindowState:=wsmaximized;
 
-      if flag
-      then fmp3.MarkInList;
+      if flag then
+        try
+          fmp3.MarkInList;
+        except
+          on E: Exception do fmp3.Log('MarkInList: ' + E.ClassName + ': ' + E.Message);
+        end;
    end;      
 except
-   fmp3.Fehler('Die Einstellungen der offenen Listen konnten nicht einwandfrei geladen werden.');
+   on E: Exception do
+     fmp3.Log('OffeneListen: ' + E.ClassName + ': ' + E.Message + ' @' + IntToStr(PtrInt(ExceptAddr)));
 end;
 end;
 

@@ -1,4 +1,4 @@
-//Deutsche Sprache für Emat | uk
+//Deutsche Sprache fÃ¼r Emat | uk
 
 unit Ulang;
 
@@ -6,8 +6,8 @@ interface
 
 resourcestring
 //Captions
-  TASKBARSEP = ' — ';
-  ARTISTSEP  = ' – ';
+  TASKBARSEP = ' â€” ';
+  ARTISTSEP  = ' â€“ ';
   SHUFFLE_ON = 'Shuffle: Aus';
   SHUFFLE_OFF= 'Shuffle: An';
   PAUSECAPTION = 'Pause';
@@ -18,10 +18,10 @@ resourcestring
   VERSIONCAPTION = 'Version: ';
   LENGTHCAPTION  = 'Dauer (ID3): ';
   LAYERCAPTION   = 'Layer: ';
-  VOLUMECAPTION  = 'Lautstärke (';
+  VOLUMECAPTION  = 'LautstÃ¤rke (';
   FORMTITLE = 'Emat ';
   PANELCAPTION   = 'Panelee';
-  TOOLBARCAPTION = 'Menüleisten';
+  TOOLBARCAPTION = 'MenÃ¼leisten';
   RENAMECAPTION  = 'Umbennen';
   NEWFILENAMECAPTION = 'Neuer Dateiname:';
   CPLSTITELS = ' %d Titel';
@@ -29,22 +29,22 @@ resourcestring
   CPLSPlAYLENGTH = '%d Dauer';
   ALWAYSONTOP_OFF = 'Immer im Vordergrund [An]';
   ALWAYSONTOP_ON = 'Immer im Vordergrund [Aus]';
-  SELDIR = 'Bitte wählen Sie das Verzeichnis (Ordner) aus, in das die angezeigten Medien kopiert werden sollen.';
-  SELDIR_ADD_DIR = 'Bitte wählen Sie ein Verzeichnis aus, dessen Inhalt Sie der Playliste hinzufügen möchten.';
+  SELDIR = 'Bitte wÃ¤hlen Sie das Verzeichnis (Ordner) aus, in das die angezeigten Medien kopiert werden sollen.';
+  SELDIR_ADD_DIR = 'Bitte wÃ¤hlen Sie ein Verzeichnis aus, dessen Inhalt Sie der Playliste hinzufÃ¼gen mÃ¶chten.';
 
 //ERRORS
-  DEL_FALSE = '"%s" konnte nicht gelöscht werden.';
-  DEL_TRUE = '"%s" wurde erfolgreich gelöscht.';
+  DEL_FALSE = '"%s" konnte nicht gelÃ¶scht werden.';
+  DEL_TRUE = '"%s" wurde erfolgreich gelÃ¶scht.';
   SETCOLORERROR = 'Set Color - TBX-Info Error.';
-  MENUEERROR  = 'Fehler beim Erstellen der %s-Menüleiste.';
-  STARTUPERROR  = 'Emat wurde nicht einwandfrei initialisiert und könnte somit '+
+  MENUEERROR  = 'Fehler beim Erstellen der %s-MenÃ¼leiste.';
+  STARTUPERROR  = 'Emat wurde nicht einwandfrei initialisiert und kÃ¶nnte somit '+
                     'nicht richtig funktionieren.';
-  CHEKEDERROR   = 'Fehler beim Ändern des Checked-Status.';
+  CHEKEDERROR   = 'Fehler beim Ã„ndern des Checked-Status.';
   SAVESETTINGSERROR = 'Fehler beim Speichern der Einstellungen.';
   DIRNOTFOUND = 'Pfad nicht gefunden';
   BASS_INIT_ERROR = 'Das Bass.dll Subsystem konnte nicht initialisiert werden.'+sLineBreak
                    +'Vielleicht kein Audiotreiber geladen?'+sLineBreak
-                   +'Die Audiowiederabe kann eingeschränkt sein.';
+                   +'Die Audiowiederabe kann eingeschrÃ¤nkt sein.';
   HELPFILENOTFOUND = 'Hilfedatei wurde nicht gefunden.';
   ONLYRUNONETIME = 'Emat kann nur einmal gestartet werden.';
 
@@ -52,14 +52,14 @@ resourcestring
   SAVEPLS = 'Soll die Playliste gespeichert werden?';
   SAVEAPPLAUNCHER = 'Soll die Applauncherliste gespeichert werden?';
   GOURL   = 'Es wird nun die url "%s" in Ihrem Browser aufgerufen,'+sLineBreak+
-              'dabei werden keinerlei Informationen an G-Software übermittelt.'+
+              'dabei werden keinerlei Informationen an G-Software Ã¼bermittelt.'+
               sLineBreak+'Wollen Sie diesen Vorgang fortsetzen?';
   RESETSETTINGS = 'Wollen Sie wirklich die visuellen Einstellungen der Paneele'+
-                    ' sowie der Symbolleisten zurücksetzen?'+sLineBreak+'Wenn '+
-                    'ja, müssen Sie Emat anschließend neustarten.';
+                    ' sowie der Symbolleisten zurÃ¼cksetzen?'+sLineBreak+'Wenn '+
+                    'ja, mÃ¼ssen Sie Emat anschlieÃŸend neustarten.';
 
-  NEWPLAYLIST  = 'In eine Playliste können Musikdateien (.mp3, .wma, .ogg, .wav, ...) hinzugefügt werden. Durch einen Doppelklick auf einen Eintrag wird der Titel abgespielt.';
-  NEWAPPLAUNCH = 'In eine "Applauncher-Liste" können ausführbare Dateien (.exe, .bat, .cmd, ...) hinzugefügt werden. Durch einen Doppelkick auf einen Eintrag wird die Datei ausgeführt.';
+  NEWPLAYLIST  = 'In eine Playliste kÃ¶nnen Musikdateien (.mp3, .wma, .ogg, .wav, ...) hinzugefÃ¼gt werden. Durch einen Doppelklick auf einen Eintrag wird der Titel abgespielt.';
+  NEWAPPLAUNCH = 'In eine "Applauncher-Liste" kÃ¶nnen ausfÃ¼hrbare Dateien (.exe, .bat, .cmd, ...) hinzugefÃ¼gt werden. Durch einen Doppelkick auf einen Eintrag wird die Datei ausgefÃ¼hrt.';
 
 //WARNINGS
   PLSNOTCOMP = 'Die Playliste "%s" wurde mit einer anderen Version vom Emat '+
@@ -75,7 +75,7 @@ resourcestring
   PLSNOTSAVED= 'Die Playliste konnte nicht in "%s" gespeichert werden';
 
 //WEB
-  WEBSITE = 'http://emat.de.gg/';
+  WEBSITE = 'https://github.com/ventilator/Emat';
   UPDATEPAGE = 'http://www.ematupdate.de.gg';
 
 implementation

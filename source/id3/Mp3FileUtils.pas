@@ -1,9 +1,9 @@
 {
   MP3FileUtils 0.1
 
-  //Orginaldatei geändert -> UTF-16 Fix
+  //Orginaldatei geÃ¤ndert -> UTF-16 Fix
 
-  Die hier implementierten Klassen ermöglichen es, diverse
+  Die hier implementierten Klassen ermÃ¶glichen es, diverse
   Informationen aus mp3 Dateien auszulesen und zu schreiben.
 
   Copyright (C) 2005, Daniel 'Gausi' Gaussmann
@@ -12,17 +12,17 @@
   Diese Unit basiert zum Teil auf "UltimaTag"
   Copyright (C) 2003 by tommie-lie, tommie-lie@delphi-forum.de
   http://www.delphi-forum.de/viewtopic.php?t=11032
-    - Die Klasse TID3v1Tag wurde fast unverändert aus UT übernommen,
+    - Die Klasse TID3v1Tag wurde fast unverÃ¤ndert aus UT Ã¼bernommen,
       ebenso einige Hilfsprozeduren
     - Die Klasse TID3v2Tag verwendet diverse Techniken aus UT,
-      die Datenstruktur jedoch wurde komplett verändert, da die Klasse hier
-      wesentlich variabler ist und nicht nur Textframes unterstützt.
+      die Datenstruktur jedoch wurde komplett verÃ¤ndert, da die Klasse hier
+      wesentlich variabler ist und nicht nur Textframes unterstÃ¼tzt.
     - Eine Klasse TMpegInfo ist in UT nicht enthalten gewesen.
 
   Diese Unit ist freie Software; sie darf weiterverbreitet und/oder
   modifiziert werden unter den Bedingungen der GNU Lesser Public License,
-  veröffentlicht von der Free Software Foundation; entweder Version 2.1 der
-  Lizenz, oder eine spätere Version.
+  verÃ¶ffentlicht von der Free Software Foundation; entweder Version 2.1 der
+  Lizenz, oder eine spÃ¤tere Version.
 
   Sie sollten ein Kopie dieser Lizenz mit dieser Unit erhalten haben.
   Wenn nicht, schreiben sie an
@@ -31,7 +31,7 @@
       Boston, MA 02111-1307 USA
 
 
-  Folgende Klassen werden zur Verfügung gestellt:
+  Folgende Klassen werden zur VerfÃ¼gung gestellt:
       - TID3v1Tag:
         Lesen und Schreiben des ID3v1-Tags.
         Alle Informationen werden ausgewertet.
@@ -39,8 +39,8 @@
 
       - TID3v2Tag:
         Lesen und schreiben von ID3v2-Tags.
-        Es werden die Versionen 2.2, 2.3 und 2.4 unterstützt.
-        Zusätzlich zu den in v1 enthaltenen Feldern wird außerdem unterstützt:
+        Es werden die Versionen 2.2, 2.3 und 2.4 unterstÃ¼tzt.
+        ZusÃ¤tzlich zu den in v1 enthaltenen Feldern wird auÃŸerdem unterstÃ¼tzt:
             Composer
             OriginalArtist
             Copyright
@@ -54,16 +54,16 @@
             OriginalLyricist
             OriginalReleaseYear
             OriginalAlbumTitel
-        Als Besonderheit werden hier auch unterstützt:
+        Als Besonderheit werden hier auch unterstÃ¼tzt:
             Lyrics
             Pictures
         Die Behandlung dieser Eigenschaften ist nicht trivial und fordert
         etwas mehr Einarbeitung in diese Unit.
-        Außerdem ist die Behandlung von Pictures noch nicht "idiotensicher".
-        Es werden können beliebige Binärdaten geschrieben werden, laut Spezifikationen
-        von id3v2Tag und den Zusatzinfos, die dort geschrieben werden, dürfen mit dieser
+        AuÃŸerdem ist die Behandlung von Pictures noch nicht "idiotensicher".
+        Es werden kÃ¶nnen beliebige BinÃ¤rdaten geschrieben werden, laut Spezifikationen
+        von id3v2Tag und den Zusatzinfos, die dort geschrieben werden, dÃ¼rfen mit dieser
         Unit dort NUR JPEGs als Bild verwendet werden. Bei der Verwendung dieser Unit ist also
-        sicherzustellen, dass der User nur JPGs zum Einfügen in den Tag auswählen darf.
+        sicherzustellen, dass der User nur JPGs zum EinfÃ¼gen in den Tag auswÃ¤hlen darf.
 
       - TMpegInfo
         Lesen der MPEG-Informationen
@@ -112,7 +112,7 @@ type
 
 
 //--------------------------------------------------------------------
-// Teil 2: Typen für ID3v1Tag
+// Teil 2: Typen fÃ¼r ID3v1Tag
 //--------------------------------------------------------------------
   String4  = String[4];                 // Strings are either 4 or 30 byte
   String30 = String[30];
@@ -163,20 +163,20 @@ type
 
 
 //--------------------------------------------------------------------
-// Teil 3: Typen für ID3v2-tags
+// Teil 3: Typen fÃ¼r ID3v2-tags
 //--------------------------------------------------------------------
   TInt28 = array[0..3] of Byte;         // 28bit integer used in ID3v2
 
-  // einige Frames können mehrfach auftreten, und können dann durch ihre
-  // Beschreibung unteschieden werden. Dabei gibt es für verschiedene Frametypen
+  // einige Frames kÃ¶nnen mehrfach auftreten, und kÃ¶nnen dann durch ihre
+  // Beschreibung unteschieden werden. Dabei gibt es fÃ¼r verschiedene Frametypen
   // unterschiedliche Beschreibungen:
 
-  // Beschreibung für z.B. Comment- und Lyric-Frames
+  // Beschreibung fÃ¼r z.B. Comment- und Lyric-Frames
   TFrameDescription = record
     Language: String;
     Description: String;
   end;
-  // Beschreibung für Bild-Frames
+  // Beschreibung fÃ¼r Bild-Frames
   TPictureFrameDesription = record
     Description: String;
     Bildtyp: Byte;
@@ -194,7 +194,7 @@ type
   TID3v2Frame = record
     FFrameID: String;    // 4 bzw. 3 Zeichen lang
     FSize: LongWord;
-    Header: TBuffer;     // 10 bzw. 6 Bytes groß
+    Header: TBuffer;     // 10 bzw. 6 Bytes groÃŸ
     Data: TBuffer;
   end;
 
@@ -235,10 +235,10 @@ type
     function GetDescribedTextFrame(ID:integer;Language:string;Description:string):string;
     procedure SetTextFrame(FrameID:integer; Value: String);
     procedure SetDescribedTextFrame(ID:integer;Language:string;Description:string; Value:string);
-    // DeleteTextFrame wird intern von SetTextFrame aufgerufen, wenn der übergebene
+    // DeleteTextFrame wird intern von SetTextFrame aufgerufen, wenn der Ã¼bergebene
     // String leer ist - und somit von allen Set-Prozeduren, die reine Textframes setzen
     procedure DeleteTextFrame(FrameID: integer);
-    // DeleteDescribedTextFrame wird außerdem von DeleteLyrics und DeleteExtendedComment aufgerufen.
+    // DeleteDescribedTextFrame wird auÃŸerdem von DeleteLyrics und DeleteExtendedComment aufgerufen.
     procedure DeleteDescribedTextFrame(ID:integer;Language:string;Description:string);
 
     function GetAllFrameDescriptions(FrameID:integer): TFrameDescriptionArray;
@@ -342,7 +342,7 @@ type
     procedure SetPicture(stream: TStream; Description:TPictureFrameDesription);
     procedure DeletePicture(Description:TPictureFrameDesription);
 
-    //für diverse Anzeigen, z.B. um Auswahl der MehrfachFrames zu realisieren
+    //fÃ¼r diverse Anzeigen, z.B. um Auswahl der MehrfachFrames zu realisieren
     function GetAllCommentDescriptions: TFrameDescriptionArray;
     function GetAllLyricsDescriptions: TFrameDescriptionArray;
     function GetAllPictureFrameDescriptions: TPictureFrameDescriptionArray;
@@ -352,7 +352,7 @@ type
 
 
 //--------------------------------------------------------------------
-// Teil 4. Typen für die MPEG-Behandlung
+// Teil 4. Typen fÃ¼r die MPEG-Behandlung
 //--------------------------------------------------------------------
 
   TMpegHeader = record
@@ -396,10 +396,10 @@ type
     Fvalid: boolean;
     FfirstHeaderPosition: int64;
 
-    // Überprüft, ob im Array aBuffer an Position position ein gültiger MpegHeader ist
-    // und liefert diesen zurück
+    // ÃœberprÃ¼ft, ob im Array aBuffer an Position position ein gÃ¼ltiger MpegHeader ist
+    // und liefert diesen zurÃ¼ck
     function GetValidatedHeader(aBuffer: TBuffer; position: integer): TMpegHeader;
-    // Überprüft, ob nach dem aMpegHeader in aBuffer (pos entsprechend setzen) ein Xing-Frame kommt
+    // ÃœberprÃ¼ft, ob nach dem aMpegHeader in aBuffer (pos entsprechend setzen) ein Xing-Frame kommt
     function GetXingHeader(aMpegheader: TMpegHeader; aBuffer: TBuffer; position: integer ): TXingHeader;
     function GetFramelength(version:byte;layer:byte;bitrate:integer;Samplerate:integer;padding:boolean):integer;
 
@@ -427,9 +427,9 @@ type
 
 
 
-// Funktionen, die nicht zu den Klassen hier gehören,
+// Funktionen, die nicht zu den Klassen hier gehÃ¶ren,
 // aber dennoch sinnvoll damit in Zusammenhang stehen.
-// sie können z.B. im OnChange eines Editfeldes benutzt werden
+// sie kÃ¶nnen z.B. im OnChange eines Editfeldes benutzt werden
   function IsValidV2TrackString(value:string):boolean;
   function IsValidV1TrackString(value:string):boolean;
   function IsValidYearString(value:string):boolean;
@@ -459,7 +459,7 @@ const
   IDv2_ORIGINALALBUMTITEL = 21;
 
   // Achtung: Es muss sichergestellt sein, dass ID3v2_X-IDs[IDv2_XXXXX] die richtige Bezeichnung ist!
-  // also z.B. muss  ID3v2_4_IDs[IDv2_ARTIST] die FrameID für Artist enthalten
+  // also z.B. muss  ID3v2_4_IDs[IDv2_ARTIST] die FrameID fÃ¼r Artist enthalten
   KnownID3v2_4_IDs: Array[0..21] of TID3v24ID
     =('TPE1', 'TIT2', 'TALB', 'TDRC', 'TCON', 'COMM', 'TRCK', 'USLT','APIC',
     'TCOM', 'TOPE', 'TCOP', 'TENC', 'TLAN', 'TSSE', 'TMED',
@@ -542,7 +542,7 @@ var
 implementation
 
 //--------------------------------------------------------------------
-// außerhalb dieser Unit nicht notwendige Struktur
+// auÃŸerhalb dieser Unit nicht notwendige Struktur
 //--------------------------------------------------------------------
 type  TID3v1Structure = record             // constant structure of an
     ID: array[1..3] of Char;               // ID3v1 tag in the file
@@ -563,7 +563,7 @@ type  TID3v1Structure = record             // constant structure of an
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------
 // Liest von einem ByteArray in einen String
-// Klappt ganz gut, aber meine Hand lege ich hierfür nicht ins Feuer !!!
+// Klappt ganz gut, aber meine Hand lege ich hierfÃ¼r nicht ins Feuer !!!
 //--------------------------------------------------------------------
 (*   //Funktion durch nachfolgenden "Beta-Hack" ersetzt
 function ReadToString(buffer: TBuffer; start:integer; Art:byte; alength: integer):string;
@@ -643,7 +643,7 @@ begin
            move(buffer[start+2], tmpws[1], 2*length(tmpws));
            tmp := UTF8ToAnsi(UTF8Encode(tmpws));
            //********************************
-           // 28. Juli 2006. Wieder zurückswappen
+           // 28. Juli 2006. Wieder zurÃ¼ckswappen
            if (buffer[start] = $FE) and (buffer[start + 1] = $FF) then
            begin
              for i := 1 to length(tmpws)-1 do begin
@@ -674,8 +674,8 @@ end;
 
 //--------------------------------------------------------------------
 // Lese einen Kommentar.
-// Dabei wird die "Description" des Kommentars übersprungen.
-// vgl. www.id3.org für Details - Thema COMMENT-Frames
+// Dabei wird die "Description" des Kommentars Ã¼bersprungen.
+// vgl. www.id3.org fÃ¼r Details - Thema COMMENT-Frames
 //--------------------------------------------------------------------
 function ReadComment(buffer: TBuffer;  start:integer; Art:byte; alength: integer):string;
 var i:integer;
@@ -705,7 +705,7 @@ begin
 end;
 
 //--------------------------------------------------------------------
-// Überprüft, ob die Frame-ID gültig ist
+// ÃœberprÃ¼ft, ob die Frame-ID gÃ¼ltig ist
 //--------------------------------------------------------------------
 function ValidFrame(ID: string): Boolean;
 var
@@ -749,7 +749,7 @@ begin
 end;
 
 //--------------------------------------------------------------------
-// Setzt die Size-Bytes in einem Header entsprechend der angegebenen Größe
+// Setzt die Size-Bytes in einem Header entsprechend der angegebenen GrÃ¶ÃŸe
 //--------------------------------------------------------------------
 procedure UpdateHeader(Version:byte; Header: TBuffer; Size:integer);
 begin
@@ -860,7 +860,7 @@ begin
 end;
 
 //---------------------------------------------------
-// Überprüft, ob ein String gültig für die Angabe eines v2-Tracks ist
+// ÃœberprÃ¼ft, ob ein String gÃ¼ltig fÃ¼r die Angabe eines v2-Tracks ist
 //---------------------------------------------------
 function IsValidV2TrackString(value:string):boolean;
 var
@@ -879,7 +879,7 @@ begin
 end;
 
 //--------------------------------------------------------------------
-// ... und für v1
+// ... und fÃ¼r v1
 //--------------------------------------------------------------------
 function IsValidV1TrackString(value:string):boolean;
 begin
@@ -887,7 +887,7 @@ begin
 end;
 
 //--------------------------------------------------------------------
-// Überprüfen auf gültige Jahresangabe
+// ÃœberprÃ¼fen auf gÃ¼ltige Jahresangabe
 //--------------------------------------------------------------------
 function IsValidYearString(value:string):boolean;
 var tmp:integer;
@@ -1209,8 +1209,8 @@ begin
 end;
 
 // Zum lesen der Infos aus den Frames
-// Achtung: Diese Prozedur nur für Frames verwenden, die eindeutig sind.
-// Es gibt Frame-IDs, die mehrfach verwendet werden dürfen,
+// Achtung: Diese Prozedur nur fÃ¼r Frames verwenden, die eindeutig sind.
+// Es gibt Frame-IDs, die mehrfach verwendet werden dÃ¼rfen,
 // z.B. die COMMent-Frames, die sich dann durch Sprache oder Beschreibung unterscheiden!
 function TID3v2Tag.GetFrameIndex(ID:integer):integer;
 var i:integer;
@@ -1249,28 +1249,28 @@ begin
     begin
       // passender IDstring gefunden
       // In Data[1] steht die Textcodierung drin
-      // Jetzt: Language überprüfen.
+      // Jetzt: Language Ã¼berprÃ¼fen.
       if (language ='*') OR (language='') then // ist ok, alle Sprachen werden akzeptiert
       else                         //[^^---] Eigentlich is das nicht ok, aber einige Frames sind fehlerhaft mit Leerstings (Nullbytes) gesetzt :-((
       begin
         setlength(tmplanguage,3);
         move(FFrames[i].Data[1],tmplanguage[1],length(tmplanguage));
-        // keine Übereinstimmung? Beim nächsten Frame weitermachen
+        // keine Ãœbereinstimmung? Beim nÃ¤chsten Frame weitermachen
         if tmplanguage <> Language then continue;
       end;
 
-      // Jetzt: Description überprüfen
+      // Jetzt: Description Ã¼berprÃ¼fen
       if description = '*' then // OK, alles wird akzeptiert
       else
         if description <> GetDescription(FFrames[i]) then continue;
       // Bis herhin durchgekommen? Dann haben wir den Frame gefunden,
-      // und können abbrechen!
+      // und kÃ¶nnen abbrechen!
       result := i;
       break;
     end;
 end;
 
-// Liefert anhand der Beschreibung den Index eines Bild-Frames zurück.
+// Liefert anhand der Beschreibung den Index eines Bild-Frames zurÃ¼ck.
 function TID3v2Tag.GetFrameIndex(Description:TPictureFrameDesription):integer;
 var mime, idstr: string;
   tmpdescription: TPictureFrameDesription;
@@ -1298,7 +1298,7 @@ begin
 end;
 
 //--------------------------------------------------------------------
-// Liefert die Beschreibung eines Frames zurück
+// Liefert die Beschreibung eines Frames zurÃ¼ck
 //--------------------------------------------------------------------
 function TID3v2Tag.GetDescription(aFrame:TID3v2Frame):string;
 var max, ldesc: integer;
@@ -1310,7 +1310,7 @@ begin
         result := '';
         exit;
       end;
-      // frühester Punkt, wo Description zuende sein kann ist Data[4]
+      // frÃ¼hester Punkt, wo Description zuende sein kann ist Data[4]
       case aFrame.Data[0] of
         1,2: begin // zwei Byte pro Zeichen,
             repeat
@@ -1373,17 +1373,17 @@ begin
 end;
 
 //--------------------------------------------------------------------
-// Liefert den MIME-Tpen eines PIC / APIC Frames zurück
+// Liefert den MIME-Tpen eines PIC / APIC Frames zurÃ¼ck
 //--------------------------------------------------------------------
 function TID3v2Tag.GetMimeType(aFrame:TID3v2Frame):string;
 var ldesc, max:integer;
 begin
   case version.Major of
-    2: begin // feste Länge für den Typen
+    2: begin // feste LÃ¤nge fÃ¼r den Typen
       setlength(result,3);
       move(aFrame.Data[1], result[1],3);
     end;
-    else begin // variable Länge. terminiert mit $00
+    else begin // variable LÃ¤nge. terminiert mit $00
       max := length(aFrame.Data);
       ldesc := -1;
       repeat
@@ -1467,13 +1467,13 @@ begin
         FVersion.Major := RawHeader.Version;
         FVersion.Minor := RawHeader.Revision;
 
-        // Wenn ExtendedHeader, dann Größe des Extended Header lesen
+        // Wenn ExtendedHeader, dann GrÃ¶ÃŸe des Extended Header lesen
         // und entsprechend weiterspringen.
         // Beim Schreiben des ID3v2Tags wird dieser nicht beachtet!
         if FFlgExtended then
         begin
           // VERSION /// NU IN 2.4 IST EXTENDED HEADER SIZE SYNC-SAFE!!!
-          Stream.ReadBuffer(ExtendedHeader[0], 6); // Minimumgröße für Extended Header ist 6
+          Stream.ReadBuffer(ExtendedHeader[0], 6); // MinimumgrÃ¶ÃŸe fÃ¼r Extended Header ist 6
           if version.Major =4 then
             ExtendedHeaderSize := 2097152 * ExtendedHeader[0]
               + 16384 * ExtendedHeader[1]
@@ -1490,7 +1490,7 @@ begin
 
       end
       else
-        // Version kleiner als 2 oder größer als 4 -> ungültig
+        // Version kleiner als 2 oder grÃ¶ÃŸer als 4 -> ungÃ¼ltig
         result := ID3ERR_Invalid_Header
     else
       result := ID3ERR_NoTag;
@@ -1509,7 +1509,7 @@ end;
 //--------------------------------------------------------------------
 function TID3v2Tag.ReadFrames(From: LongInt; Stream: TStream): TMP3Error;
 var
-  aHeader: TBuffer;  // Header hat Länge 6 oder 10
+  aHeader: TBuffer;  // Header hat LÃ¤nge 6 oder 10
   newframeIDX: integer;
   FrameIDstr: string;
   FrameSize: integer;
@@ -1518,14 +1518,14 @@ begin
   FUsePadding := False;
   try
     case Version.Major of
-      // Version 2-Header hat eine Größe von 6 Byte (3 Byte ID, 3 Byte Größe)
+      // Version 2-Header hat eine GrÃ¶ÃŸe von 6 Byte (3 Byte ID, 3 Byte GrÃ¶ÃŸe)
       2 : begin
         SetLength(aHeader,6);
         Setlength(FrameIDstr,3);
       end;
-      // Version 3 und 4 haben 10 Byte Headergröße
+      // Version 3 und 4 haben 10 Byte HeadergrÃ¶ÃŸe
       // 4 Byte ID
-      // 4 Byte Größe
+      // 4 Byte GrÃ¶ÃŸe
       // 2 Byte Flags
       3,4: begin
         Setlength(aHeader,10);
@@ -1549,7 +1549,7 @@ begin
       move(aHeader[0],FrameIDstr[1],length(FrameIDstr));
       if ValidFrame(FrameIDstr) then
       begin
-        // Framegröße je nach Version berechnen
+        // FramegrÃ¶ÃŸe je nach Version berechnen
         case Version.Major of
           2:   FrameSize := 65536 * aHeader[3]
                       + 256 * aHeader[4]
@@ -1564,7 +1564,7 @@ begin
                       + aHeader[7];
         end;
 
-        // Frame-Array um eins vergrößern
+        // Frame-Array um eins vergrÃ¶ÃŸern
         SetLength(FFrames, Length(FFrames)+1);
         newFrameIDX := Length(FFrames)-1;
 
@@ -1582,7 +1582,7 @@ begin
           FSize := FrameSize;
         end;
       end else
-      // Kein neuer gültiger Frame gefunden. Der Rest des Tags ist also Padding
+      // Kein neuer gÃ¼ltiger Frame gefunden. Der Rest des Tags ist also Padding
       // Den evtl. vorhandenen Footer ignoriere ich (bzw. ersetze ihn durch 0)
       begin
         FPadding := FTagSize - (Stream.Position - length(aHeader));
@@ -1605,7 +1605,7 @@ end;
 //--------------------------------------------------------------------
 function TID3v2Tag.ReadFromStream(Stream: TStream): TMP3Error;
 begin
-  // Tag löschen - es könnten Frames entahlten sein
+  // Tag lÃ¶schen - es kÃ¶nnten Frames entahlten sein
   clear;
   result := MP3ERR_None;
   result := ReadHeader(Stream, True);
@@ -1630,12 +1630,12 @@ begin
 
   // Ein ID3v2Tag muss mindestens einen Frame enthalten, und dieser muss mindestens ein
   // Byte lang sein.
-  // Sollten alle Frames gelöscht worden sein, so muss hier ein Frame erzeugt werden.
+  // Sollten alle Frames gelÃ¶scht worden sein, so muss hier ein Frame erzeugt werden.
   // Ich nehme hier den Titel-Frame und weise diesem dern Wert ' ' zu (ein Leerzeichen)
   //
   // Hinweis: Dass die anderen Frames nicht leer sind, liegt in der "Verantwortung der Frames"
-  //          d.h. beim setzen der Eigenschaft muss ggf. der ganze Frame gelöscht werden, wenn
-  //          er durch die Änderung keine Daten mehr enthält.
+  //          d.h. beim setzen der Eigenschaft muss ggf. der ganze Frame gelÃ¶scht werden, wenn
+  //          er durch die Ã„nderung keine Daten mehr enthÃ¤lt.
   if length(FFrames) = 0 then
     Title := ' ';
 
@@ -1646,8 +1646,8 @@ begin
 
     try // stop immediately when an error occurs and delete the frame file
       // Baue einen neuen Header
-      // Die Größe des geasmten Tags ist hier noch unbekannt -
-      // sie wird später neugesetzt
+      // Die GrÃ¶ÃŸe des geasmten Tags ist hier noch unbekannt -
+      // sie wird spÃ¤ter neugesetzt
       aHeader.ID := 'ID3';
       aHeader.Version := Version.Major;
       aHeader.Revision := Version.Minor;
@@ -1660,7 +1660,7 @@ begin
         // und den Footer lass ich auch weg 0
       ID3v2Stream.WriteBuffer(aHeader,10);
 
-      // schreibe alle Frames in ein temporäres File (Framestream)
+      // schreibe alle Frames in ein temporÃ¤res File (Framestream)
       for i := 0 to Length(FFrames) - 1 do
       with FFrames[i] do
         begin
@@ -1675,12 +1675,12 @@ begin
 
         // (-*-)
 
-        // Achtung! Damit wird natürlich der aktuelle Header überschrieben und somit ggf.
-        // die ganze Struktur ungültig! (v2.2 hat eine andere Framestruktur als v2.3 und v2.4!!)
+        // Achtung! Damit wird natÃ¼rlich der aktuelle Header Ã¼berschrieben und somit ggf.
+        // die ganze Struktur ungÃ¼ltig! (v2.2 hat eine andere Framestruktur als v2.3 und v2.4!!)
 
-        // HÄ?? - Zur Erklärung: Man könnte ja auf die Idee kommen, den ID3v2 Tag von einer Datei,
+        // HÃ„?? - Zur ErklÃ¤rung: Man kÃ¶nnte ja auf die Idee kommen, den ID3v2 Tag von einer Datei,
         //        die mit Version v2.2 getaggt ist, zu lesen (id3v2.ReadFromFile(c:\v2_2.mp3);)
-        //        und anschliessend in eine ANDERE Datei zu schreiben, die dann möglicherweise mit
+        //        und anschliessend in eine ANDERE Datei zu schreiben, die dann mÃ¶glicherweise mit
         //        einer anderen Version getaggt ist. (id3v2.WriteToFile(c:\v2_3.mp3);)
         //        Es versteht sich, dass dadurch die Tag-Informationen der Datei v2_3.mp3
         //        verlorengehen und durch die von v2_2.mp3 ersetzt werden.
@@ -1705,7 +1705,7 @@ begin
 
         if CacheAudio then
         begin
-          // Alter ID3v2Tag ist zu klein für unsere neuen Frames, daher muss der Stream
+          // Alter ID3v2Tag ist zu klein fÃ¼r unsere neuen Frames, daher muss der Stream
           // komplett neu geschrieben werden
           // copy audio data to a temporary file
           TmpName := GetTempFile;
@@ -1726,10 +1726,10 @@ begin
           end;
         end;
         // Damit liegt jetzt der komplette (d.h. bis auf das Padding) ID3 Tag im Stream  "ID3v2Stream"
-        // und die AudioDaten im Stream "tmpstream" (falls das nötig war)
+        // und die AudioDaten im Stream "tmpstream" (falls das nÃ¶tig war)
 
-        // allerdings ist der Header noch ungültig - es fehlt ja noch die Größe des Tags
-        // Dazu ist aber auch noch das Padding nötig:
+        // allerdings ist der Header noch ungÃ¼ltig - es fehlt ja noch die GrÃ¶ÃŸe des Tags
+        // Dazu ist aber auch noch das Padding nÃ¶tig:
         FDataSize := ID3v2Stream.Size;
         if FUsePadding then
         // if we want padding, get its size
@@ -1752,11 +1752,11 @@ begin
           FTagSize := FDataSize;
         end;
 
-        // Jetzt die Größe des Headers neu schreiben
+        // Jetzt die GrÃ¶ÃŸe des Headers neu schreiben
         aHeader.TagSize := Int32ToInt28(FTagSize - 10);
         // JA, FTagSize aus dem Tag, der bereits in der Datei steht
         //     oder halt, wenn der Platz nicht ausreichte (if CacheAudio),
-        //     die neu berechnete Größe
+        //     die neu berechnete GrÃ¶ÃŸe
 
         ID3v2Stream.Seek(0, soFromBeginning);
         ID3v2Stream.WriteBuffer(aHeader,10);
@@ -1801,18 +1801,18 @@ begin
                   // the temporary cache file
           end;
         end;
-        // Audio-Cache-File löschen
+        // Audio-Cache-File lÃ¶schen
         DeleteFile(PChar(TmpName));
 
         // Jetzt den Header wieder lesen
 
-        // HÄ??  Wir haben oben [(-*-)]möglicherweise einen Header gelesen, der nicht zum Rest der Daten passt
-        //       Diesen haben wir benötigt, um die Größe des evtl. vorhandenen Tags im Stream festzustellen.
-        //       Dieser wurde mit dem neu gebauten Header aHeader und den ganzen Frames überschrieben.
-        //       Wenn man nun später neue Frames einfügen möchte, wäre ansonsten aber noch die möglicherweise
-        //       fehlerhafte Version des überschriebenen Headers im Speicher. Daher muss der Header hier nochmals
+        // HÃ„??  Wir haben oben [(-*-)]mÃ¶glicherweise einen Header gelesen, der nicht zum Rest der Daten passt
+        //       Diesen haben wir benÃ¶tigt, um die GrÃ¶ÃŸe des evtl. vorhandenen Tags im Stream festzustellen.
+        //       Dieser wurde mit dem neu gebauten Header aHeader und den ganzen Frames Ã¼berschrieben.
+        //       Wenn man nun spÃ¤ter neue Frames einfÃ¼gen mÃ¶chte, wÃ¤re ansonsten aber noch die mÃ¶glicherweise
+        //       fehlerhafte Version des Ã¼berschriebenen Headers im Speicher. Daher muss der Header hier nochmals
         //       gelesen werden.
-        // Ja, ich gebe zu, das ist etwas umständlich
+        // Ja, ich gebe zu, das ist etwas umstÃ¤ndlich
         ID3v2Stream.Seek(0, soFromBeginning);
         ReadHeader(ID3v2Stream, False);
 
@@ -1820,7 +1820,7 @@ begin
 
     finally
       ID3v2Stream.Free;
-      // tmp-File für den ID3Tag löschen
+      // tmp-File fÃ¼r den ID3Tag lÃ¶schen
       DeleteFile(PChar(FrameName));
     end;
   except
@@ -1854,16 +1854,16 @@ begin
 
     // in ReadHeader werden folgende Eigenschaften gesetzt
     // FExists, FTagSize FVersion, "Die 4 Flags im Header"
-    // Wie auch in "WriteToStream" erläutert, benötige ich hier die Information,
-    // ob bereits ein Tag im File/Stream ist. Ich überschreibe mit ReadHeader die
+    // Wie auch in "WriteToStream" erlÃ¤utert, benÃ¶tige ich hier die Information,
+    // ob bereits ein Tag im File/Stream ist. Ich Ã¼berschreibe mit ReadHeader die
     // Privaten Variablen FVersion etc.
     // Aber: Die Version brauche ich beim Erstellen neuer Frames. Es darf nicht passieren,
     // das im Tag (der, der im Speicher ist), sowohl V2 als auch V3 Frames enthalten sind,
     // denn diese haben ein anderes Format und sind zueinander inkompatibel.
 
-    // Man könnte das Problem auch dadurch lösen, dass man für den Test "Ist ein Header vorhanden"
+    // Man kÃ¶nnte das Problem auch dadurch lÃ¶sen, dass man fÃ¼r den Test "Ist ein Header vorhanden"
     // eine eigene Prozedur schreibt. Oder die vorhandene entsprechend anpasst, ob die "echten"
-    // Werte geändert werden sollen, oder nur die "temporären"
+    // Werte geÃ¤ndert werden sollen, oder nur die "temporÃ¤ren"
 
     ReadHeader(Stream, False);
 
@@ -1871,7 +1871,7 @@ begin
     FVersion.Major := ActualVersion.Major;
     FVersion.Minor := ActualVersion.Minor;
 
-    // Wenn die übrigen Variablen "falsch" im Speicher liegen, macht das beim gegenwärtigen
+    // Wenn die Ã¼brigen Variablen "falsch" im Speicher liegen, macht das beim gegenwÃ¤rtigen
     // Stand der Klasse nichts aus:
     // Die Flags ignoriere ich sowieso, Die Tagsize ist nur beim Speichern interessant und
     // muss dort sowieso neu berechnet werden, und FExists wird nur hier und bei ReadfromStream
@@ -2037,7 +2037,7 @@ end;
 
 
 //--------------------------------------------------------------------
-// Liefert die Textinformationen aus einem textframe zurück
+// Liefert die Textinformationen aus einem textframe zurÃ¼ck
 //--------------------------------------------------------------------
 function TID3v2Tag.GetTextFrame(FrameID: integer):String;
 var i:integer;
@@ -2045,10 +2045,10 @@ begin
   i := GetFrameIndex(FrameID);
   if i > -1 then
   begin
-    result := readtostring(FFrames[i].Data,   // Der gewünschte Datenteil
-        1,                          // Das erste Byte gehört nicht zum string, sondern:
+    result := readtostring(FFrames[i].Data,   // Der gewÃ¼nschte Datenteil
+        1,                          // Das erste Byte gehÃ¶rt nicht zum string, sondern:
         FFrames[i].Data[0],         // Im ersten Byte steht die TextCodierung drin
-        length(FFrames[i].Data)-1); // Länge
+        length(FFrames[i].Data)-1); // LÃ¤nge
   end
   else result := '';
 end;
@@ -2057,7 +2057,7 @@ end;
 // Schreibt einen String in einen Textframe
 // Zeichenkodierung ist Standard [ISO-8859-1]
 //
-// Ist der übergebene String leer, wird der gesamte Frame gelöscht
+// Ist der Ã¼bergebene String leer, wird der gesamte Frame gelÃ¶scht
 //--------------------------------------------------------------------
 procedure TID3v2Tag.SetTextFrame(FrameID:integer; Value: String);
 var i:integer;
@@ -2128,10 +2128,10 @@ var i: integer;
 begin
   i := GetFrameIndex(ID,Language,Description);
   if i > -1 then
-    result := ReadComment(FFrames[i].Data,   // Der gewünschte Datenteil
-        1,                          // Das erste Byte gehört nicht zum string, sondern:
+    result := ReadComment(FFrames[i].Data,   // Der gewÃ¼nschte Datenteil
+        1,                          // Das erste Byte gehÃ¶rt nicht zum string, sondern:
         FFrames[i].Data[0],         // Im ersten Byte steht die TextCodierung drin
-        length(FFrames[i].Data)-1) // Länge
+        length(FFrames[i].Data)-1) // LÃ¤nge
   else result:='';
 end;
 
@@ -2142,8 +2142,8 @@ begin
   // der Comment-Frame im id3v2Tag _kann_ mehrfach auftreten - jeweils einer mit eindeutiger Sprache|Description
   // Viele ID3Tagger zeigen aber eine Art "Standard-Comment" an.
   // Dieser hat die Description '' (Leerstring). Die Sprache ist aber nicht einheitlich.
-  // Um diesen "Pseudo-Standard-Kommentar" zu setzen erlaube ich die Übergabe von "*" im Sprach-Parameter.
-  // Dann wird der erste gefundene Frame, der mit der Beschreibung zusammenpasst, überschrieben. Wird kein
+  // Um diesen "Pseudo-Standard-Kommentar" zu setzen erlaube ich die Ãœbergabe von "*" im Sprach-Parameter.
+  // Dann wird der erste gefundene Frame, der mit der Beschreibung zusammenpasst, Ã¼berschrieben. Wird kein
   // passender Frame gefunden, wird die Sprache auf 'eng' (english) gesetzt.
   // DIESES PROBLEM SOLLTE NUR BEIM STANDARD-COMMENT KOMMEN (Description = '') !
   // ANDERE KOMMENTARE ODER DESCRIBED-TEXTFRAMES SOLLTEN _EINDEUTIG_ GESETZT WERDEN
@@ -2174,7 +2174,7 @@ begin
         Setlength(FFrames[i].Data, length(Value)+length(description)+5);
         // Set Text Encoding to 00
         FFrames[i].Data[0] := 0;
-        // Kopiere den Language String in den Frame, wenn eine Sprache gewünscht ist
+        // Kopiere den Language String in den Frame, wenn eine Sprache gewÃ¼nscht ist
         // andernfalls bleibt die Sprache des vorher vorhandenen Frames erhalten
         if language <> '*' then
           move(Language[1], FFrames[i].Data[1], 3);
@@ -2185,9 +2185,9 @@ begin
         FFrames[i].Data[4 + length(description)] := 0;
         // Kopiere Value in den Frame
         move(Value[1], FFrames[i].Data[5+length(description)], length(Value));
-        // Setze Größe neu
+        // Setze GrÃ¶ÃŸe neu
         FFrames[i].FSize := length(FFrames[i].Data);
-        // Berechne GreößenFeld im Header neu
+        // Berechne GreÃ¶ÃŸenFeld im Header neu
         UpdateHeader(Version.Major,FFrames[i].Header,FFrames[i].FSize);
   end else
   // entsprechender Frame existiert noch nicht
@@ -2198,7 +2198,7 @@ begin
       2: begin
         // Setze den Frame-ID-String
         FFrames[i].FFrameID := KnownID3v2_2_IDs[ID];
-        // Setze die Größe des DatenTeils
+        // Setze die GrÃ¶ÃŸe des DatenTeils
         Setlength(FFrames[i].Data, length(Value)+length(description)+5);
         // Set TextEncoding auf 00
         FFrames[i].Data[0] := 0;
@@ -2215,11 +2215,11 @@ begin
         move(Value[1], FFrames[i].Data[5+length(description)], length(Value));
 
         FFrames[i].FSize := length(FFrames[i].Data);
-        // Header Länge auf 6 setzen
+        // Header LÃ¤nge auf 6 setzen
         Setlength(FFrames[i].Header,6);
         // Header ID-String setzen
         move(FFrames[i].FFrameID[1], FFrames[i].Header[0], 3);
-        // Größe im Header neu setzen
+        // GrÃ¶ÃŸe im Header neu setzen
         UpdateHeader(Version.Major,FFrames[i].Header,FFrames[i].FSize);
       end;
       3,4: begin
@@ -2359,7 +2359,7 @@ end;
 // Bild lesen
 // WARNUNG: EVTL. wird in dem MP3File ein Unsynchronisations-Schema verwendet (laut id3.org nur bei MPEG 2 und 2.5)
 // das wird hier ignoriert!
-// Dies kann beim lesen zu JPEG-Fehlern führen,
+// Dies kann beim lesen zu JPEG-Fehlern fÃ¼hren,
 // und beim Schreiben zu Problemen mit anderen Taggern!
 // ------------------------------------------
 procedure TID3v2Tag.GetPicture(stream: TStream; Description:TPictureFrameDesription);
@@ -2393,7 +2393,7 @@ end;
 
     Version 2:
       Frame ID:      P I C    (3 Bytes)
-      Grösse:        xx xx xx (3 Bytes)
+      GrÃ¶sse:        xx xx xx (3 Bytes)
 
      Textencoding:   xx (00)
      IMageFormat:    xx xx xx  (JPG)
@@ -2403,7 +2403,7 @@ end;
 
     Version 3 / 4:
      Frame ID:       A P I C     (4 Bytes)
-     Größe:          xx xx xx xx (4 Bytes)
+     GrÃ¶ÃŸe:          xx xx xx xx (4 Bytes)
      Flags:          xx xx       (2 Bytes)
 
      Textencoding:   xx (00)
@@ -2444,7 +2444,7 @@ begin
     3,4:begin
       setlength(FFrames[IDX].Data, 1 + 11 + 1 + length(description.Description) + 1 + stream.size);
       FFrames[IDX].Data[0] := 0; // Textencoding        // [0]
-      mime := 'image/jpeg'; // Länge: 10, +1 Terminate => 11 in der Länge oben
+      mime := 'image/jpeg'; // LÃ¤nge: 10, +1 Terminate => 11 in der LÃ¤nge oben
       move(mime[1], FFrames[IDX].Data[1], length(mime)); // [1] [2] [3]...
       FFrames[IDX].Data[length(mime)+1] := 0; // Terminate-Mime
       FFrames[IDX].Data[length(mime)+2] := Description.Bildtyp;
@@ -2607,7 +2607,7 @@ var posauf, poszu: integer;
 begin
   //Erwartete Formate des Genrestrings im ID3v2Tag:
   // (a): (nr), wobei nr. die v1-ID ist, oder sein sollte
-  // (b): (nr)BEZEICHNUNG, wobei "Bezeichnung" zusätzlich die entsprechende Benennung zur ID sein sollte
+  // (b): (nr)BEZEICHNUNG, wobei "Bezeichnung" zusÃ¤tzlich die entsprechende Benennung zur ID sein sollte
   // (c): BEZEICHNUNG, die dann in dem Array genres[] gesucht werden sollte.}
   // Default
   result := value;
@@ -2748,7 +2748,7 @@ begin
     inc(positionInStream);
     // damit ist sind wir beim ersten durchlauf an Position 0 im BufferArray;
 
-    // beim nächsten Durchlauf der Schleife sind wir evtl. übers Ende des Buffers hinaus
+    // beim nÃ¤chsten Durchlauf der Schleife sind wir evtl. Ã¼bers Ende des Buffers hinaus
     // Wir lesen ja jeweils im Laufe der Prozedur 4 Byte Daten ein, also pos,pos+1,pos+2,pos+3
     if (bufferpos+3) = (length(buffer)-1) then
     begin
@@ -2767,12 +2767,12 @@ begin
     tmpMpegHeader := GetValidatedHeader(Buffer, bufferpos);
     if not tmpMpegHeader.valid then continue;
 
-    // Nächster Schritt 2: Test auf XingHeader
+    // NÃ¤chster Schritt 2: Test auf XingHeader
     // ---------------------------------------------------------------------------
     // dazu: evtl. Daten in einen Puffer laden, falls der Frame des
     //       gefundenen Headers nicht mehr komplett im Buffer entahlten ist.
-    //      (ich lade ggf. direkt den nächsten Header mit)
-    if (bufferpos + tmpMpegHeader.framelength + 3 > length(buffer)-1)  // nächster Header nicht mehr im Buffer
+    //      (ich lade ggf. direkt den nÃ¤chsten Header mit)
+    if (bufferpos + tmpMpegHeader.framelength + 3 > length(buffer)-1)  // nÃ¤chster Header nicht mehr im Buffer
        AND
        (positionInStream + tmpMpegHeader.framelength + 3 < max) // aber noch im Stream
        then
@@ -2782,7 +2782,7 @@ begin
       setlength(smallBuffer1,tmpMpegHeader.framelength + 4);
       // Daten in Buffer lesen
       Stream.Read(smallBuffer1[0],length(smallBuffer1));
-      // XingHeader und nächsten MPEG HEader überprüfen
+      // XingHeader und nÃ¤chsten MPEG HEader Ã¼berprÃ¼fen
       try
         tmpXingHeader := GetXingHeader(tmpMpegheader, smallbuffer1, 0);        // !!!!!????!!!!!!!!!
         tmp2MpegHeader := GetValidatedHeader(smallBuffer1, tmpMpegHeader.framelength );
@@ -2796,17 +2796,17 @@ begin
       begin
         continue;
       end;
-      // XingHeader und nächsten MpegHeader aus Buffer lesen
+      // XingHeader und nÃ¤chsten MpegHeader aus Buffer lesen
       tmpXingHeader := GetXingHeader(tmpMpegheader, buffer, bufferpos );         // !!!!!!?????!!!!!!!!
       tmp2MpegHeader := GetValidatedHeader(buffer, bufferpos + tmpMpegHeader.framelength);
     end;
-    // wenn der neue Header nicht gültig ist: Abbruch
+    // wenn der neue Header nicht gÃ¼ltig ist: Abbruch
     if not tmp2MpegHeader.valid then continue;
 
     // 3. Schritt: Einen dritten MpegHeader suchen
     // ---------------------------------------------------------------------------
     // dazu: wieder ggf. nachladen                                          // + 3: Darauf wird zugegriffen!
-    if (bufferpos + tmpMpegHeader.framelength + tmp2MpegHeader.framelength + 3 > length(buffer)-1)  // nächster Header nicht mehr im Buffer
+    if (bufferpos + tmpMpegHeader.framelength + tmp2MpegHeader.framelength + 3 > length(buffer)-1)  // nÃ¤chster Header nicht mehr im Buffer
        AND
        (positionInStream + tmpMpegHeader.framelength + tmp2MpegHeader.framelength + 3 < max) // aber noch im Stream
     then // nachladen
@@ -2844,9 +2844,9 @@ begin
 
     // Hinweis zu dem " - PositionInStream"
     // Was am Anfang des mp3Files nicht als AudioFrame erkannt wurde
-    // (z.B. ID3v2Tag), darf nicht in die Längenberechnung eingehen
-    // eigentlich müsste man ggf. Auf den ID3v1 Tag abziehen,
-    // aber das dürfte nur sehr selten einen Unterschied machen (max. +/- 1 Frame)
+    // (z.B. ID3v2Tag), darf nicht in die LÃ¤ngenberechnung eingehen
+    // eigentlich mÃ¼sste man ggf. Auf den ID3v1 Tag abziehen,
+    // aber das dÃ¼rfte nur sehr selten einen Unterschied machen (max. +/- 1 Frame)
     if tmpXingHeader.valid then
       try
         Fbitrate := trunc((tmpMpegheader.samplerate/1000 *
@@ -2894,8 +2894,8 @@ begin
 end;
 
 //------------------------------------------------------
-// Überprüft, ob an Postion von aBuffer ein gültiger MpegHeader steht
-// und liefert diesen zurück
+// ÃœberprÃ¼ft, ob an Postion von aBuffer ein gÃ¼ltiger MpegHeader steht
+// und liefert diesen zurÃ¼ck
 // Eigenschaft .valid ist dabei entscheidend !!!
 //------------------------------------------------------
 function TMpegInfo.GetValidatedHeader(aBuffer: TBuffer; position: integer): TMpegheader;
@@ -2983,8 +2983,8 @@ begin
 end;
 
 //------------------------------------------------------
-// Überprüft, ob an Postion von aBuffer ein gültiger XingHeader steht
-// und liefert diesen zurück
+// ÃœberprÃ¼ft, ob an Postion von aBuffer ein gÃ¼ltiger XingHeader steht
+// und liefert diesen zurÃ¼ck
 // Eigenschaft .valid ist dabei entscheidend !!!
 //------------------------------------------------------
 function TMpegInfo.GetXingHeader(aMpegheader: TMpegHeader; aBuffer: TBuffer; position: integer ): TXingHeader;
@@ -3007,10 +3007,10 @@ begin
      AND (abuffer[position+xing_offset+3]=$67)
      then // Xing Tag vorhanden
   begin
-          // Die nächsten 4 Bytes sind die "Flags", wobei eigentlich nur das 4te interessant ist
+          // Die nÃ¤chsten 4 Bytes sind die "Flags", wobei eigentlich nur das 4te interessant ist
           Xing_flags := abuffer[position+xing_offset+7];
           if (Xing_flags AND 1)=1 then
-          begin //Anzahl der frames in den nächsten 4 Bytes gespeichert
+          begin //Anzahl der frames in den nÃ¤chsten 4 Bytes gespeichert
               result.frames := 16777216 * abuffer[position+xing_offset+8]
                   + 65536 * abuffer[position+xing_offset+9]
                   + 256 * abuffer[position+xing_offset+10]
@@ -3190,7 +3190,7 @@ initialization
   Genres.Add('Euro-House');
   Genres.Add('Dance Hall');
 
-  // Quelle für die Sprachcodes und Namen:
+  // Quelle fÃ¼r die Sprachcodes und Namen:
   // http://www.id3.org/iso639-2.html
   LanguageCodes := TStringList.Create;
   LanguageNames := TStringList.Create;
@@ -3603,7 +3603,7 @@ initialization
   LanguageCodes.Add('vai');  LanguageNames.Add('Vai');
   LanguageCodes.Add('ven');  LanguageNames.Add('Venda');
   LanguageCodes.Add('vie');  LanguageNames.Add('Vietnamese');
-  LanguageCodes.Add('vol');  LanguageNames.Add('Volapük');
+  LanguageCodes.Add('vol');  LanguageNames.Add('VolapÃ¼k');
   LanguageCodes.Add('vot');  LanguageNames.Add('Votic');
   LanguageCodes.Add('wak');  LanguageNames.Add('Wakashan Languages');
   LanguageCodes.Add('wal');  LanguageNames.Add('Walamo');

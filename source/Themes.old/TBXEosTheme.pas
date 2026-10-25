@@ -4,7 +4,7 @@ unit TBXEosTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Eos' TBX theme © 2004 Roy Magne Klever
+// 'Eos' TBX theme Â© 2004 Roy Magne Klever
 //
 //  Last updated: 12.09.2004
 

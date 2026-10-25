@@ -4,7 +4,7 @@ unit TBXSentimoXTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'SentimoX' TBX theme © 2004 Roy Magne Klever
+// 'SentimoX' TBX theme Â© 2004 Roy Magne Klever
 // roymagne@rmklever.com
 //
 // Version for TBX version 2.1

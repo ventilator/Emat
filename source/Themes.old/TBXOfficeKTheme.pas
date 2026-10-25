@@ -5,7 +5,7 @@ unit TBXOfficeKTheme;
 // See TBX.chm for license and installation instructions
 //
 //
-// OfficeKtheme ©2004 Roy Magne Klever
+// OfficeKtheme Â©2004 Roy Magne Klever
 //
 // Version for TBX 2.1 done 9. aug. 2004
 //

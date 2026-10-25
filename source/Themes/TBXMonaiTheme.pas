@@ -4,7 +4,7 @@ unit TBXMonaiTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Monai' TBX theme © 2004 Roy Magne Klever
+// 'Monai' TBX theme Â© 2004 Roy Magne Klever
 //
 //  Last updated: 28.08.2004
 
@@ -74,7 +74,7 @@ begin
   StockPatternBitmap.Width := 8;
   StockPatternBitmap.Height := 8;
   StockImgList := TImageList.Create(nil);
-  StockImgList.Handle := ImageList_LoadBitmap(HInstance, 'TBXGLYPHS', 16, 0, clWhite);
+  { TBXGLYPHS glyph strip not ported }
 end;
 
 procedure FinalizeStock;
@@ -361,7 +361,7 @@ var
   procedure _Draw(Color: TColor);
   begin
     Canvas.Font.Color := Color;
-    if not Rotated then Windows.DrawText(Canvas.Handle, PChar(ACaption), Length(ACaption), R, AFormat)
+    if not Rotated then DrawText(Canvas.Handle, ACaption, -1, R, AFormat)
     else DrawRotatedText(Canvas.Handle, ACaption, R, AFormat);
   end;
 
@@ -570,7 +570,7 @@ begin
       InflateRect(R, -2, 0);
       Dec(R.Top, 2);
 
-      DrawText(DC, PChar(CaptionString), Length(CaptionString), R,
+      DrawText(DC, CaptionString, -1, R,
         DT_SINGLELINE or DT_CENTER or DT_VCENTER or DT_END_ELLIPSIS or DT_HIDEPREFIX);
     end;
 

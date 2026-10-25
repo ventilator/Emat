@@ -5,7 +5,7 @@ unit TBXDreamTheme;
 // See TBX.chm for license and installation instructions
 //
 //
-// 'Dream' theme © 2004 Roy Magne Klever
+// 'Dream' theme Â© 2004 Roy Magne Klever
 //
 
 interface

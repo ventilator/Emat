@@ -33,24 +33,20 @@ object FStatus: TFStatus
       DockPos = 0
       SupportedDocks = [dkStandardDock, dkMultiDock]
       TabOrder = 0
-      object LTitel: TLMDLabel
+      object LTitel: TLabel
         Left = 8
         Top = 8
         Width = 222
         Height = 15
-        Bevel.Mode = bmCustom
-        Options = []
         Caption = 'Es werden Medien der Playliste hinzugef'#252'gt...'
       end
-      object LName: TLMDLabel
+      object LName: TLabel
         Left = 8
         Top = 64
         Width = 437
         Height = 65
-        Bevel.Mode = bmCustom
         AutoSize = False
-        MultiLine = True
-        Options = []
+        WordWrap = True
         Caption = 
           'D:\Daten\Mp3\Deine Lakaien\Dark Star\Deine Lakaien - Dark Star -' +
           ' 01 - Dark Star.mp3'

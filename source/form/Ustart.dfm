@@ -2725,7 +2725,7 @@ object Fstart: TFstart
       Transparent = True
     end
   end
-  object RichEdit1: TRichEdit
+  object RichEdit1: TMemo
     Left = 0
     Top = 201
     Width = 480

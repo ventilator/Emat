@@ -4,7 +4,7 @@ unit TBXTristan2Theme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'Tristan2' TBX theme ©2004 Roy Magne Klever
+// 'Tristan2' TBX theme Â©2004 Roy Magne Klever
 // roymagne@rmklever.com
 //
 // Version for TBX version 2.1

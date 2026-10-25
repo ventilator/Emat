@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <General>
+      <Flags><CompatibilityMode Value="True"/></Flags>
+      <Title Value="test_bass"/>
+    </General>
+    <BuildModes Count="1"><Item1 Name="default" Default="True"/></BuildModes>
+    <RequiredPackages Count="1"><Item1><PackageName Value="LCL"/></Item1></RequiredPackages>
+    <Units Count="1"><Unit0><Filename Value="test_bass.lpr"/><IsVisibleTab Value="True"/><UsageCount Value="10"/></Unit0></Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <SearchPaths><OtherUnitFiles Value="../source/render"/></SearchPaths>
+    <Parsing><SyntaxOptions><SyntaxMode Value="Delphi"/></SyntaxOptions></Parsing>
+  </CompilerOptions>
+</CONFIG>

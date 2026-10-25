@@ -406,7 +406,7 @@ begin
    {$IFDEF DELPHI_2007_BELOW}
     Result := Trim(UTF8Decode(Source));
    {$ELSE}
-    Result := Trim(UTF8ToWideString(Source));
+    Result := Trim(UTF8Decode(Source));
    {$ENDIF}
 end;
 
@@ -417,7 +417,7 @@ begin
    {$IFDEF DELPHI_2007_BELOW}
      Result := Trim(UTF8Decode(Source));
    {$ELSE}
-     Result := Trim(UTF8ToWideString(Source));
+     Result := Trim(UTF8Decode(Source));
    {$ENDIF}
    end else
      Result := GetUnicode(Source);
@@ -672,8 +672,8 @@ var
   TagData: TStringStream;
  {$ELSE}
  // TStringStream of Delphi 2009 shows erroneous behaviour at handling ansistring.
- // So, use TAnsiStringStream instead of TStringStream for ansistring.
-  TagData: TAnsiStringStream;
+ // So, use TStringStream instead of TStringStream for ansistring.
+  TagData: TStringStream;
  {$ENDIF}
   Iterator, FrameSize: Integer;
   Padding: array [1..ID3V2_MAX_SIZE] of Byte;
@@ -682,7 +682,7 @@ begin
   {$IFDEF DELPHI_2007_BELOW}
    TagData := TStringStream.Create('');
   {$ELSE}
-   TagData := TAnsiStringStream.Create('');
+   TagData := TStringStream.Create('');
   {$ENDIF}
   BuildHeader(Tag);
   TagData.Write(Tag, 10);

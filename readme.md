@@ -70,3 +70,55 @@ Screenshot siehe oben.
 ## Ende
 
 Es wird keine weitere Entwicklung geben. Das Projekt ist längst abgeschlossen, und die dabei gesammelten Erfahrungen sind in mein Arbeitsleben eingeflossen. Es war und ist ein Bildungsprojekt.
+
+## Lazarus-Port — Version 0.90 (EmAIt)
+
+Der Delphi-Quelltext läuft jetzt unter **Lazarus 4.8 / FPC 3.2.2 (i386-win32)**.
+Der Port ist ein erster lauffähiger Stand: Die Anwendung startet, zeigt die
+TBX-Oberfläche, lädt Playlisten und spielt MP3s über die BASS-DLL ab.
+
+### Bauen
+
+`bass.dll` ist 32 Bit, deshalb braucht der Build den i386-Compiler
+(`C:\FPC\3.2.2\bin\i386-win32\ppc386.exe`). Reihenfolge:
+
+```
+# 1. TBX-Paket (Ersatz für Toolbar2000 + TBX)
+cd third_party/TB2_TBX
+lazbuild --compiler=C:/FPC/3.2.2/bin/i386-win32/ppc386.exe --pcp=C:/lazarus --ws=win32 tbx_d7.lpk
+
+# 2. Anwendung
+lazbuild --compiler=C:/FPC/3.2.2/bin/i386-win32/ppc386.exe --pcp=C:/lazarus --ws=win32 Emat.lpi
+```
+
+Die LCL muss für i386-win32 gebaut sein (`lcl/units/i386-win32`).
+`Emat.exe` erwartet `bass.dll` im Programmverzeichnis.
+
+### Was ersetzt wurde
+
+* **Toolbar2000 + TBX** → `third_party/TB2_TBX` (`tbx_d7.lpk`), der
+  Lazarus-Port derselben Bibliothek. Menüs, Docks, Themes und Statusleisten
+  sind damit wieder originalgetreu vorhanden.
+* **LMD-Tools, GR32-Visualisierung, Vis-Plugin-Host, MBDrawer** → entfernt;
+  die betroffenen Fenster und Aufrufe sind raus, der Rest nutzt LCL-Standard-
+  komponenten.
+
+### Was deaktiviert ist (erster Lauf)
+
+* **Winamp-Input-Plugins** (`Plugins/winamp/in_mp3.dll` …): MP3/OGG werden
+  direkt von BASS dekodiert (`Bassplayer1.PluginFirst := False`).
+* **Modale Fehlerdialoge** der Player-Unit schreiben ins Debug-Log, damit der
+  Start nicht blockiert.
+* **Binäruhr, Visualisierung, OSD-Sonderfälle**: vorhanden, aber ungetestet.
+
+### Technische Punkte des Ports
+
+* Alle Quellen sind **UTF-8** (vorher CP1252) — sonst erscheinen Umlaute im
+  UI als Kästchen.
+* BASS bekommt Dateipfade als **UTF-16 mit `BASS_UNICODE`**; die ANSI-Variante
+  scheitert an Umlauten in Pfaden (`BASS_ERROR_FILEOPEN`).
+* `AllocateHWnd` muss `LclIntf.AllocateHWnd` sein — die RTL-Version aus
+  `Classes` stürzt ab.
+* `DELPHI_2007_BELOW` ist projektweit definiert (AnsiString-Semantik).
+* Die `.lfm`-Dateien sind aus den `.dfm`-Dateien erzeugt; nicht mehr benötigte
+  Delphi-Properties (`TransparentColor` u. a.) wurden entfernt.

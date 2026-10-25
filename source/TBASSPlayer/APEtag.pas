@@ -56,7 +56,7 @@ interface
 
 uses
   Dialogs, Classes, SysUtils, UniCodeUtils, TntCollection
- {$IFNDEF DELPHI_2007_BELOW}, AnsiStringStream, AnsiStrings{$ENDIF};
+ ;
 
 const
   { Tag ID }
@@ -218,8 +218,8 @@ begin
       ValuePosition := SourceFile.Position;
       SourceFile.Read(FieldValue, ValueSize mod SizeOf(FieldValue));
      {$IFNDEF DELPHI_2007_BELOW}
-      pField[Iterator].Name := Ansistrings.Trim(FieldName);
-      pField[Iterator].Value := Ansistrings.Trim(FieldValue);
+      pField[Iterator].Name := Trim(FieldName);
+      pField[Iterator].Value := Trim(FieldValue);
      {$ELSE}
       pField[Iterator].Name := Trim(FieldName);
       pField[Iterator].Value := Trim(FieldValue);
@@ -319,7 +319,7 @@ var
  {$IFDEF DELPHI_2007_BELOW}
   TagData: TStringStream;
  {$ELSE}
-  TagData: TAnsiStringStream;
+  TagData: TStringStream;
  {$ENDIF}
 begin
   ID3 := nil;
@@ -352,7 +352,7 @@ begin
  {$IFDEF DELPHI_2007_BELOW}
   TagData := TStringStream.Create('');
  {$ELSE}
-  TagData := TAnsiStringStream.Create('');
+  TagData := TStringStream.Create('');
  {$ENDIF}
   TagSize := APE_TAG_FOOTER_SIZE;
 
@@ -481,7 +481,7 @@ begin
   for i:=0 to high(pField) do
   begin
   {$IFNDEF DELPHI_2007_BELOW}
-   if Ansistrings.UpperCase(Field)=Ansistrings.UpperCase(pField[i].Name) then
+   if UpperCase(Field)=UpperCase(pField[i].Name) then
   {$ELSE}
    if UpperCase(Field)=UpperCase(pField[i].Name) then
   {$ENDIF}

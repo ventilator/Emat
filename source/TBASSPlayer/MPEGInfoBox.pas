@@ -125,7 +125,7 @@ type
 
 implementation
 
-{$R *.DFM}
+{$R *.lfm}
 
 var
    MPEG_ : TMPEGaudio;

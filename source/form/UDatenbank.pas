@@ -223,7 +223,7 @@ type
 
     procedure AddFile(ListenNummer: integer; FileName: string);
 
-    //Löscht ein Element aus dem Mp3Daten-Array
+    //LÃ¶scht ein Element aus dem Mp3Daten-Array
     //Der 2. Parameter ist wahlweise die ElementNummer oder der ArrayIndex
     procedure DeleteItem(ListenNummer,ElementNummerOrArrayIndex: integer;
                           IsArrayIndex:boolean=false);
@@ -265,7 +265,7 @@ type
     procedure Search(ListenNummer:integer; SearchString: string);
 
     //SetHistory ist mit History_QueueItem fast identisch
-    //Bitte letzteres nutzen und erstes bei Zeiten löschen
+    //Bitte letzteres nutzen und erstes bei Zeiten lÃ¶schen
     procedure SetHistory(ListenNummer,ElementNummer:integer);
 
     procedure ClearHistoryStatus(ListenNummer:integer);
@@ -284,8 +284,8 @@ type
 
     procedure RemoveEmptyFolders(ListenNummer:integer);
 
-    //Löscht alle Elemente aus dem Mp3Daten-Array deren .FileName = '' ist
-    //Diese Elemente können beim OrdnerAnListeAnhaengen entstehen
+    //LÃ¶scht alle Elemente aus dem Mp3Daten-Array deren .FileName = '' ist
+    //Diese Elemente kÃ¶nnen beim OrdnerAnListeAnhaengen entstehen
     procedure DeleteInvalidItems(ListenNummer:integer);
 
     function DeleteDirAndItsItems(Dir:string; ListenNummer:integer):boolean;
@@ -297,7 +297,7 @@ type
     //Verschiebt Elemente
     procedure MoveItem(ListenNummer,SourceElementNummer,TargetElementNummer
                               :integer);
-    //Löscht Historyelemente
+    //LÃ¶scht Historyelemente
     procedure History_DeleteItem(ListenNummer,Position:integer);
 
     //Baut aus einer StringListe die History neu auf
@@ -307,7 +307,7 @@ type
     //Kapselt GetEintragfuerSpalte            
     function GetValue(ListenNummer,ElementNummer,ValueIndex:integer):string;
 
-    //Erzeugt einen Dateinamen für das Playlistverzeichnis
+    //Erzeugt einen Dateinamen fÃ¼r das Playlistverzeichnis
     procedure CreateFileNameForPlaylist (ListenNummer : integer; PlaylistDir: string);
 
     //Anzahl der Titel in einer Playliste
@@ -317,7 +317,7 @@ type
 
 implementation
 
-uses ump3, uspieler, ustatus;
+uses ump3, uspieler, ustatus, LazUTF8, LConvEncoding;
 
 constructor TDatenbank.Create;
 begin
@@ -641,7 +641,7 @@ begin
 1   Dauer
 2   Dateiname (ohne Endung)
 3   Dateiname (mit Endung)
-4   Dateigröße
+4   DateigrÃ¶ÃŸe
 5   Interpret
 6   Titel
 7   Album
@@ -650,7 +650,7 @@ begin
 10    Bitrate
 11    Kommentar
 12    Speicherpfad
-13    Anzahl Abspielvorgänge
+13    Anzahl AbspielvorgÃ¤nge
 14    [nichts]
 
 20  intern: Speicherpfad + Album + Track + Interpret + Titel / Dateiname
@@ -774,7 +774,7 @@ begin
             ) 
               then
                begin
-                 //Falls nicht schon früher gefunden
+                 //Falls nicht schon frÃ¼her gefunden
                  if not ItemExists(ZielListe,Mp3Daten[QuellListe,i].path,Mp3Daten[QuellListe,i].filename)
                  then
                    begin
@@ -818,8 +818,8 @@ begin
   else Result:=false;
 end;
 
-//Diese Funktion löscht alle leeren Ordner aus den Suchpfaden
-//{ursprüngliche Version: "Delete-Tool" aus "OrdnerSync"
+//Diese Funktion lÃ¶scht alle leeren Ordner aus den Suchpfaden
+//{ursprÃ¼ngliche Version: "Delete-Tool" aus "OrdnerSync"
 procedure TDatenbank.RemoveEmptyFolders(ListenNummer:integer);
 var i,counter:integer;
     DirList: TStringlist;
@@ -853,7 +853,7 @@ end;
 
 begin
  if (ListeExists(ListenNummer)) and
-    (MessageDlg('Alle leeren Verzeichnisse aus den hinzugefügten Verzeichnissen werden jetzt gelöscht.'
+    (MessageDlg('Alle leeren Verzeichnisse aus den hinzugefÃ¼gten Verzeichnissen werden jetzt gelÃ¶scht.'
                +#13+'Dieser Vorgang kann mitunter mehrere Minuten dauern.',mtConfirmation, [mbok, mbcancel], 0) = mrok)
   then
  begin
@@ -865,14 +865,14 @@ begin
    DirList.Sort;
    counter:=0;
 
-{ Liste wird rückwärts durchlaufen, weil so erst die Unterordner gelöscht
+{ Liste wird rÃ¼ckwÃ¤rts durchlaufen, weil so erst die Unterordner gelÃ¶scht
   werden }
    for i:=DirList.Count-1 downto 0 do
    begin
      if RemoveDir(DirList[i]) then inc(counter);
    end;
 
-  MessageDlg('Es wurden '+inttostr(counter)+' leere Verzeichnisse gelöscht.',
+  MessageDlg('Es wurden '+inttostr(counter)+' leere Verzeichnisse gelÃ¶scht.',
              mtInformation, [mbok],0);
 end;
       
@@ -881,7 +881,7 @@ PROCEDURE TFHaupt.LeereOrdnerLoeschen(Pfad:string);
 VAR Ordnerliste,Errors:TStringlist;
 VAR i,anzahl,gesamtanzahl:integer;
 BEGIN
-IF MessageDlg('Alle leeren Ordner in "'+pfad+'" werden jetzt gelöscht.'+#13+'Dieser Vorgang kann mitunter mehrere Minuten dauern.',mtConfirmation, [mbok, mbcancel], 0) = mrcancel
+IF MessageDlg('Alle leeren Ordner in "'+pfad+'" werden jetzt gelÃ¶scht.'+#13+'Dieser Vorgang kann mitunter mehrere Minuten dauern.',mtConfirmation, [mbok, mbcancel], 0) = mrcancel
 THEN exit;
 
 gesamtanzahl:=0;
@@ -903,7 +903,7 @@ gesamtanzahl:=gesamtanzahl+anzahl;
 UNTIL anzahl=0;
 
 
-Showmessage('Es wurden '+inttostr(gesamtanzahl)+' leere Ordner in "'+pfad+'" gelöscht.');
+Showmessage('Es wurden '+inttostr(gesamtanzahl)+' leere Ordner in "'+pfad+'" gelÃ¶scht.');
 END;}
 
 end;
@@ -925,24 +925,24 @@ begin
     ADirectory:=ADirectory+'\';
 
   fmp3.updatetextfstatus('Durchsuche '+adirectory,
-    'Es werden Medien der Playliste hinzugefügt... ('+inttostr(FileList.Count)+' Titel)');
+    'Es werden Medien der Playliste hinzugefÃ¼gt... ('+inttostr(FileList.Count)+' Titel)');
 
   if (FindFirst(ADirectory+AMask,faAnyFile-faDirectory,SR)=0) then
    begin
     repeat
       if (SR.Name<>'.') and (SR.Name<>'..') and (SR.Attr<>faDirectory) then
               begin
-                //Daten dem dyn. Array zuweisen   //ähnlich AddFile
+                //Daten dem dyn. Array zuweisen   //Ã¤hnlich AddFile
                 if (fmp3.Spieler.ZustaendigerRenderKern(ExtractFileExt(sr.Name))=
                                               Mp3DatenMeta[ListenNummer].mode)
                 then
                   begin
                     //Zwischenspeichern in einer StringListe um einmalig ein
-                    //SetLength auf das Array Anwenden zu müssen.
+                    //SetLength auf das Array Anwenden zu mÃ¼ssen.
                     //Tausende SetLengths erzeugen viel Speicherlast.
                     FileList.Add(sr.Name);
                     Dirlist.Add(adirectory); 
-                    //Liste der Dateigrößen
+                    //Liste der DateigrÃ¶ÃŸen
                     sizelist.Add(inttostr(sr.size));
 
                     //AddFileToList(ListenNummer,SR.Size,sr.Name,Adirectory,FastAndUnsaveMode);
@@ -976,15 +976,15 @@ begin
  for i:=0 to Mp3DatenMeta[ListenNummer].AnzahlSuchPfade-1 do
   begin
     //Vorsicht: c:\test
-    //          c:\test2 sind unterschiedlich, werden aber überschrieben
-    //                   wenn kein Trailingslash angefügt wird
+    //          c:\test2 sind unterschiedlich, werden aber Ã¼berschrieben
+    //                   wenn kein Trailingslash angefÃ¼gt wird
 
-    //Unterverzeichnisse werden nicht hinzugefügt
+    //Unterverzeichnisse werden nicht hinzugefÃ¼gt
     if (Pos(Mp3DatenMeta[ListenNummer].SuchPfade[i]+'\',Verzeichnis+'\')>0)
     then flag:=false;
 
-    //Überverzeichnisse überschreiben ihr Unterverzeichnis
-    //und werden ebenfalls logischerweise nicht hinzugefügt
+    //Ãœberverzeichnisse Ã¼berschreiben ihr Unterverzeichnis
+    //und werden ebenfalls logischerweise nicht hinzugefÃ¼gt
     if (Pos(Verzeichnis+'\',Mp3DatenMeta[ListenNummer].SuchPfade[i]+'\')>0)
     then
       begin
@@ -1014,13 +1014,13 @@ begin
   //Einmaliger SetLength-Aufruf um Speicher zu sparen
   //Array wird um neue Anzahl erweitert
   ArrayLength:=High(Mp3daten[ListenNummer])+1;
-  //Alte Arraylänge (=High +1) + Anzahl der neuen Elemente
+  //Alte ArraylÃ¤nge (=High +1) + Anzahl der neuen Elemente
   SetLength(Mp3daten[ListenNummer],ArrayLength+filelist.Count);
-  //Achtung: Array wird dadurch länger, falls in der Liste Elemente sind, die keine Medien sind
+  //Achtung: Array wird dadurch lÃ¤nger, falls in der Liste Elemente sind, die keine Medien sind
 
   fmp3.StartFStatus(filelist.Count);
 
-  //Hinzufügegeschwindigkeitsmessung init.
+  //HinzufÃ¼gegeschwindigkeitsmessung init.
   Zeitmessung.letzterMesszeitpunkt:=fmp3.Zeitmessung2Stopp;
   Zeitmessung.Geschwindigkeit:=0;
   fstatus.LSpeed.Visible:=true;
@@ -1034,7 +1034,7 @@ begin
        fmp3.UpdateFStatus(dirlist.Strings[i]+filelist.Strings[i],i+1);
 
 
-       //Hinzufügegeschwindigkeitsmessung
+       //HinzufÃ¼gegeschwindigkeitsmessung
        if Zeitmessung.Geschwindigkeit=0
 
        then Zeitmessung.Geschwindigkeit:= round(
@@ -1049,7 +1049,7 @@ begin
        fmp3.UpdateFStatusSpeed(Zeitmessung.Geschwindigkeit);
      except
        //Bei sehr schnellen Systemen vergeht keine Zeit und eine Division durch 0 tritt auf
-       Fmp3.Log('Exception bei der Hinzufügegeschwindigkeitsberechnung');
+       Fmp3.Log('Exception bei der HinzufÃ¼gegeschwindigkeitsberechnung');
      end;
      //
     end;
@@ -1059,14 +1059,14 @@ begin
   end;
 
    //Statusupdate, um die Progressbar auf das Ende zu setzen; Verizizierung steht an
-   //und lässt die Bar noch einige Zeit anzeigen
+   //und lÃ¤sst die Bar noch einige Zeit anzeigen
    fstatus.LSpeed.Visible:=false;
    fmp3.UpdateFStatus('Vorgang fast abgeschlossen',filelist.Count);
 //
 
   //Wenn die Liste vorher leer war, dann Spezialsortierung anwenden
   if (EmtyFlag) then Sort(ListenNummer, 20);
-  //RedundanteItemsAussortieren(ListenNummer); nicht nötig weil die nicht entstehen können
+  //RedundanteItemsAussortieren(ListenNummer); nicht nÃ¶tig weil die nicht entstehen kÃ¶nnen
 
 
 end;
@@ -1092,7 +1092,7 @@ begin
     LeseId3(ListenNummer,Mp3daten[ListenNummer,ArrayIndex].Nummer);
   end else
   begin
-    if extendedDebugLogInfo then fmp3.Log(Path + Filename+' wurde nicht doppelt der Liste hinzugefügt.');
+    if extendedDebugLogInfo then fmp3.Log(Path + Filename+' wurde nicht doppelt der Liste hinzugefÃ¼gt.');
   end;
 
 end;
@@ -1364,20 +1364,62 @@ begin
   //Leerzeichen dazwischen um nicht in "ArmBein" "mB" zu finden
 end;
 
+function LooksLikeUTF8(const S: RawByteString): boolean;
+{ Port: kleine UTF-8-Pruefung - Playlisten aus der Delphi-Zeit sind CP1252. }
+var
+  i, n: integer;
+begin
+  Result := True;
+  i := 1;
+  n := Length(S);
+  while i <= n do
+  begin
+    if Ord(S[i]) < $80 then
+      Inc(i)
+    else if (Ord(S[i]) and $E0) = $C0 then
+    begin
+      if (i + 1 > n) or ((Ord(S[i+1]) and $C0) <> $80) then Exit(False);
+      Inc(i, 2);
+    end
+    else if (Ord(S[i]) and $F0) = $E0 then
+    begin
+      if (i + 2 > n) or ((Ord(S[i+1]) and $C0) <> $80)
+        or ((Ord(S[i+2]) and $C0) <> $80) then Exit(False);
+      Inc(i, 3);
+    end
+    else if (Ord(S[i]) and $F8) = $F0 then
+    begin
+      if (i + 3 > n) or ((Ord(S[i+1]) and $C0) <> $80)
+        or ((Ord(S[i+2]) and $C0) <> $80)
+        or ((Ord(S[i+3]) and $C0) <> $80) then Exit(False);
+      Inc(i, 4);
+    end
+    else
+      Exit(False);
+  end;
+end;
+
 procedure TDatenbank.LoadPlaylist(FileName:string; ListenNummer:integer);
 
  var Datei : TFileStream;
      Mp3DatenSaetze,DateiDatenVersion,i : integer;
 
-  function LoadString :string;
-
+  function LoadString : string;
+  { Port: Playlisten aus der Delphi-Zeit enthalten CP1252-Bytes. Da 'string'
+    unter Lazarus UTF-8 ist, wurden Umlaute zu '?' und die Datei war nicht
+    mehr auffindbar. Gueltiges UTF-8 bleibt unveraendert, alles andere wird
+    als CP1252 interpretiert und konvertiert. }
   var StringLength : integer;
-
+      Raw: RawByteString;
   begin
     Datei.ReadBuffer( Stringlength, SizeOf(Stringlength) );
-    SetLength( Result, stringlength );
+    SetLength( Raw, stringlength );
     if (Stringlength > 0) then
-      Datei.ReadBuffer( Result[1], Stringlength * SizeOf(Char) );
+      Datei.ReadBuffer( Raw[1], Stringlength * SizeOf(Char) );
+    if (Stringlength > 0) and not LooksLikeUTF8(Raw) then
+      Result := WinCPToUTF8(Raw)
+    else
+      Result := Raw;
   end;
 
 begin
@@ -1393,6 +1435,7 @@ begin
     then
       begin
         Mp3DatenMeta[ListenNummer].FileName:=FileName;
+        Mp3DatenMeta[ListenNummer].offen:=True;   // Port: geladene Liste gilt als offen
 
         with Mp3DatenMeta[ListenNummer] do
         begin
@@ -1600,7 +1643,7 @@ begin
           Result:=true;
         end;
 end;
-      //Überprüft auf Existenz und gibt ggf. den ArrayIndex zurück
+      //ÃœberprÃ¼ft auf Existenz und gibt ggf. den ArrayIndex zurÃ¼ck
 function TDatenbank.EintragExists(ListenNummer, ElementNummer:integer;
                                               var ArrayIndex:integer):boolean;
 var i:integer;
@@ -1746,7 +1789,7 @@ begin
             end;
          end;
        end;
-       //Stream auflösen
+       //Stream auflÃ¶sen
        stream.Free;
     end;
 
@@ -1921,7 +1964,7 @@ var i:integer;
     DirList:TStringlist;
 
 begin
- fmp3.UpdateTextFStatus('Überprüfe auf verwaiste Einträge...');
+ fmp3.UpdateTextFStatus('ÃœberprÃ¼fe auf verwaiste EintrÃ¤ge...');
 
  VerwaisteEintraegeloeschen(ListenNummer);
 
@@ -1935,9 +1978,9 @@ begin
 
  fmp3.UpdateTextFStatus('Verifiziere die Ergebnisse...');
 
- //Die ungültigen, leeren Listeneinträge sind für Medien, die schon in der Liste
+ //Die ungÃ¼ltigen, leeren ListeneintrÃ¤ge sind fÃ¼r Medien, die schon in der Liste
  //sind und deswegen nicht eingetragen wurden
- //Daher müssen sie wieder gelöscht werden
+ //Daher mÃ¼ssen sie wieder gelÃ¶scht werden
  DeleteInvalidItems(ListenNummer);
 end;
 
@@ -2059,7 +2102,7 @@ begin
   if EintragExists(ListenNummer,ElementNummer,ArrayIndex)
   then
   begin
-    //Hier könnte man auch den schon oben ermittelten ArrayIndex nutzen
+    //Hier kÃ¶nnte man auch den schon oben ermittelten ArrayIndex nutzen
   GetMediumFullFileName(ListenNummer,ElementNummer,FileName);
 
   FileExt:=AnsiLowerCase(ExtractFileExt(FileName));
@@ -2171,7 +2214,7 @@ begin
     while (CurrentAnzahl<MaxAnzahl) and (max>0) do
     begin
 
-     //Items=max hinzufügen
+     //Items=max hinzufÃ¼gen
       for i:=0 to High(Mp3Daten[ListenNummer]) do
       begin
         if (Mp3Daten[ListenNummer,i].spielcounter=max)
@@ -2214,7 +2257,7 @@ begin
   end
   else
   begin
-    fmp3.Fehler('Das Verzeichnis "'+ Dir +'" konnte nicht gelöscht werden');
+    fmp3.Fehler('Das Verzeichnis "'+ Dir +'" konnte nicht gelÃ¶scht werden');
     result := false
   end
 end;
@@ -2232,8 +2275,8 @@ begin
     end;
 end;
 
-//Diese Prozedur ist nicht für öffentliche Zwecke bestimmt
-//Ich brauchte sie nur für einen Sonderfall meiner MP3-Sammlung
+//Diese Prozedur ist nicht fÃ¼r Ã¶ffentliche Zwecke bestimmt
+//Ich brauchte sie nur fÃ¼r einen Sonderfall meiner MP3-Sammlung
 //(um die Ordner zu finden, die nur wenige Dateien enthalten,
 // da der MagicMP3Tagger zahlreiche Ordner erstellt hat, die nur 1-2 MP3s
 // enthalten)
@@ -2261,7 +2304,7 @@ begin
       //Hauptpfad wegschneiden
       currentsearchpath:=copy(mp3daten[ListenNummer,k].path,
                          length(mp3datenmeta[listennummer].suchpfade[0])+1,500);
-      //Alles nach nächstem Semikolon wegschneiden
+      //Alles nach nÃ¤chstem Semikolon wegschneiden
       currentsearchpath:=copy(currentsearchpath,1,posex('\',currentsearchpath,2));
 
       //Hauptpfad wieder dran setzen

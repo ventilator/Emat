@@ -15,7 +15,7 @@
         Philip@EverX.co.il
         WWW.EverX.co.il
 
-   modifications by Chris Trösken
+   modifications by Chris TrÃ¶sken
    Contact : cst-tech@foni.net
 
 }
@@ -96,7 +96,7 @@ type
 
 implementation
 
-{$R *.DFM}
+{$R *.lfm}
 
 var
    WMA_ : TWMAfile;

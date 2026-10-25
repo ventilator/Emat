@@ -4,7 +4,7 @@ unit TBXSolarizedLightTheme;
 // Copyright 2001-2002 Alex A. Denisov. All Rights Reserved
 // See TBX.chm for license and installation instructions
 //
-// 'OfficeC' TBX theme ©2004 Roy Magne Klever
+// 'OfficeC' TBX theme Â©2004 Roy Magne Klever
 // roymagne@rmklever.com
 //
 //  Version for TBX version 2.1
@@ -17,7 +17,7 @@ unit TBXSolarizedLightTheme;
 interface
 
 uses
-  Windows, Messages, Graphics, TBXThemes, ImgList;
+  Windows, Messages, Graphics, TBXThemes, ImgList, rmkGradient;
 
 {$DEFINE ALTERNATIVE_DISABLED_STYLE} // remove the asterisk to change appearance of disabled images
 
@@ -146,7 +146,7 @@ implementation
 {.$R tbx_glyphs.res}
 
 uses
-  TBXUtils, TB2Common, TB2Item, Classes, Controls, Commctrl, Forms, rmkThemes;
+  TB2Common, TB2Item, Classes, Controls, Commctrl, Forms, rmkThemes, TBXUtils;
 
 var
   StockImgList: TImageList;
@@ -176,8 +176,7 @@ var
 procedure InitializeStock;
 begin
   StockImgList := TImageList.Create(nil);
-  StockImgList.Handle := ImageList_LoadBitmap(HInstance, 'TBXGLYPHS', 16, 0,
-    clWhite);
+  { StockImgList glyph strip (TBXGLYPHS resource) not ported }
   GradientBmp := TBitmap.Create;
   GradientBmp.PixelFormat := pf24bit;
 end;
@@ -661,7 +660,7 @@ begin
         TBVert := false;
         R.Top := R.Top - 1;
         R.Bottom := R.Bottom + 1;
-        GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
+        rmkGradient.GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
         R.Bottom := R.Bottom - 1;
         R.Top := R.Top + 1;
       end
@@ -670,7 +669,7 @@ begin
         TBVert := true;
         R.Left := R.Left - 1;
         R.Right := R.Right + 1;
-        GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
+        rmkGradient.GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
         R.Right := R.Right - 1;
         R.Left := R.Left + 1;
       end;
@@ -715,7 +714,7 @@ begin
     if c = clNone then
       Font.Color := GetPartColor(ItemInfo, ipText);
     if not Rotated then
-      Windows.DrawText(Handle, PChar(ACaption), Length(ACaption), R, AFormat)
+      DrawText(Handle, ACaption, -1, R, AFormat)
     else
       DrawRotatedText(Handle, ACaption, R, AFormat);
     Brush.Style := bsSolid;
@@ -1600,13 +1599,13 @@ begin
       begin
         if (Toolbarinfo.IsVertical) then
         begin
-          GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
+          rmkGradient.GradientFill(Canvas, R, gradCol1, gradCol2, TGLeftRight);
           R2 := R;
           R2.Top := R2.Bottom - 1;
 
           if ToolbarInfo.BorderStyle <> bsSingle then exit;
 
-          GradientFill(Canvas, R2, gradCol1, gradCol2, TGLeftRight);
+          rmkGradient.GradientFill(Canvas, R2, gradCol1, gradCol2, TGLeftRight);
 
           Pen.Color := gradBL;
           MoveTo(Right - 1, Top + 1);
@@ -1624,14 +1623,14 @@ begin
         end
         else
         begin
-          GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
+          rmkGradient.GradientFill(Canvas, R, gradCol1, gradCol2, TGTopBottom);
           R2 := R;
           R2.Top:= R.Top + 1;
           R2.Left := R2.Right - 1;
 
           if ToolbarInfo.BorderStyle <> bsSingle then exit;
 
-          GradientFill(Canvas, R2, GradBL, Blend(gradCol1, gradCol2, 50), TGTopBottom);
+          rmkGradient.GradientFill(Canvas, R2, GradBL, Blend(gradCol1, gradCol2, 50), TGTopBottom);
 
           Pen.Color := gradBL;
           MoveTo(Left + 1, Bottom - 1);

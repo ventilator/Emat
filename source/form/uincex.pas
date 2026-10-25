@@ -7,9 +7,9 @@ interface
 
 uses dialogs,forms,StdCtrls;
 
-  //David Grünewald 01.04.2005
+  //David GrÃ¼newald 01.04.2005
   //undeadking@gmx.de
-  procedure IncEx(var X: integer; max: integer; min: integer = 0); forward;
+  procedure IncEx(var X: integer; max: integer; min: integer = 0);
   //Clg 30.10.05
   function  CopyEx(SourceString:string;Start,Stop:integer):string;
   //Clg 29.12.2005  by xaromz@DP
@@ -119,7 +119,7 @@ begin
   aMsgDlg := CreateMessageDialog(Msg, DlgType, Buttons);
   captionIndex := 0;
   { Loop through Objects in Dialog }
-  { Über alle Objekte auf dem Dialog iterieren}
+  { Ãœber alle Objekte auf dem Dialog iterieren}
   for i := 0 to aMsgDlg.ComponentCount - 1 do
   begin
    { If the object is of type TButton, then }

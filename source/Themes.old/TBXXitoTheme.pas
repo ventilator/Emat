@@ -9,7 +9,7 @@ unit TBXXitoTheme;
 //
 // 18.10.2003 - Roy Magne Klever roy.magne@os.ino.no
 //              First version...
-//              ©2003 Roy Magne Klever
+//              Â©2003 Roy Magne Klever
 
 interface
 

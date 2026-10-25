@@ -8,11 +8,11 @@ unit TBXNexos5Theme;
 //
 // Modified OfficeXP theme by Roy Magne Klever - I named it 'NEXOS2'
 //
-// 10.05.2003 - © Roy Magne Klever
+// 10.05.2003 - Â© Roy Magne Klever
 //              roymagne@rmklever.com
 //              First version.
 //
-// 13.05.2003 - © Roy Magne Klever
+// 13.05.2003 - Â© Roy Magne Klever
 //              roymagne@rmklever.com
 //              Version2.
 //

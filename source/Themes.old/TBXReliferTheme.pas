@@ -7,7 +7,7 @@ unit TBXReliferTheme;
 //
 // 'SentimoX'
 //
-// 01.06.2004 - © Roy Magne Klever
+// 01.06.2004 - Â© Roy Magne Klever
 //              roymagne@rmklever.com
 //              First version.
 

@@ -8,13 +8,13 @@ Grafische Stringlistenausgabe (also eine Listbox)
 
 Programmiert mit Delphi 7  / BDS 3.0 PE / Delphi 2010
 Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
- sondern meiner Unfähigkeit
+ sondern meiner UnfÃ¤higkeit
 
 -'Denglischer' Code, weil ich deutsch angefangen habe und zu faul bin alles
-  zu übersetzen
--Extrem unsicherer, umständlicher und unverständlicher Code sowie Übergabeparameter
+  zu Ã¼bersetzen
+-Extrem unsicherer, umstÃ¤ndlicher und unverstÃ¤ndlicher Code sowie Ãœbergabeparameter
 
-© Clemens Grünewald
+Â© Clemens GrÃ¼newald
 0.1.0  01.07.2004 - 20.07.2004
 - initial release
 0.1.1
@@ -30,7 +30,7 @@ Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
 0.3   04.02.05
 - dyn Array Struktur
 0.3.1
-- keine dyn Array Struktur mehr aus Performancegründen
+- keine dyn Array Struktur mehr aus PerformancegrÃ¼nden
 0.3.2   08.03.05
 - PopupMenu                     //uk
 0.3.3   25.04.05
@@ -43,24 +43,24 @@ Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
 0.3.5b   27.06.05
 - rechter Rand
 0.3.5c   01.08.05
-- Mausüberzeichenbug
+- MausÃ¼berzeichenbug
 0.3.6
 - Resizebug workaround, kein Fix (siehe Draw)
 0.3.7
-- MinimizeName für Spalten, die Pfad enthalten. //uk
+- MinimizeName fÃ¼r Spalten, die Pfad enthalten. //uk
 0.3.8
 - Focusbug searching...and workaround
 0.3.9
 - Gradient testing
 0.3.99
-- "'`SingleColMode´'" //<-- Ventilator Name
+- "'`SingleColModeÂ´'" //<-- Ventilator Name
 0.3.999
 - Globale Variablen in den private Teil
-  (KEIN IMPLEMENTATION -> verhindert Abhängigkeit)
+  (KEIN IMPLEMENTATION -> verhindert AbhÃ¤ngigkeit)
 0.4.0
-- Demarkiermöglichkeit (der Hauptmarkierung)
+- DemarkiermÃ¶glichkeit (der Hauptmarkierung)
 0.4.1   22.12.05
-- Markiermöglichkeit   (flag-Auswertung)
+- MarkiermÃ¶glichkeit   (flag-Auswertung)
 0.4.2   31.12.2005
 - Scrollbar->optische Verbesserung
 0.4.3   29.05.2006
@@ -79,22 +79,22 @@ Das Design entspricht nicht modernen ergonomischen Gepflogenheiten,
 - Scrollt die Liste hoch/runter, wenn die Markierung 2 Zeilen vor dem Rand steht
   (Anstatt die Markierung immer in die Mitte zu positionieren)
 0.4.7   21.09.2006
-- Maus kann beim Scrollen auch über der Liste schweben
+- Maus kann beim Scrollen auch Ã¼ber der Liste schweben
 0.4.8   23/25.9.06
-- OnItemMove hinzugefügt
+- OnItemMove hinzugefÃ¼gt
 0.4.9   20.04.2007
 - SetSelected
 0.4.9.1 25.02.2008
 - Zweiter Klick des Doppelklicks markiert nicht mehr
 0.4.9.2 24.08.2010
-- Zweiter Klick des Doppelklicks löst kein DragDropEvent aus
+- Zweiter Klick des Doppelklicks lÃ¶st kein DragDropEvent aus
 0.5.0   08.09.2010
 - SetCustomArrows
-- DrawGradientMulitColor für etwas schönere Scrollbarbalken
+- DrawGradientMulitColor fÃ¼r etwas schÃ¶nere Scrollbarbalken
 0.5.1   23.09.2010
-- Mausüberbalken wird nicht mehr gezeichnet, wenn nicht gemausübert wird
+- MausÃ¼berbalken wird nicht mehr gezeichnet, wenn nicht gemausÃ¼bert wird
 0.5.2   16.06.2014
-- von außen gesetzte Schriftfarbe wird genutzt anstatt schwarz
+- von auÃŸen gesetzte Schriftfarbe wird genutzt anstatt schwarz
 }
 
 
@@ -243,16 +243,16 @@ type
       //Verschiebt Items innerhalb der Listen
       procedure ItemMove(currentIndex,newIndex:integer);
 
-      //Löscht Elemente
+      //LÃ¶scht Elemente
       procedure ItemDelete(Index:integer);
 
-      //Fügt Elemente ein
+      //FÃ¼gt Elemente ein
       procedure ItemInsert(Index,Nummer:integer; markiert:boolean;
                                l0,l1,l2,l3,l4 :string);
 
       function GetFirstMultiSelectedItem(var Index:integer):boolean;
 
-      //Markiert ein Element (falls möglich)
+      //Markiert ein Element (falls mÃ¶glich)
       procedure SetSelected(ID:integer);
 
       //Ersetzt den schwarzen Pfeil
@@ -548,7 +548,7 @@ procedure Tgliste2.Draw;
       k:=0;
       for i:=erstereintrag to erstereintrag+zeilen do
         begin
-          if i<liste.l0.Count             //falls weniger Einträge als darstellbar
+          if i<liste.l0.Count             //falls weniger EintrÃ¤ge als darstellbar
           then
            begin
 
@@ -594,7 +594,7 @@ procedure Tgliste2.Draw;
   procedure DHintergrund;
   begin
     with bild do begin
-      //Löschen  bzw. Hintergrund
+      //LÃ¶schen  bzw. Hintergrund
       if (focused) or (aktiv) then
       begin
         canvas.Pen.Color:=clhintergrund;
@@ -882,7 +882,7 @@ end;
 procedure Tgliste2.incMarkiertesElement;
 begin
  //Wenn es schon das letzte Element ist, kann man nicht noch weiter gehen
- //Ein Überlauf wird zwar von Draw verhindert, verursacht aber beim
+ //Ein Ãœberlauf wird zwar von Draw verhindert, verursacht aber beim
  //OnElementMarkieren Fehler, deshalb die if Abrage um Fehler zu vermeiden
  if markiertesElement<liste.l0.Count-1 then
  begin
@@ -1125,7 +1125,7 @@ inherited;
         end;
    end
             {
-          //nur wenn wirklich neues gemausübert wird
+          //nur wenn wirklich neues gemausÃ¼bert wird
           if (altesMouseover<>mausueberElement) and (mausueberElement>-1) then
           begin
             draw;
@@ -1133,7 +1133,7 @@ inherited;
             flag:=true;
           end;
 
-          //nicht wenn über Markiertem
+          //nicht wenn Ã¼ber Markiertem
           if (mausueberElement=markiertesElement) and (flag) then
            begin
              mausueberElement:=-1;
@@ -1148,7 +1148,7 @@ inherited;
 
 
 
-          //nur wenn wirklich neues gemausübert wird
+          //nur wenn wirklich neues gemausÃ¼bert wird
           if (altesMouseover<>mausueberElement) and (mausueberElement>-1) then
           begin
             draw;
@@ -1156,7 +1156,7 @@ inherited;
             flag:=true;
           end;
 
-          //nicht wenn über Markiertem
+          //nicht wenn Ã¼ber Markiertem
           if (mausueberElement=markiertesElement) and (flag) then
            begin
              mausueberElement:=-1;
@@ -1214,7 +1214,7 @@ begin
    then
    begin
      //Errechnet neue Position zwischen 2 Elementen
-     //Zone beginnt ein halbes Element über dem Ersten
+     //Zone beginnt ein halbes Element Ã¼ber dem Ersten
      newPosition:=(y-randverschiebung+(zeilenhoehe div 2)) div zeilenhoehe
                         + ersterEintrag ;
 
@@ -1227,7 +1227,7 @@ begin
        begin
          DragTarget:=newPosition;
 
-         //Verhindern, dass die Positionsbalken direkt über/unter dem Item gezeichnet wird
+         //Verhindern, dass die Positionsbalken direkt Ã¼ber/unter dem Item gezeichnet wird
          DrawDragTarget:= (DragTarget<>GetSelectet) and
                           (DragTarget<>GetSelectet+1);
          draw;
@@ -1246,12 +1246,12 @@ begin
   if Source is TGliste2 then
   begin
   //TargetID muss um eins erniedrigt werden, wenn es unter der Markierung ist,
-  //da die TargetID zeichentechnisch um eins zu groß ist,
-  //weil das markierte Element zwei ungültige Targets beinhaltet
+  //da die TargetID zeichentechnisch um eins zu groÃŸ ist,
+  //weil das markierte Element zwei ungÃ¼ltige Targets beinhaltet
   //Aber nur wenn innerhalb einer Liste gedragt wird
   if (Source=Self) and (DragTarget>GetSelectet) then dec(DragTarget);
 
-  //Bei ungültiger Target ID ober einem Drag ans Ende der Liste liefert das
+  //Bei ungÃ¼ltiger Target ID ober einem Drag ans Ende der Liste liefert das
   //System TargetID := -1
 
   if (DragTarget>liste.Nummer.Count-1) or
@@ -1261,7 +1261,7 @@ begin
 
   if (DragTarget<>GetSelectet) then
   begin
-    //OnItemMove wird nur durchgeführt wenn INNERHALB der Liste gedraggt wird
+    //OnItemMove wird nur durchgefÃ¼hrt wenn INNERHALB der Liste gedraggt wird
     if (Source = Self) then
       begin
         if assigned(OnItemMove) and (DragTarget>=0) and (DragTarget<liste.l0.count)
@@ -1270,7 +1270,7 @@ begin
                         Self, DragTarget,TargetID);
       end
     else
-    //Wenn ein Item von außen kommt
+    //Wenn ein Item von auÃŸen kommt
       begin
         if assigned(OnDragItemInsert) and (DragTarget>=0) and (DragTarget<liste.l0.count)
         then OnDragItemInsert(Source,(Source as Tgliste2).GetSelectet,
@@ -1669,7 +1669,7 @@ if not AtoZ then  //Hier fehlt der Umkehrquicksort !!! (Notbehelf)
  end;
 
 
-//alternativer Gradient, da anderer Schwächen im nicht Vollbild hat
+//alternativer Gradient, da anderer SchwÃ¤chen im nicht Vollbild hat
 procedure Tgliste2.DrawGradientMulitColor(ACanvas: TCanvas; Rect: TRect;
   Horicontal: Boolean; Colors: array of TColor);
 type
@@ -1736,7 +1736,7 @@ begin
   end
   else
     // Please specify at least two colors
-    raise EMathError.Create('Es müssen mindestens zwei Farben angegeben werden.');
+    raise EMathError.Create('Es mÃ¼ssen mindestens zwei Farben angegeben werden.');
 end;
 
 end.

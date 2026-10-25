@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   TB2Dock, TB2Common, TBX, TBXThemes, TBXUxThemes, extctrls, TBXDefaultTheme,
 
-  TBXOffice11AdaptiveTheme;
+  TBXOffice11AdaptiveTheme, rmkGradient;
   //TBXOffice2003Theme;
   //TBXOfficeXPGradientTheme;
 

@@ -7,7 +7,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, DateUtils,
-  StdCtrls, ComCtrls, jpeg, ExtCtrls, TBXDkPanels,
+  StdCtrls, ComCtrls, ExtCtrls, TBXDkPanels,
   Dialogs, ump3, TB2Item, ulang;
 
 const
@@ -18,7 +18,7 @@ type
     i0: TImage;
     i1: TImage;
     TBXAlignmentPanel1: TTBXAlignmentPanel;
-    RichEdit1: TRichEdit;
+    RichEdit1: TMemo;
     Lweblink: TLabel;
     Lupdate: TLabel;
     TBXAlignmentPanel2: TTBXAlignmentPanel;
@@ -40,7 +40,111 @@ var
 
 implementation
 
-{$R *.dfm}
+// Plain-text reader for the RTF help file (LCL has no rich edit control here).
+function RtfToPlain(const FileName: string): string;
+var
+  s, outS: string;
+  i, j, n, depth, skipDepth: Integer;
+  word: string;
+  c: Char;
+  ms: TMemoryStream;
+
+  function StartsAt(pos: Integer; const pat: string): Boolean;
+  begin
+    Result := Copy(s, pos, Length(pat)) = pat;
+  end;
+
+begin
+  outS := '';
+  ms := TMemoryStream.Create;
+  try
+    ms.LoadFromFile(FileName);
+    SetLength(s, ms.Size);
+    if ms.Size > 0 then
+    begin
+      ms.Position := 0;
+      ms.Read(s[1], ms.Size);
+    end;
+  finally
+    ms.Free;
+  end;
+  n := Length(s);
+  i := 1;
+  depth := 0;
+  skipDepth := 0;
+  while i <= n do
+  begin
+    c := s[i];
+    if c = '{' then
+    begin
+      Inc(depth);
+      if (skipDepth = 0) and (StartsAt(i + 1, '\*') or StartsAt(i + 1, '\fonttbl') or
+         StartsAt(i + 1, '\colortbl') or StartsAt(i + 1, '\stylesheet') or
+         StartsAt(i + 1, '\info') or StartsAt(i + 1, '\pict')) then
+        skipDepth := depth;
+      Inc(i);
+    end
+    else if c = '}' then
+    begin
+      if (skipDepth <> 0) and (depth = skipDepth) then
+        skipDepth := 0;
+      Dec(depth);
+      Inc(i);
+    end
+    else if c = '\' then
+    begin
+      if i + 1 > n then
+        Inc(i)
+      else if s[i + 1] in ['\', '{', '}'] then
+      begin
+        if skipDepth = 0 then outS := outS + s[i + 1];
+        Inc(i, 2);
+      end
+      else if s[i + 1] = '''' then
+      begin
+        if skipDepth = 0 then outS := outS + Chr(StrToIntDef('$' + Copy(s, i + 2, 2), 63));
+        Inc(i, 4);
+      end
+      else if s[i + 1] = '~' then
+      begin
+        if skipDepth = 0 then outS := outS + ' ';
+        Inc(i, 2);
+      end
+      else if s[i + 1] in ['a'..'z', 'A'..'Z'] then
+      begin
+        word := '';
+        j := i + 1;
+        while (j <= n) and (s[j] in ['a'..'z', 'A'..'Z']) do
+        begin
+          word := word + s[j];
+          Inc(j);
+        end;
+        if (j <= n) and ((s[j] = '-') or (s[j] in ['0'..'9'])) then
+        begin
+          Inc(j);
+          while (j <= n) and (s[j] in ['0'..'9']) do Inc(j);
+        end;
+        if (j <= n) and (s[j] = ' ') then Inc(j);
+        if skipDepth = 0 then
+        begin
+          if (word = 'par') or (word = 'line') then outS := outS + #13#10
+          else if word = 'tab' then outS := outS + #9;
+        end;
+        i := j;
+      end
+      else
+        Inc(i, 2);
+    end
+    else
+    begin
+      if (skipDepth = 0) and (c <> #13) and (c <> #10) then outS := outS + c;
+      Inc(i);
+    end;
+  end;
+  Result := outS;
+end;
+
+{$R *.lfm}
 
 procedure TFstart.FormShow(Sender: TObject);
 
@@ -197,7 +301,7 @@ begin
 
   (FindComponent( 'i' + inttostr(random(Logos))) as TImage).BringToFront;
   if FileExists(extractfilepath(application.ExeName) + 'emat.rtf')
-  then fstart.RichEdit1.Lines.LoadFromFile(extractfilepath(application.ExeName) + 'emat.rtf')
+  then fstart.RichEdit1.Lines.Text := RtfToPlain(extractfilepath(application.ExeName) + 'emat.rtf')
   else fstart.RichEdit1.Lines.Add(HELPFILENOTFOUND);
   RichEdit1.SelStart := -1;
 end;

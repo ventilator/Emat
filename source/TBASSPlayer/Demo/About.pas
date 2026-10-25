@@ -68,17 +68,17 @@ const
      'Contributors'#13#10 + #13#10 + 'Emil Weiss';
 
    SAboutText_Han: string =
-     'BASSPlay´Â TBASSPlayerÀÇ È°¿ë¹ıÀ» º¸¿©ÁÖ±â À§ÇÑ'#13#10 +
-     ' µ¥¸ğ ÇÁ·Î±×·¥ÀÔ´Ï´Ù.'#13#10 +
-     'TBASSPlayer´Â BASS ¿Àµğ¿À ¶óÀÌºê·¯¸®¸¦ ±â¹İÀ¸·Î'#13#10 +
-     ' ¸¸µé¾îÁø µ¨ÆÄÀÌ¿ë ÄÄÆ÷³ÍÆ®ÀÔ´Ï´Ù.'#13#10 +
-     'BASS ¿Àµğ¿À ¶óÀÌºê·¯¸®¿¡ ´ëÇØ ´õ ÀÚ¼¼È÷ ¾Ë°í ½ÍÀ¸¸é'#13#10 +
-     ' http://www.un4seen.com/ À» ¹æ¹®ÇØ º¸½Ê½Ã¿ä.'#13#10 + #13#10 +
-     'BASSPlay¿Í TBASSPlayerÀÇ ÀÛ¼ºÀÚ : Çö½ÇÈ¯'#13#10 + #13#10 +
-     '¹öÀü Á¤º¸'#13#10;
+     'BASSPlayÂ´Ã‚ TBASSPlayerÃ€Ã‡ ÃˆÂ°Â¿Ã«Â¹Ã½Ã€Â» ÂºÂ¸Â¿Â©ÃÃ–Â±Ã¢ Ã€Â§Ã‡Ã‘'#13#10 +
+     ' ÂµÂ¥Â¸Ã° Ã‡ÃÂ·ÃÂ±Ã—Â·Â¥Ã€Ã”Â´ÃÂ´Ã™.'#13#10 +
+     'TBASSPlayerÂ´Ã‚ BASS Â¿Ã€ÂµÃ°Â¿Ã€ Â¶Ã³Ã€ÃŒÂºÃªÂ·Â¯Â¸Â®Â¸Â¦ Â±Ã¢Â¹ÃÃ€Â¸Â·Ã'#13#10 +
+     ' Â¸Â¸ÂµÃ©Â¾Ã®ÃÃ¸ ÂµÂ¨Ã†Ã„Ã€ÃŒÂ¿Ã« Ã„Ã„Ã†Ã·Â³ÃÃ†Â®Ã€Ã”Â´ÃÂ´Ã™.'#13#10 +
+     'BASS Â¿Ã€ÂµÃ°Â¿Ã€ Â¶Ã³Ã€ÃŒÂºÃªÂ·Â¯Â¸Â®Â¿Â¡ Â´Ã«Ã‡Ã˜ Â´Ãµ Ã€ÃšÂ¼Â¼ÃˆÃ· Â¾Ã‹Â°Ã­ Â½ÃÃ€Â¸Â¸Ã©'#13#10 +
+     ' http://www.un4seen.com/ Ã€Â» Â¹Ã¦Â¹Â®Ã‡Ã˜ ÂºÂ¸Â½ÃŠÂ½ÃƒÂ¿Ã¤.'#13#10 + #13#10 +
+     'BASSPlayÂ¿Ã TBASSPlayerÃ€Ã‡ Ã€Ã›Â¼ÂºÃ€Ãš : Ã‡Ã¶Â½Ã‡ÃˆÂ¯'#13#10 + #13#10 +
+     'Â¹Ã¶Ã€Ã¼ ÃÂ¤ÂºÂ¸'#13#10;
 
    SContributors_Han: string =
-     'µµ¿ò ÁÖ½Å ºĞ'#13#10 + #13#10 + 'Emil Weiss';
+     'ÂµÂµÂ¿Ã² ÃÃ–Â½Ã… ÂºÃ'#13#10 + #13#10 + 'Emil Weiss';
 
    WaitingCycle = 700;
 
@@ -135,7 +135,7 @@ begin
      begin
        TimeLeft := ((WaitingCycle - PassedCounter) * Timer1.Interval) div 1000 + 1;
        if GetOEMCP = 949 then   // OEM code page is Korean Language ?
-          WaitingText := ' ÀÌ À©µµ¿ì´Â ' + intToStr(TimeLeft) + ' ÃÊÈÄ¿¡ ÀÚµ¿À¸·Î ´İÈü´Ï´Ù.'
+          WaitingText := ' Ã€ÃŒ Ã€Â©ÂµÂµÂ¿Ã¬Â´Ã‚ ' + intToStr(TimeLeft) + ' ÃƒÃŠÃˆÃ„Â¿Â¡ Ã€ÃšÂµÂ¿Ã€Â¸Â·Ã Â´ÃÃˆÃ¼Â´ÃÂ´Ã™.'
        else
           WaitingText := ' This window will be closed in ' + intToStr(TimeLeft) + ' seconds';
        Brush.Color := clBlack;
@@ -193,8 +193,8 @@ begin
    VerStr2 := 'TBASSPlayer : ' + TBASSPlayerVer + #13#10;
    if GetOEMCP = 949 then
    begin
-      Self.Caption := 'BASSPlay´Â..';
-      VerStr3 := 'BASS ¿Àµğ¿À ¶óÀÌºê·¯¸® : ' + BASSLibVer + #13#10 + #13#10
+      Self.Caption := 'BASSPlayÂ´Ã‚..';
+      VerStr3 := 'BASS Â¿Ã€ÂµÃ°Â¿Ã€ Â¶Ã³Ã€ÃŒÂºÃªÂ·Â¯Â¸Â® : ' + BASSLibVer + #13#10 + #13#10
    end else
       VerStr3 := 'BASS audio library : ' + BASSLibVer + #13#10 + #13#10;
    AboutMsg := SAboutText + VerStr1 + VerStr2 + VerStr3 + SContributors;
