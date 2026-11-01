@@ -122,3 +122,35 @@ Die LCL muss für i386-win32 gebaut sein (`lcl/units/i386-win32`).
 * `DELPHI_2007_BELOW` ist projektweit definiert (AnsiString-Semantik).
 * Die `.lfm`-Dateien sind aus den `.dfm`-Dateien erzeugt; nicht mehr benötigte
   Delphi-Properties (`TransparentColor` u. a.) wurden entfernt.
+
+## Lizenz
+
+Emat steht unter der **GNU General Public License, Version 2** (siehe
+`COPYING.txt`).
+
+### BASS ist nicht GPL
+
+Das Programm nutzt die Audio-Bibliotheken von **un4seen developments**
+(`bass.dll`, `basswma.dll`), die **nicht** unter der GPL stehen. Sie werden
+unverändert mitgeliefert; ihre Nutzung und Weitergabe richtet sich
+ausschließlich nach der Lizenz von un4seen (kostenlos für nicht-kommerzielle
+Nutzung, https://www.un4seen.com/). Die GPL von Emat erstreckt sich nicht auf
+diese Dateien. Die vollständigen Hinweise stehen in `LICENSE-NOTICE.txt` und
+liegen jedem Release-Zip bei.
+
+Wer die DLLs nicht mitliefern möchte, kann `bass.dll` im Programmverzeichnis
+durch eine eigene Kopie ersetzen — der Rest des Programms ist davon unberührt.
+
+## Release bauen
+
+```bat
+build-release.bat
+```
+
+Baut das Paket `third_party/TB2_TBX/tbx_d7.lpk`, danach Emat im Build-Modus
+`Release` (`-g- -Xs -O2`, ca. 5 MB statt 53 MB) und packt
+`release/Emat-<Tag>-win32.zip` samt SHA256. Die Versionsnummer kommt aus
+`git describe` und landet über `source/form/emversion.inc` im Fenstertitel.
+Auf GitHub läuft derselbe Weg über `.github/workflows/release.yml`: Tag
+pushen (`git push github v0.90-dev-freepascal-port`) und das Release
+erscheint mit Zip als Download.

@@ -2965,6 +2965,10 @@ begin
       result := true
    else
       result := false;
+   { Port: Diagnose - meldet, ob der Treiber den Start annimmt }
+   if Assigned(fmp3) then
+      fmp3.Log(Format('Vis: Start_Vis(%s) embed=%d visdrawer=%d -> %d',
+        [ExtractFileName(VisPlugin), FEmbedHandle, Ord(FUseVisDrawer), Ord(result)]));
 end;
 
 function  TBASSPlayer.RunVisPlugin(VisPlugin : string; VismodNo : word) : boolean;  
@@ -3004,7 +3008,8 @@ begin
          exit;
       end;
 
-   Run_VisPlugin(VisPlugin, VismodNo);
+   { Port: Ergebnis wurde vorher verworfen - RunVisPlugin lieferte immer false }
+   result := Run_VisPlugin(VisPlugin, VismodNo);
 end;
 
 procedure TBASSPlayer.QuitVisPlugin;
@@ -4161,6 +4166,8 @@ begin
          VisDataThread.SetVisModuleInfo(PVisModuleInfo^);
       end else if Msg.wParam = StartVisOut then // vis plug-in started ?
       begin
+         if (Msg.lParam = 0) and Assigned(fmp3) then
+            fmp3.Log('Vis: StartVisOut ohne Handle - Plugin-Start fehlgeschlagen');
          if Msg.lParam <> 0 then
          begin
           //  TimerFFT.Enabled := false;
