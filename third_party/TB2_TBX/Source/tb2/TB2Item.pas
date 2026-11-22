@@ -5375,9 +5375,14 @@ begin
   ValidatePositions;
 
   if tbisInvalidated in Viewer.State then begin
+    {$IFNDEF FPC}
     Offscreen := True;
+    {$ENDIF}
     Exclude(Viewer.State, tbisInvalidated);
   end;
+  {$IFDEF FPC}
+  Offscreen := False;
+  {$ENDIF}
 
   R1 := Viewer.BoundsRect;
   if not Viewer.Show or IsRectEmpty(R1) or (Viewer.Item is TTBControlItem) then
@@ -5415,8 +5420,9 @@ begin
     end
     else begin
       {$IFDEF FPC}
+      FWindow.Perform(LM_ERASEBKGND, WPARAM(DrawToDC), 0);
       MoveWindowOrg(DrawToDC, R1.Left, R1.Top);
-      FWindow.Perform(LM_ERASEBKGND, WPARAM(DrawTo), 0);
+      {$IFDEF FPC}windelphi.{$ENDIF}SetBrushOrgEx(DrawToDC, R1.Left and 1, R1.Top and 1, nil);
       DrawCanvas := DrawTo;
       {$ELSE}
       Bmp := TBitmap.Create;
@@ -5481,9 +5487,11 @@ begin
 
     Viewer.Paint(DrawCanvas, R2, IsSelected, IsPushed, UseDisabledShadow);
 
+    {$IFNDEF FPC}
     if Offscreen then
-      {$IFDEF FPC}LclIntf.{$ENDIF}BitBlt(DrawToDC, R1.Left, R1.Top, R2.Width, R2.Height, DrawCanvas.Handle,
+      BitBlt(DrawToDC, R1.Left, R1.Top, R2.Width, R2.Height, DrawCanvas.Handle,
         0, 0, SRCCOPY);
+    {$ENDIF}
   finally
     DrawTo.Refresh;  { must do this before a RestoreDC }
     RestoreDC(DrawToDC, SaveIndex);
@@ -6550,7 +6558,7 @@ begin
             is up, so swallow the message. }
           ;
         WM_CONTEXTMENU:
-          HandlePopupMenu(SmallPointToPoint(TSmallPoint(Msg.lParam)));
+          HandlePopupMenu(SmallPointToPoint(TSmallPoint(DWORD(Msg.lParam))));
         WM_KEYFIRST..WM_KEYLAST: begin
             Application.CancelHint;
             MouseIsDown := (GetKeyState(VK_LBUTTON) < 0) or

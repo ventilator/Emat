@@ -401,7 +401,7 @@ end;
 
 procedure Tgliste2.ItemDelete(Index:integer);
 begin
-   if index< liste.l0.Count
+   if (index>=0) and (index< liste.l0.Count)
    then
      begin
      liste.l0.Delete(index);
@@ -412,15 +412,17 @@ begin
      liste.Nummer.Delete(index);
      liste.markiert.Delete(index);
 
-     if Index<markiertesElement then dec(markiertesElement);
-     if Index<fortschrittlichesElement then dec(fortschrittlichesElement);
+     if Index<markiertesElement then dec(markiertesElement)
+     else if Index=markiertesElement then markiertesElement:=-1;
+     if Index<fortschrittlichesElement then dec(fortschrittlichesElement)
+     else if Index=fortschrittlichesElement then fortschrittlichesElement:=-1;
      end;
 end;
 
 procedure Tgliste2.ItemInsert(Index,Nummer:integer; markiert:boolean;
                                l0,l1,l2,l3,l4 :string);
 begin
-   if index< liste.l0.Count
+   if (index>=0) and (index<= liste.l0.Count)
    then
      begin
      liste.l0.Insert(Index,l0);
@@ -908,7 +910,7 @@ begin
    dec(markiertesElement);
 
    //Scrollt die Liste hoch, wenn die Markierung 2 Zeilen vor dem Rand steht
-   if markiertesElement-2<ersterEintrag
+   if (markiertesElement-2<ersterEintrag) and (ersterEintrag > 0)
    then dec(ersterEintrag);
 
    if assigned(OnElementMarkieren) then OnElementMarkieren(markiertesElement,[]);
@@ -955,7 +957,7 @@ begin
   maustaste:=true;
   markiert:=((y-randverschiebung) div zeilenhoehe) + ersterEintrag;
 
-  if (markiert<=liste.l0.Count-1)
+  if (markiert>=0) and (markiert<=liste.l0.Count-1)
   then
    begin
    //wenn auf Liste
@@ -1552,7 +1554,7 @@ procedure Tgliste2.SetSelected(ID:integer);
   var i : integer;
 begin
   for i:=0 to liste.Nummer.Count-1 do
-    if strtoint(liste.Nummer[i])=ID
+    if StrToIntDef(liste.Nummer[i], -1)=ID
     then
       begin
         markiertesElement:=i;
@@ -1639,6 +1641,11 @@ end;
   end;
         {   }
  //Quicksort
+    if liste.l0.Count <= 1 then
+    begin
+      ersterEintrag := 0;
+      Exit;
+    end;
 
     case SortColIndex of
     1 :  QuickSort(liste.l1,0,liste.l0.Count-1);

@@ -1896,7 +1896,13 @@ begin
         end;
       end;
 
+      if (C = clNone) or (C = clDefault) then C := clBtnText;
       Canvas.Font.Color := C;
+      {$IFDEF FPC}
+      Windows.SelectObject(Canvas.Handle, Canvas.Font.Reference.Handle);
+      Windows.SetTextColor(Canvas.Handle, ColorToRGB(C));
+      Windows.SetBkMode(Canvas.Handle, TRANSPARENT);
+      {$ENDIF}
       PaintDefault := True;
       DoPaintCaption(Canvas, ClientAreaRect, CaptionRect, IsTextRotated, PaintDefault);
       if PaintDefault then
@@ -1916,7 +1922,12 @@ begin
 
       CaptionRect.Right := CaptionRect.Left + TextSize.CX;
 
+      if (C = clNone) or (C = clDefault) then C := clMenuText;
       Canvas.Font.Color := C;
+      {$IFDEF FPC}
+      Windows.SetTextColor(Canvas.Handle, ColorToRGB(C));
+      Windows.SetBkMode(Canvas.Handle, TRANSPARENT);
+      {$ENDIF}
       PaintDefault := True;
       DoPaintCaption(Canvas, ClientAreaRect, CaptionRect, IsTextRotated, PaintDefault);
       if PaintDefault then
@@ -1937,7 +1948,12 @@ begin
         if (Bottom - Top) - (tmHeight + tmExternalLeading) = Margins.BottomHeight then Dec(Bottom);
         Inc(Top, TextMetrics.tmExternalLeading);
       end;
+      if (C = clNone) or (C = clDefault) then C := clMenuText;
       Canvas.Font.Color := C;
+      {$IFDEF FPC}
+      Windows.SetTextColor(Canvas.Handle, ColorToRGB(C));
+      Windows.SetBkMode(Canvas.Handle, TRANSPARENT);
+      {$ENDIF}
       PaintDefault := True;
       DoPaintCaption(Canvas, ClientAreaRect, CaptionRect, IsTextRotated, PaintDefault);
       if PaintDefault then

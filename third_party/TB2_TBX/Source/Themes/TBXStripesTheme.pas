@@ -371,10 +371,31 @@ var
   InMenuBar: Boolean;
 
   procedure _Draw(Color: TColor);
+  var
+    TS: TTextStyle;
   begin
+    if (Color = clNone) or (Color = clDefault) then Color := clBtnText;
     Canvas.Font.Color := Color;
-    if not Rotated then DrawText(Canvas.Handle, ACaption, -1, R, AFormat)
-    else DrawRotatedText(Canvas.Handle, ACaption, R, AFormat);
+    if not Rotated then
+    begin
+      {$IFDEF FPC}
+      TS := Canvas.TextStyle;
+      TS.Opaque := False;
+      TS.Clipping := True;
+      TS.SingleLine := True;
+      TS.ShowPrefix := (AFormat and DT_NOPREFIX = 0) and (AFormat and DT_HIDEPREFIX = 0);
+      if (AFormat and DT_CENTER) <> 0 then TS.Alignment := taCenter
+      else if (AFormat and DT_RIGHT) <> 0 then TS.Alignment := taRightJustify
+      else TS.Alignment := taLeftJustify;
+      if (AFormat and DT_VCENTER) <> 0 then TS.Layout := tlCenter
+      else TS.Layout := tlTop;
+      Canvas.TextRect(R, R.Left, R.Top, ACaption, TS);
+      {$ELSE}
+      DrawText(Canvas.Handle, ACaption, -1, R, AFormat);
+      {$ENDIF}
+    end
+    else
+      DrawRotatedText(Canvas.Handle, ACaption, R, AFormat);
   end;
 
 begin

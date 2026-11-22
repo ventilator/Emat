@@ -31381,7 +31381,42 @@ end;
 function InterlockedIncrement; external kernel32 name 'InterlockedIncrement';
 {$ENDIF}
 {$IFDEF WIN64}
-{$I ..\sys\InterlockedAPIs.inc}
+function InterlockedCompareExchange(var Destination: Integer; Exchange: Integer; Comparand: Integer): Integer; stdcall;
+begin
+  Result := System.InterlockedCompareExchange(Destination, Exchange, Comparand);
+end;
+function InterlockedCompareExchange64(var Destination: Int64; Exchange: Int64; Comparand: Int64): Int64; stdcall;
+begin
+  Result := System.InterlockedCompareExchange64(Destination, Exchange, Comparand);
+end;
+function InterlockedCompareExchangePointer(var Destination: Pointer; Exchange: Pointer; Comparand: Pointer): Pointer;
+begin
+  Result := System.InterlockedCompareExchange(Destination, Exchange, Comparand);
+end;
+function InterlockedDecrement(var Addend: Integer): Integer; stdcall;
+begin
+  Result := System.InterlockedDecrement(Addend);
+end;
+function InterlockedExchange(var Target: Integer; Value: Integer): Integer; stdcall;
+begin
+  Result := System.InterlockedExchange(Target, Value);
+end;
+function InterlockedExchangeAdd(Addend: PInteger; Value: Integer): Integer; stdcall; overload;
+begin
+  Result := System.InterlockedExchangeAdd(Addend^, Value);
+end;
+function InterlockedExchangeAdd(var Addend: Integer; Value: Integer): Integer; stdcall; overload;
+begin
+  Result := System.InterlockedExchangeAdd(Addend, Value);
+end;
+function InterlockedExchangePointer(var Target: Pointer; Value: Pointer): Pointer;
+begin
+  Result := System.InterlockedExchange(Target, Value);
+end;
+function InterlockedIncrement(var Addend: Integer): Integer; stdcall;
+begin
+  Result := System.InterlockedIncrement(Addend);
+end;
 {$ENDIF}
 {$IFDEF MSWINDOWS}
 function FreeResource; external kernel32 name 'FreeResource';

@@ -19,6 +19,7 @@ tests/*.dll
 tests/*.mp3
 tests/*.wma
 tests/new/
+tests/classical/
 tests/test_bass.compiled
 epldump.py
 osdwatch.py

@@ -217,7 +217,8 @@ procedure TFPlayliste.GlisteKeyDown(Key:word;Shift:tshiftstate);
 begin
     //Backspace
   if (key = 8) then
-    Fmp3.Esuche.Text := Copy(Fmp3.Esuche.Text, 0, Length(Fmp3.Esuche.Text) -1);
+    if Length(Fmp3.Esuche.Text) > 0 then
+      Fmp3.Esuche.Text := Copy(Fmp3.Esuche.Text, 1, Length(Fmp3.Esuche.Text) - 1);
 
   if (key = vk_return) then
     if fmp3.TBX_PartyMode.Checked then

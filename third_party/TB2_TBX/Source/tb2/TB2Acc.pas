@@ -297,7 +297,7 @@ type
 {$IFNDEF CLR}
 var
   LastAccObject: TTBCustomAccObject;  { last object in the linked list }
-  LastAccObjectCritSect: {$IFnDEF FPC}TRTLCriticalSection{$ELSE}LongWord{$ENDIF};
+  LastAccObjectCritSect: TRTLCriticalSection;
 
   NotifyWinEventInited: BOOL;
   NotifyWinEventFunc: procedure(event: DWORD; hwnd: HWND; idObject: Longint;
@@ -1390,7 +1390,7 @@ begin
 end;
 
 initialization
-  InitializeCriticalSection(LastAccObjectCritSect);
+  InitCriticalSection(LastAccObjectCritSect);
   if not IsLibrary then begin
     SaveInitProc := InitProc;
     InitProc := @InitCOM;
@@ -1399,6 +1399,6 @@ finalization
   DisconnectAccObjects;
   if NeedToUninitialize then
     CoUninitialize;
-  DeleteCriticalSection(LastAccObjectCritSect);
+  DoneCriticalSection(LastAccObjectCritSect);
 {$ENDIF}
 end.

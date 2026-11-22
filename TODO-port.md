@@ -1,10 +1,12 @@
 # Emat-Port — offene Punkte
 
-Stand: 0.90-dev-freepascal-port, Lazarus 4.8 / FPC 3.2.2 i386, BASS 2.4.17.
-Release-Build: `build-release.bat` bzw. `.github/workflows/release.yml`
-(Tag `v0.90-dev-freepascal-port`, Zip mit Exe + bass.dll + basswma.dll).
-Erledigt: Oberfläche mit TBX-Themes, Playlist laden/speichern, MP3 **und** WMA
-über bass.dll + basswma, OSD, Equalizer-FX-Kette, Winamp-Input-Plugins aus.
+Stand: Windows 11 x64 (`x86_64-win64`), Lazarus 4.8 / FPC 3.2.2, BASS 2.4 (x64), libprojectM v4 (`projectM-4.dll` + `glew32.dll`).
+Release-Build: `build-release.bat` bzw. `.github/workflows/release.yml` (`Emat-*-win64.zip`).
+Erledigt:
+- Nativer 64-Bit-Port (`TB2_TBX`, `BASSPlayer`, `Emat.lpi`), 64-Bit `bass.dll` + `basswma.dll`
+- Visualisierung auf **libprojectM v4** (OpenGL 3.3 Core via `TOpenGLControl`) umgestellt — liest die 949 `.milk`-Presets direkt, inkl. Nächstes/Vorheriges/Zufälliges Preset, Sperren (`L`), Vollbild (`F11`/Doppelklick), Kontextmenü und gespeicherter Fenstergeometrie
+- Menüleisten-Beschriftungen sichtbar ohne Hover (Offscreen-`BitBlt`-Fehler in `TB2Item.pas` behoben)
+- `MarkInList`-AV abgesichert, EQ-Klick in `IEQMouseDown` behoben, 6 glyphenlose Themes aus `Emat.lpr` entfernt, `debug.log`-Rotation ab 512 KB
 
 Die Liste ist als Auswahl gedacht: jeder Punkt steht für sich, mit Aufwand und
 dem, was dafür konkret zu tun ist.

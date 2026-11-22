@@ -985,6 +985,12 @@ type
       //        may be filled with default value.
       //        The default value is 0 for numeric item, null for string item.
 
+    function GetPCMFloat(Buffer: PSingle; FrameCount: Integer): Integer;
+      // Reads interleaved stereo 32-bit float PCM samples from the active PlayChannel.
+      // Returns the number of stereo frames written to Buffer (0 if not playing).
+    function GetFFT512(Buffer: PSingle): Boolean;
+      // Reads 512 float FFT magnitude bins (BASS_DATA_FFT1024) from PlayChannel.
+
     property Mode : TPlayerMode read FPlayerMode;
       //  Indicates the state of TBASSPlayer, It can be one of followings.
       //   plmStandby : TBASSPlayer is in standby state. (= Not opened a stream to play yet)
@@ -1596,19 +1602,19 @@ end;
 
 destructor  TVisDataThread.Destroy;
 begin
+   Terminate;
    if VisTimer <> 0 then
    begin
-    // Error occurs if TVisDataThread is terminated during suspended state.
-      if not Suspended then
-         Terminate;
-
       CancelWaitableTimer(VisTimer);
       CloseHandle(VisTimer);
+      VisTimer := 0;
    end;
-
-   LockFlag.Free;
-
-   inherited Destroy;
+   if not Suspended then
+      inherited Destroy
+   else
+      FreeAndNil(LockFlag);
+   if LockFlag <> nil then
+      FreeAndNil(LockFlag);
 end;
 
 function TVisDataThread.Ready : boolean;
@@ -3179,7 +3185,7 @@ begin
      MessageHandle := LclIntf.AllocateHWnd(ProcMessage);
    //  MessageHandle := MakeObjectInstance(ProcMessage);
 
-     FOrgWndProc := Pointer(GetWindowLong(MessageHandle, GWL_WNDPROC));
+     FOrgWndProc := Pointer(GetWindowLongPtr(MessageHandle, GWLP_WNDPROC));
      MetaSyncParam.MsgHandle := MessageHandle;
      LyricSyncParam.MsgHandle := MessageHandle;
      SlideSyncParam.MsgHandle := MessageHandle;
@@ -3221,7 +3227,7 @@ begin
    BASS_SetConfig(BASS_CONFIG_WMA_PREBUF, 1);     // * Added at Ver 2.00
 
  // setup output - default device, 44100hz, stereo, 16 bits
-   if not BASS_Init(1, 44100, 0, AppHWND, nil) then
+   if not BASS_Init(-1, 44100, 0, 0, nil) then
    begin
       if not (csDesigning in ComponentState) then
          Error('Can''t initialize device');
@@ -3360,8 +3366,11 @@ var
 begin
    if not (csDesigning in ComponentState) then
    begin
-     TimerFFT.Free;
-   //  TimerTitleBar.Free;
+     if TimerFFT <> nil then
+     begin
+       TimerFFT.Enabled := False;
+       FreeAndNil(TimerFFT);
+     end;
    end;
 
    if ChannelType = Channel_Plugin then
@@ -3394,35 +3403,31 @@ begin
 
    if not (csDesigning in ComponentState) then
    begin
-     MPEG.Free;
-     Vorbis.Free;
-     AAC.Free;
-     WMA.Free;
-     WAV.Free;
-   //  QuitPluginCtrl;
-     VisDataThread.Free;
+     FreeAndNil(MPEG);
+     FreeAndNil(Vorbis);
+     FreeAndNil(AAC);
+     FreeAndNil(WMA);
+     FreeAndNil(WAV);
+     FreeAndNil(VisDataThread);
 
-     PluginConfigForm.Free;
-     MPEGFileInfoForm.Free;
-     OggVorbisInfoForm.Free;
-     WMAInfoForm.Free;
-
-    { if MessageHandle <> 0 then
-        DeallocateHWnd(MessageHandle);   }
+     FreeAndNil(PluginConfigForm);
+     FreeAndNil(MPEGFileInfoForm);
+     FreeAndNil(OggVorbisInfoForm);
+     FreeAndNil(WMAInfoForm);
    end;
 
    if BASSDLLLoaded then
    begin
-      BASS_PluginFree(0);  // Unplugs all plugins
-      BASS_Free;
-      Unload_BASSDLL;
+      try
+         if Assigned(BASS_Free) then
+            BASS_Free;
+         if Assigned(BASS_PluginFree) then
+            BASS_PluginFree(0);
+         HBASSWMA := 0;
+         HBASSAAC := 0;
+      except
+      end;
    end;
-  { if FBASSWMAReady then
-      Unload_BASSWMADLL; }
-   if HBASSWMA <> 0 then
-      BASS_PluginFree(HBASSWMA);
-   if HBASSAAC <> 0 then
-      BASS_PluginFree(HBASSAAC);
    if FBASSCDReady then
       Unload_BASSCDDLL;
    if FBASSMIDIReady then
@@ -3437,7 +3442,7 @@ begin
    Unload_MBDrawerDLL;
    Unload_VisDrawerDLL;
 
-   if not (csDesigning in ComponentState) then
+   if not (csDesigning in ComponentState) and FPluginReady then
       QuitPluginCtrl;
 
    if msgCount > 0 then
@@ -3449,13 +3454,41 @@ begin
  // Release subclassed window procedure before deallocating MessageHandle.
    if MessageHandle <> 0 then      // * Added at Ver 2.00.1
    begin
-      if GetWindowLong(MessageHandle, GWL_WNDPROC) <> LongInt(FOrgWndProc) then
-         SetWindowLong(MessageHandle, GWL_WNDPROC, LongInt(FOrgWndProc));
+      if GetWindowLongPtr(MessageHandle, GWLP_WNDPROC) <> PtrInt(FOrgWndProc) then
+         SetWindowLongPtr(MessageHandle, GWLP_WNDPROC, PtrInt(FOrgWndProc));
       DeallocateHWnd(MessageHandle);
     //  FreeObjectInstance(MessageHandle);
    end;
 
    inherited Destroy;
+end;
+
+function TBASSPlayer.GetPCMFloat(Buffer: PSingle; FrameCount: Integer): Integer;
+var
+   BytesRead: DWORD;
+begin
+   Result := 0;
+   if (Buffer = nil) or (FrameCount <= 0) or (not BASSDLLLoaded) or (PlayChannel = 0) then
+      Exit;
+   if BASS_ChannelIsActive(PlayChannel) <> BASS_ACTIVE_PLAYING then
+      Exit;
+   BytesRead := BASS_ChannelGetData(PlayChannel, Buffer,
+     DWORD(FrameCount * 2 * SizeOf(Single)) or BASS_DATA_FLOAT);
+   if (BytesRead <> DW_ERROR) and (BytesRead > 0) then
+      Result := Integer(BytesRead div (2 * SizeOf(Single)));
+end;
+
+function TBASSPlayer.GetFFT512(Buffer: PSingle): Boolean;
+var
+   Res: DWORD;
+begin
+   Result := False;
+   if (Buffer = nil) or (not BASSDLLLoaded) or (PlayChannel = 0) then
+      Exit;
+   if BASS_ChannelIsActive(PlayChannel) <> BASS_ACTIVE_PLAYING then
+      Exit;
+   Res := BASS_ChannelGetData(PlayChannel, Buffer, BASS_DATA_FFT1024);
+   Result := (Res <> DW_ERROR);
 end;
 
 // Get the version information as string

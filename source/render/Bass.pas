@@ -811,10 +811,10 @@ function BASS_SampleGetChannel(handle: HSAMPLE; onlynew: BOOL): HCHANNEL; stdcal
 function BASS_SampleGetChannels(handle: HSAMPLE; channels: Pointer): DWORD; stdcall; external bassdll;
 function BASS_SampleStop(handle: HSAMPLE): BOOL; stdcall; external bassdll;
 
-function BASS_StreamCreate(freq, chans, flags: DWORD; proc: Pointer; user: DWORD): HSTREAM; stdcall; external bassdll;
+function BASS_StreamCreate(freq, chans, flags: DWORD; proc: Pointer; user: Pointer): HSTREAM; stdcall; external bassdll;
 function BASS_StreamCreateFile(mem: BOOL; f: Pointer; offset, length, flags: DWORD): HSTREAM; stdcall; external bassdll;
-function BASS_StreamCreateURL(url: PChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: DWORD):HSTREAM; stdcall; external bassdll;
-function BASS_StreamCreateFileUser(buffered: BOOL; flags: DWORD; proc: STREAMFILEPROC; user: DWORD): HSTREAM; stdcall; external bassdll;
+function BASS_StreamCreateURL(url: PChar; offset: DWORD; flags: DWORD; proc: DOWNLOADPROC; user: Pointer):HSTREAM; stdcall; external bassdll;
+function BASS_StreamCreateFileUser(buffered: BOOL; flags: DWORD; proc: STREAMFILEPROC; user: Pointer): HSTREAM; stdcall; external bassdll;
 function BASS_StreamFree(handle: HSTREAM): BOOL; stdcall; external bassdll;
 function BASS_StreamGetFilePosition(handle:HSTREAM; mode:DWORD) : DWORD;stdcall;external bassdll;
 
@@ -827,7 +827,7 @@ function BASS_RecordGetInfo(var info:BASS_RECORDINFO):BOOL;stdcall;external bass
 function BASS_RecordGetInputName(input:Integer):PChar;stdcall;external bassdll;
 function BASS_RecordSetInput(input:Integer; setting:DWORD):BOOL;stdcall;external bassdll;
 function BASS_RecordGetInput(input:Integer):DWORD;stdcall;external bassdll;
-function BASS_RecordStart(freq,chans,flags:DWORD; proc:RECORDPROC; user:DWORD):HRECORD;stdcall;external bassdll;
+function BASS_RecordStart(freq,chans,flags:DWORD; proc:RECORDPROC; user:Pointer):HRECORD;stdcall;external bassdll;
 
 function BASS_ChannelBytes2Seconds(handle: DWORD; pos: QWORD): FLOAT; stdcall;external bassdll;
 function BASS_ChannelSeconds2Bytes(handle: DWORD; pos: FLOAT): QWORD; stdcall;external bassdll;
@@ -856,9 +856,9 @@ function BASS_ChannelSetPosition(handle: DWORD; pos: QWORD; mode: DWORD = 0): BO
 function BASS_ChannelGetPosition(handle: DWORD): QWORD; stdcall; external bassdll;
 function BASS_ChannelGetLevel(handle: DWORD): DWORD; stdcall; external bassdll;
 function BASS_ChannelGetData(handle: DWORD; buffer: Pointer; length: DWORD): DWORD; stdcall; external bassdll;
-function BASS_ChannelSetSync(handle: DWORD; stype: DWORD; param: QWORD; proc: SYNCPROC; user: DWORD): HSYNC; stdcall; external bassdll;
+function BASS_ChannelSetSync(handle: DWORD; stype: DWORD; param: QWORD; proc: SYNCPROC; user: Pointer): HSYNC; stdcall; external bassdll;
 function BASS_ChannelRemoveSync(handle: DWORD; sync: HSYNC): BOOL; stdcall; external bassdll;
-function BASS_ChannelSetDSP(handle: DWORD; proc: DSPPROC; user: DWORD; priority: Integer): HDSP; stdcall; external bassdll;
+function BASS_ChannelSetDSP(handle: DWORD; proc: DSPPROC; user: Pointer; priority: Integer): HDSP; stdcall; external bassdll;
 function BASS_ChannelRemoveDSP(handle: DWORD; dsp: HDSP): BOOL; stdcall; external bassdll;
 function BASS_ChannelSetEAXMix(handle: DWORD; mix: FLOAT): BOOL; stdcall; external bassdll;
 function BASS_ChannelGetEAXMix(handle: DWORD; var mix: FLOAT): BOOL; stdcall; external bassdll;

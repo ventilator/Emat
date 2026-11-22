@@ -46,7 +46,7 @@ uses
 
 
   udatenbank, usave, uspieler, ulang, uincex, uliste, GListe2, ustatus,
-  UOSD, Spin;
+  UOSD, Spin, WinTaskbar, UPortableSync, BASSPlayer, PluginCtrl, ULangMgr, UPanelHeader;
 
 
 const
@@ -57,7 +57,7 @@ const
 {$I emversion.inc}
   Version     = EMAT_VERSION;
 {$ELSE}
-  Version     = '0.91-dev-freepascal-port';
+  Version     = '0.92-leap';
 {$ENDIF}
   extendedDebugLogInfo = False;
   FormCaption = '';
@@ -685,7 +685,38 @@ type
     procedure ClearScreenText;
 
     //HotKeymessages abfangen
+  private
+    FTaskbar: TWinTaskbarMedia;
+    FVis2D: TPaintBox;
+    FVis2DTimer: TTimer;
+    FVis2DBuf: TBitmap;
+    FVis2DPeaks: array[0..31] of Single;
+    FVis2DWaveform: Boolean;
+    FCoverGradStart: TColor;
+    FCoverGradEnd: TColor;
+    FPanelHeaders: array of TPanelHeaderBar;
+    FMILangDE: TTBXItem;
+    FMILangEN: TTBXItem;
     procedure WMHotKey(var Msg: TLMessage); message WM_HOTKEY;
+    procedure WndProc(var Message: TMessage); override;
+    procedure AppMinimizeHandler(Sender: TObject);
+    procedure UpdateTrayAndTaskbarState;
+    procedure Vis2DTimerTick(Sender: TObject);
+    procedure Vis2DPaint(Sender: TObject);
+    procedure Vis2DClick(Sender: TObject);
+    procedure ArrangePlaylistWindows(Mode: Integer);
+    procedure TBXI_TileHorizClick(Sender: TObject);
+    procedure TBXI_TileVertClick(Sender: TObject);
+    procedure TBXI_CascadeClick(Sender: TObject);
+    procedure LMDFGradientCoverPaint(Sender: TObject);
+    procedure TBXI_OSDConfigClick(Sender: TObject);
+    procedure TBXI_PortableSyncClick(Sender: TObject);
+    procedure InitPanelHeaders;
+    procedure RefreshPanelHeaders;
+    procedure PanelHeaderClosed(Sender: TObject);
+    procedure ApplyCurrentLanguage;
+    procedure TBXI_LangDEClick(Sender: TObject);
+    procedure TBXI_LangENClick(Sender: TObject);
     function ChangeSize(Handle: Hwnd; dHeight, dWidth: Integer;
       ScreenCenter: Boolean): Boolean;
     procedure LoadEQ_Presets;
@@ -961,7 +992,7 @@ end;
 
 function TFmp3.ExtractRealFilename(filename :string) :string;
 begin
-  Result:=Copy(Filename, 0, length(Filename)-length( ExtractFileExt(Filename) ))
+  Result:=Copy(Filename, 1, length(Filename)-length( ExtractFileExt(Filename) ))
 end;
 
 procedure TFmp3.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -973,6 +1004,10 @@ begin
   Tanimation.Enabled:=false;
   SpielerTimer.Enabled:=false;
   Ttaskbarscroller.Enabled:=false;
+  ScreenText_refresher.Enabled:=false;
+  if FVis2DTimer <> nil then FVis2DTimer.Enabled := False;
+  FreeAndNil(FTaskbar);
+  FreeAndNil(FVis2DBuf);
 
   for i:=0 to High(FPlaylisten) do
   begin
@@ -1006,43 +1041,61 @@ begin
    end;
    }
 
-  Save.S_Einstellungen;
-  Save.CloseIniFile;
+  try
+    Save.S_Einstellungen;
+    Save.CloseIniFile;
+  except
+    on E: Exception do Log('FormClose Save: ' + E.ClassName + ': ' + E.Message);
+  end;
 
-  if not noTBXsave then TBIniSavePositions(Self,Speicherpfad+VISSETTINGS, '');
+  if not noTBXsave then
+    try
+      TBIniSavePositions(Self, Speicherpfad + VISSETTINGS, '');
+    except
+      on E: Exception do Log('FormClose TBIniSavePositions: ' + E.ClassName + ': ' + E.Message);
+    end;
 
-  RemoveHotkeys;
+  try
+    RemoveHotkeys;
+  except
+  end;
 
-  //Wird ja eh alles geschlossen, wenn der Prozess weg ist
-  //Spieler.Stop;
-  Spieler.Free;
-  //BmpGradient_Clock.Free;
+  try
+    TrayIcon.Visible := False;
+  except
+  end;
+
+  if mHandle <> 0 then
+  begin
+    CloseHandle(mHandle);
+    mHandle := 0;
+  end;
+
+  Windows.ExitProcess(0);
 end;
 
 
 procedure TFmp3.TrayIconDblClick(Sender: TObject);
 begin
-  if minimiert
-    then
-      begin
-        flaut.Visible:=false;
-        Application.Restore;
-        Application.MainForm.Show;
-
-        with Screen do  //Animation von Bernd Hikele
-        DrawAnimatedRects(Handle,3,Rect(Width-20, Height, Width-10, Height),
-                                BoundsRect);
-        minimiert:=false;
-      end
+  if minimiert or (not Visible) then
+  begin
+    flaut.Visible := false;
+    if TBXCBtaskbuttton.Checked then
+      ShowInTaskBar := stDefault;
+    Show;
+    WindowState := wsNormal;
+    Application.Restore;
+    BringToFront;
+    minimiert := false;
+  end
+  else
+  begin
+    if TBXCBmintotray.Checked then
+      Hide
     else
-      begin
-        Application.Minimize;
-
-        with Screen do  //Animation von Bernd Hikele
-        DrawAnimatedRects(Handle,3,BoundsRect,Rect(Width-20, Height, Width-10,
-                                Height));
-        minimiert:=true;
-      end;
+      Application.Minimize;
+    minimiert := true;
+  end;
 end;
 
 procedure TFmp3.TBXIBeenden1Click(Sender: TObject);
@@ -1086,38 +1139,47 @@ end;
 
                //Fortschrittliches Element nach oben/unten scrollen
 procedure TFmp3.MarkInList;       //uk name
+var
+  PL: TFPlayliste;
+  Zeilen, Ziel, NeuErster: Integer;
 begin
- FPlaylisten[Aktiv.SpielendeListe].BringToFront;
+  if (Aktiv.SpielendeListe < 0) or (Aktiv.SpielendeListe > High(FPlaylisten)) then
+    Exit;
+  PL := FPlaylisten[Aktiv.SpielendeListe];
+  if (PL = nil) or (PL.GListe1 = nil) or (PL.GListe1.liste.l0 = nil) then
+    Exit;
 
- if FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement>=0
- then
- begin
+  if PL.HandleAllocated and PL.Visible then
+    PL.BringToFront;
 
-  if FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement>5
-  then
-   if FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement
-   >=(FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1)
-   -FPlaylisten[Aktiv.SpielendeListe].GListe1.GetZeilen-5
-   then FPlaylisten[Aktiv.SpielendeListe].GListe1.ersterEintrag:=
-          (FPlaylisten[Aktiv.SpielendeListe].GListe1.liste.l0.Count-1)+1
-          -FPlaylisten[Aktiv.SpielendeListe].GListe1.GetZeilen
-   else  FPlaylisten[Aktiv.SpielendeListe].GListe1.ersterEintrag:=
-          FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement-5
-  else
-   FPlaylisten[Aktiv.SpielendeListe].GListe1.ersterEintrag:=0;
-
-  if FPlaylisten[Aktiv.SpielendeListe].GListe1.markiertesElement<>
-          FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement
-  then
+  Ziel := PL.GListe1.fortschrittlichesElement;
+  if (Ziel >= 0) and (Ziel < PL.GListe1.liste.l0.Count) then
   begin
-   FPlaylisten[Aktiv.SpielendeListe].GListe1.markiertesElement:=
-          FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement;
-   ElementMarkieren(Aktiv.SpielendeListe,
-                    strtoint(FPlaylisten[Aktiv.SpielendeListe].GListe1.Liste.Nummer
-                    [FPlaylisten[Aktiv.SpielendeListe].GListe1.fortschrittlichesElement]));
-   end;
- FPlaylisten[Aktiv.SpielendeListe].GListe1.Draw;
- end;
+    Zeilen := PL.GListe1.GetZeilen;
+    if Zeilen < 1 then Zeilen := 1;
+
+    if Ziel > 5 then
+    begin
+      if Ziel >= (PL.GListe1.liste.l0.Count - 1) - Zeilen - 5 then
+        NeuErster := PL.GListe1.liste.l0.Count - Zeilen
+      else
+        NeuErster := Ziel - 5;
+    end
+    else
+      NeuErster := 0;
+    if NeuErster < 0 then NeuErster := 0;
+    PL.GListe1.ersterEintrag := NeuErster;
+
+    if PL.GListe1.markiertesElement <> Ziel then
+    begin
+      PL.GListe1.markiertesElement := Ziel;
+      if Ziel < PL.GListe1.Liste.Nummer.Count then
+        ElementMarkieren(Aktiv.SpielendeListe,
+                         StrToIntDef(PL.GListe1.Liste.Nummer[Ziel], 0));
+    end;
+    if PL.HandleAllocated and PL.Visible then
+      PL.GListe1.Draw;
+  end;
 end;
 
 procedure TFmp3.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -1864,6 +1926,7 @@ procedure TFmp3.IEQMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   EQTaste:=true;
+  IEQMouseMove(Sender, Shift, X, Y);
 end;
 
 procedure TFmp3.IEQMouseUp(Sender: TObject; Button: TMouseButton;
@@ -2281,15 +2344,17 @@ if TBXCBtrayicon.Checked then
  begin
 (* ^^ uk Damit das Trayicon unsichtbar belibt, wenn man es in den Einstellungen
 abgestellt hat ;-)  *)
+  if (iconnummer >= 0) and (iconnummer < ILanimation.Count) then
+    ILanimation.GetIcon(iconnummer, TrayIcon.Icon);
   inc(iconnummer);
-  if iconnummer=ILanimation.Count
+  if iconnummer>=ILanimation.Count
     then
       begin
         trayIcon.Icon:=Application.Icon;
         iconnummer:=1;
         Tanimation.Enabled:=false;
       end;
- end;     
+ end;
 except showmessage('[Fehler: AnimationsTimer]');end;
 end;
 
@@ -2428,7 +2493,11 @@ begin
 
 
 
-    LMDFGradientCover.Color :=  CurrentTheme.GetItemImageBackground(tbxinfo);
+    LMDFGradientCover.Color := CurrentTheme.GetItemImageBackground(tbxinfo);
+    FCoverGradStart := CurrentTheme.GetItemImageBackground(tbxinfo);
+    FCoverGradEnd := CurrentTheme.GetItemTextColor(tbxinfo);
+    LMDFGradientCover.Invalidate;
+    RefreshPanelHeaders;
 
  {   with BmpGradient_Clock do
     begin
@@ -2455,7 +2524,8 @@ var
   Items, Items2: TStringlist;
 begin
   try
-    TBXSubmenuItem1.Clear;
+    while TBXSubmenuItem1.Count > 0 do
+      TBXSubmenuItem1.Items[TBXSubmenuItem1.Count - 1].Free;
     Items := TStringlist.Create;
     Items2:= TStringList.Create;
 
@@ -2508,8 +2578,26 @@ begin
       TBXSubmenuItem1.Add(TBXItem);
       (FindComponent('TBXDockablePanel'+id) as TTBXDockablePanel).Tag:=strtoint(id);
     end;
+
+    // MDI-Fensteranordnung unter &Fenster
+    TBXSubmenuItem1.Add(TTBXSeparatorItem.Create(Self));
+
+    TBXItem := TTBXItem.Create(Self);
+    TBXItem.Caption := Tr('Playlisten nebeneinander', 'Tile Playlists Vertically');
+    TBXItem.OnClick := TBXI_TileVertClick;
+    TBXSubmenuItem1.Add(TBXItem);
+
+    TBXItem := TTBXItem.Create(Self);
+    TBXItem.Caption := Tr('Playlisten untereinander', 'Tile Playlists Horizontally');
+    TBXItem.OnClick := TBXI_TileHorizClick;
+    TBXSubmenuItem1.Add(TBXItem);
+
+    TBXItem := TTBXItem.Create(Self);
+    TBXItem.Caption := Tr('Playlisten überlappend', 'Cascade Playlists');
+    TBXItem.OnClick := TBXI_CascadeClick;
+    TBXSubmenuItem1.Add(TBXItem);
   except
-    Fehler(Format(MENUEERROR, [PANELCAPTION]));
+    on E: Exception do Log('DockablePanelMenuErstellen: ' + E.ClassName + ': ' + E.Message);
   end;
 end;
 
@@ -2524,12 +2612,13 @@ end;
 procedure TFmp3.TBXCBtaskbutttonChange(Sender: TObject);
 begin
   if TBXCBtaskbuttton.Checked then
-  begin
-  end else
+    ShowInTaskBar := stDefault
+  else
   begin
     TBXCBtrayicon.Checked := true;
     TBXCBmintotray.Checked := true;
     TBXCBscrolltitle.Checked := false;
+    ShowInTaskBar := stNever;
   end;
 end;
 
@@ -2537,6 +2626,8 @@ end;
 procedure TFmp3.FormShow(Sender: TObject);
 var i:integer;
     Parameter : TStringlist;
+    MI_Ext : TTBXItem;
+    Sub_Lang : TTBXSubmenuItem;
 begin
   if not CreateDone then
   if not CreateDone
@@ -2583,6 +2674,76 @@ begin
     //EQ laden
     LoadEQ_Presets;
 
+    try
+      // Playlist-Dialogfilter fuer JSON (.epl/.json) und M3U8 erweitern
+      OpenD.Filter := 'Alle Playlisten (*.epl;*.json;*.m3u8;*.m3u)|*.epl;*.json;*.m3u8;*.m3u|Emat Playlisten (*.epl;*.json)|*.epl;*.json|M3U8 Playlisten (*.m3u8;*.m3u)|*.m3u8;*.m3u|Alle Dateien (*.*)|*.*';
+      SaveD.Filter := 'Emat Playliste JSON (*.epl)|*.epl|Emat Playliste (*.json)|*.json|M3U8 Playliste (*.m3u8)|*.m3u8|Alle Dateien (*.*)|*.*';
+
+      // OSD-Einstellungen laden
+      if FOSD = nil then FOSD := TEmatOSD.CreateNewOSD(Self);
+      FOSD.LoadSettings(Speicherpfad + 'Emat.ini');
+
+      // Minimize-to-Tray + Cover-Gradient + Windows-11-Taskbar-Medientasten
+      Application.OnMinimize := AppMinimizeHandler;
+      LMDFGradientCover.OnPaint := LMDFGradientCoverPaint;
+      if FTaskbar = nil then
+      begin
+        FTaskbar := TWinTaskbarMedia.Create(Handle);
+        FTaskbar.InitButtons;
+      end;
+
+      // Eingebetteter 2D-Spektrum-/Oszilloskop-Visualizer in TBXDockablePanel2
+      if (FVis2D = nil) and (TBXDockablePanel2 <> nil) then
+      begin
+        FVis2D := TPaintBox.Create(Self);
+        FVis2D.Parent := TBXDockablePanel2;
+        FVis2D.Align := alClient;
+        FVis2D.Hint := 'Klick wechselt zwischen Spektrum und Oszilloskop';
+        FVis2D.ShowHint := True;
+        FVis2D.OnPaint := Vis2DPaint;
+        FVis2D.OnClick := Vis2DClick;
+        FVis2DTimer := TTimer.Create(Self);
+        FVis2DTimer.Interval := 33;
+        FVis2DTimer.OnTimer := Vis2DTimerTick;
+        FVis2DTimer.Enabled := True;
+      end;
+
+      // Menuepunkte unter Extras: OSD-Einstellungen, Tragbares Geraet & Sprache
+      if TBXSIspezial <> nil then
+      begin
+        TBXSIspezial.Add(TTBXSeparatorItem.Create(Self));
+        MI_Ext := TTBXItem.Create(Self);
+        MI_Ext.Caption := 'OSD-Einstellungen...';
+        MI_Ext.OnClick := TBXI_OSDConfigClick;
+        TBXSIspezial.Add(MI_Ext);
+
+        MI_Ext := TTBXItem.Create(Self);
+        MI_Ext.Caption := 'Tragbares Gerät synchronisieren...';
+        MI_Ext.OnClick := TBXI_PortableSyncClick;
+        TBXSIspezial.Add(MI_Ext);
+
+        Sub_Lang := TTBXSubmenuItem.Create(Self);
+        Sub_Lang.Caption := 'Sprache / Language';
+        FMILangDE := TTBXItem.Create(Self);
+        FMILangDE.Caption := 'Deutsch';
+        FMILangDE.OnClick := TBXI_LangDEClick;
+        Sub_Lang.Add(FMILangDE);
+        FMILangEN := TTBXItem.Create(Self);
+        FMILangEN.Caption := 'English';
+        FMILangEN.OnClick := TBXI_LangENClick;
+        Sub_Lang.Add(FMILangEN);
+        TBXSIspezial.Add(Sub_Lang);
+      end;
+
+      // Panel-Kopfzeilen (X zum Schliessen + Drei-Punkte-Menue zum Andocken)
+      InitPanelHeaders;
+      LoadLanguageSetting(Speicherpfad + 'Emat.ini');
+      ApplyCurrentLanguage;
+      SetColor;
+    except
+      on E: Exception do Log('FormShow init: ' + E.ClassName + ': ' + E.Message + ' @ ' + BackTraceStrFunc(ExceptAddr));
+    end;
+
     CreateDone := true;
     AllowDatenbankListeAusgeben:=True;
 
@@ -2604,8 +2765,11 @@ begin
   count:=0;
   for i:=0 to parameter.Count-1 do
   begin
-    //Playlisten öffnen
-    if ExtractFileExt(Parameter[i])=PlayListExt
+    //Playlisten öffnen (.epl, .json, .m3u8, .m3u)
+    if SameText(ExtractFileExt(Parameter[i]), PlayListExt) or
+       SameText(ExtractFileExt(Parameter[i]), '.json') or
+       SameText(ExtractFileExt(Parameter[i]), '.m3u8') or
+       SameText(ExtractFileExt(Parameter[i]), '.m3u')
     then
       begin
       ListeLaden(Parameter[i]);
@@ -2684,7 +2848,7 @@ begin
     else
       Album_Year := Aktiv.ScreenText_Jahr;
   FOSD.ShowOSD(TransText, Album_Year, Aktiv.ScreenText_Dauer,
-               TBXI_ScreenText.Checked, 5000);
+               TBXI_ScreenText.Checked, 0);
 end;
 
 
@@ -2717,9 +2881,9 @@ begin
   Parameter:=TStringlist.Create;
   for i := 0 to (anzahl - 1) do
   begin
-    size := DragQueryFile(Msg.WParam, i , nil, 0) + 1;
-    Dateiname:= StrAlloc(size);
-    DragQueryFile(Msg.WParam,i , Dateiname, size);
+    size := DragQueryFile(Msg.WParam, i , nil, 0);
+    Dateiname:= StrAlloc(size + 1);
+    DragQueryFile(Msg.WParam,i , Dateiname, size + 1);
     Parameter.Add(Dateiname);
     StrDispose(Dateiname);
   end;
@@ -4174,18 +4338,34 @@ begin
 end;
 
 procedure Tfmp3.Log(Text:string);
+const
+  MAX_LOG_BYTES = 512 * 1024; // 512 KB rotation threshold
 var time: cardinal;
     F: TextFile;
-    FN: string;
+    FN, OldFN: string;
+    SR: TSearchRec;
 begin
   time:= Gettickcount - ematstarttickcount;
 
   MLog.Lines.Add(Format('[ %d ] ',[time])+Text);
 
   { Port: dieselben Meldungen zusaetzlich in eine Datei (debug.log), damit man
-    beim Debuggen nicht auf das Log-Fenster schauen muss. }
+    beim Debuggen nicht auf das Log-Fenster schauen muss. Rotiert ab 512 KB. }
   FN := ExtractFilePath(ParamStr(0)) + 'debug.log';
   try
+    if SysUtils.FindFirst(FN, faAnyFile, SR) = 0 then
+    begin
+      try
+        if SR.Size > MAX_LOG_BYTES then
+        begin
+          OldFN := FN + '.old';
+          if FileExists(OldFN) then DeleteFile(OldFN);
+          RenameFile(FN, OldFN);
+        end;
+      finally
+        SysUtils.FindClose(SR);
+      end;
+    end;
     AssignFile(F, FN);
     if FileExists(FN) then Append(F) else Rewrite(F);
     WriteLn(F, Format('[ %d ] ',[time]) + Text);
@@ -5010,7 +5190,7 @@ try
         EQPresets[i].name := Preset.GetAttribute('name');
 
         //Wortanfang (Winamp) wegloeschen
-        if '(WinAmp) '=Copy(EQPresets[i].name,0,Length('(WinAmp) ') )
+        if '(WinAmp) '=Copy(EQPresets[i].name,1,Length('(WinAmp) ') )
          then EQPresets[i].name:=Copy(EQPresets[i].name,Length('(WinAmp) ')+1,Length(EQPresets[i].name));
 
         cbEQPresets.Items.Add(EQPresets[i].name);
@@ -5041,6 +5221,365 @@ except
 end;
 end;
 
+
+
+procedure TFmp3.WndProc(var Message: TMessage);
+begin
+  inherited WndProc(Message);
+  if FTaskbar <> nil then
+  begin
+    if (FTaskbar.TaskbarCreatedMsg <> 0) and (Message.Msg = FTaskbar.TaskbarCreatedMsg) then
+      FTaskbar.InitButtons
+    else if (Message.Msg = WM_COMMAND) and (HiWord(Message.WParam) = THBN_CLICKED) then
+    begin
+      case LoWord(Message.WParam) of
+        TBTN_ID_PREV: Zurueckschalten;
+        TBTN_ID_PLAY:
+          if (Spieler <> nil) and (Spieler.BassPlayer1 <> nil) and
+             (Spieler.BassPlayer1.Mode = plmPlaying) then
+            Pause
+          else
+            AplayExecute(Self);
+        TBTN_ID_NEXT: ANextExecute(Self);
+      end;
+    end;
+  end;
+end;
+
+procedure TFmp3.AppMinimizeHandler(Sender: TObject);
+begin
+  if TBXCBmintotray.Checked then
+  begin
+    TrayIcon.Visible := True;
+    Hide;
+    minimiert := True;
+  end;
+end;
+
+procedure TFmp3.UpdateTrayAndTaskbarState;
+var
+  IsPlaying: Boolean;
+begin
+  IsPlaying := (Spieler <> nil) and (Spieler.BassPlayer1 <> nil) and
+               (Spieler.BassPlayer1.Mode = plmPlaying);
+  if FTaskbar <> nil then
+    FTaskbar.SetPlaying(IsPlaying);
+end;
+
+procedure TFmp3.Vis2DClick(Sender: TObject);
+begin
+  FVis2DWaveform := not FVis2DWaveform;
+  if FVis2D <> nil then
+    FVis2D.Invalidate;
+end;
+
+procedure TFmp3.Vis2DTimerTick(Sender: TObject);
+begin
+  UpdateTrayAndTaskbarState;
+  if (FVis2D <> nil) and (TBXDockablePanel2 <> nil) and TBXDockablePanel2.Visible then
+    FVis2D.Invalidate;
+end;
+
+procedure TFmp3.Vis2DPaint(Sender: TObject);
+const
+  BANDS = 32;
+var
+  W, H, i, b, BinStart, BinEnd, BarW, BarH, PeakY, X1, X2: Integer;
+  FFT: array[0..511] of Single;
+  PCM: array[0..511] of Single;
+  HasData: Boolean;
+  Mag, PeakVal: Single;
+  Frames, MidY, PrevX, PrevY, CurX, CurY: Integer;
+  BgCol, BarCol, PeakCol: TColor;
+begin
+  if FVis2D = nil then Exit;
+  W := FVis2D.Width;
+  H := FVis2D.Height;
+  if (W < 16) or (H < 16) then Exit;
+
+  if FVis2DBuf = nil then
+    FVis2DBuf := TBitmap.Create;
+  if (FVis2DBuf.Width <> W) or (FVis2DBuf.Height <> H) then
+    FVis2DBuf.SetSize(W, H);
+
+  BgCol := ColorToRGB(FCoverGradStart);
+  if BgCol = 0 then BgCol := $00202020;
+  BarCol := ColorToRGB(FCoverGradEnd);
+  if (BarCol = BgCol) or (BarCol = 0) then BarCol := clLime;
+  PeakCol := clWhite;
+
+  with FVis2DBuf.Canvas do
+  begin
+    Brush.Color := BgCol;
+    FillRect(0, 0, W, H);
+
+    if FVis2DWaveform then
+    begin
+      Frames := 0;
+      if (Spieler <> nil) and (Spieler.BassPlayer1 <> nil) then
+        Frames := Spieler.BassPlayer1.GetPCMFloat(@PCM[0], 256);
+      MidY := H div 2;
+      Pen.Color := BarCol;
+      Pen.Width := 1;
+      if Frames > 1 then
+      begin
+        PrevX := 0;
+        PrevY := MidY - Round(PCM[0] * (H * 0.45));
+        MoveTo(PrevX, PrevY);
+        for i := 1 to Frames - 1 do
+        begin
+          CurX := (i * (W - 1)) div (Frames - 1);
+          CurY := MidY - Round(((PCM[i * 2] + PCM[i * 2 + 1]) * 0.5) * (H * 0.45));
+          if CurY < 1 then CurY := 1;
+          if CurY > H - 2 then CurY := H - 2;
+          LineTo(CurX, CurY);
+        end;
+      end
+      else
+      begin
+        MoveTo(0, MidY);
+        LineTo(W, MidY);
+      end;
+    end
+    else
+    begin
+      HasData := (Spieler <> nil) and (Spieler.BassPlayer1 <> nil) and
+                 Spieler.BassPlayer1.GetFFT512(@FFT[0]);
+      BarW := W div BANDS;
+      if BarW < 2 then BarW := 2;
+
+      for b := 0 to BANDS - 1 do
+      begin
+        Mag := 0;
+        if HasData then
+        begin
+          BinStart := Round(Exp(b / BANDS * Ln(256))) - 1;
+          BinEnd := Round(Exp((b + 1) / BANDS * Ln(256))) - 1;
+          if BinStart < 1 then BinStart := 1;
+          if BinEnd < BinStart then BinEnd := BinStart;
+          if BinEnd > 511 then BinEnd := 511;
+          PeakVal := 0;
+          for i := BinStart to BinEnd do
+            if FFT[i] > PeakVal then PeakVal := FFT[i];
+          Mag := Sqrt(PeakVal) * 2.4;
+          if Mag > 1.0 then Mag := 1.0;
+        end;
+
+        if Mag > FVis2DPeaks[b] then
+          FVis2DPeaks[b] := Mag
+        else
+        begin
+          FVis2DPeaks[b] := FVis2DPeaks[b] - 0.03;
+          if FVis2DPeaks[b] < 0 then FVis2DPeaks[b] := 0;
+        end;
+
+        X1 := b * BarW + 1;
+        X2 := (b + 1) * BarW - 1;
+        if X2 <= X1 then X2 := X1 + 1;
+
+        BarH := Round(Mag * (H - 4));
+        if BarH > 0 then
+        begin
+          Brush.Color := BarCol;
+          FillRect(X1, H - 2 - BarH, X2, H - 2);
+        end;
+
+        PeakY := H - 3 - Round(FVis2DPeaks[b] * (H - 4));
+        if PeakY < H - 3 then
+        begin
+          Brush.Color := PeakCol;
+          FillRect(X1, PeakY, X2, PeakY + 2);
+        end;
+      end;
+    end;
+  end;
+
+  FVis2D.Canvas.Draw(0, 0, FVis2DBuf);
+end;
+
+procedure TFmp3.ArrangePlaylistWindows(Mode: Integer);
+{ Mode: 0 = Tile Horizontal (untereinander), 1 = Tile Vertical (nebeneinander), 2 = Cascade }
+var
+  OpenForms: array of TFPlayliste;
+  i, Count, AreaW, AreaH, StepX, StepY, CellW, CellH: Integer;
+begin
+  SetLength(OpenForms, 0);
+  for i := 0 to High(FPlaylisten) do
+    if (FPlaylisten[i] <> nil) and FPlaylisten[i].Visible then
+    begin
+      SetLength(OpenForms, Length(OpenForms) + 1);
+      OpenForms[High(OpenForms)] := FPlaylisten[i];
+    end;
+
+  Count := Length(OpenForms);
+  if Count = 0 then Exit;
+
+  AreaW := ClientWidth;
+  AreaH := ClientHeight;
+  if AreaW < 200 then AreaW := 600;
+  if AreaH < 150 then AreaH := 400;
+
+  for i := 0 to Count - 1 do
+    OpenForms[i].WindowState := wsNormal;
+
+  case Mode of
+    0: begin // Horizontal (untereinander)
+      CellH := AreaH div Count;
+      for i := 0 to Count - 1 do
+        OpenForms[i].SetBounds(0, i * CellH, AreaW, CellH);
+    end;
+    1: begin // Vertical (nebeneinander)
+      CellW := AreaW div Count;
+      for i := 0 to Count - 1 do
+        OpenForms[i].SetBounds(i * CellW, 0, CellW, AreaH);
+    end;
+    2: begin // Cascade (ueberlappend)
+      StepX := 28;
+      StepY := 28;
+      CellW := AreaW - StepX * (Count - 1);
+      CellH := AreaH - StepY * (Count - 1);
+      if CellW < 240 then CellW := 240;
+      if CellH < 180 then CellH := 180;
+      for i := 0 to Count - 1 do
+      begin
+        OpenForms[i].SetBounds(i * StepX, i * StepY, CellW, CellH);
+        OpenForms[i].BringToFront;
+      end;
+    end;
+  end;
+end;
+
+procedure TFmp3.TBXI_TileHorizClick(Sender: TObject);
+begin
+  ArrangePlaylistWindows(0);
+end;
+
+procedure TFmp3.TBXI_TileVertClick(Sender: TObject);
+begin
+  ArrangePlaylistWindows(1);
+end;
+
+procedure TFmp3.TBXI_CascadeClick(Sender: TObject);
+begin
+  ArrangePlaylistWindows(2);
+end;
+
+procedure TFmp3.LMDFGradientCoverPaint(Sender: TObject);
+var
+  C1, C2: LongInt;
+  R1, G1, B1, R2, G2, B2, y, H, W: Integer;
+  T: Double;
+begin
+  if LMDFGradientCover = nil then Exit;
+  W := LMDFGradientCover.ClientWidth;
+  H := LMDFGradientCover.ClientHeight;
+  if (W <= 0) or (H <= 0) then Exit;
+
+  C1 := ColorToRGB(FCoverGradStart);
+  C2 := ColorToRGB(FCoverGradEnd);
+  R1 := Red(C1); G1 := Green(C1); B1 := Blue(C1);
+  R2 := Red(C2); G2 := Green(C2); B2 := Blue(C2);
+
+  for y := 0 to H - 1 do
+  begin
+    T := (y / H) * 0.45; // subtle theme gradient
+    LMDFGradientCover.Canvas.Pen.Color := RGBToColor(
+      Round(R1 + (R2 - R1) * T),
+      Round(G1 + (G2 - G1) * T),
+      Round(B1 + (B2 - B1) * T));
+    LMDFGradientCover.Canvas.MoveTo(0, y);
+    LMDFGradientCover.Canvas.LineTo(W, y);
+  end;
+end;
+
+procedure TFmp3.TBXI_OSDConfigClick(Sender: TObject);
+begin
+  if FOSD = nil then
+  begin
+    FOSD := TEmatOSD.CreateNewOSD(Self);
+    FOSD.LoadSettings(Speicherpfad + 'Emat.ini');
+  end;
+  FOSD.ShowConfigDialog(Self, Speicherpfad + 'Emat.ini');
+end;
+
+procedure TFmp3.TBXI_PortableSyncClick(Sender: TObject);
+begin
+  ShowPortableSyncDialog(Self, Datenbank, Aktiv.Liste);
+end;
+
+procedure TFmp3.InitPanelHeaders;
+var
+  i: Integer;
+  DP: TTBXDockablePanel;
+  Hdr: TPanelHeaderBar;
+  Panels: array of TTBXDockablePanel;
+begin
+  if Length(FPanelHeaders) > 0 then Exit;
+  SetLength(Panels, 0);
+  for i := 0 to ComponentCount - 1 do
+    if Components[i] is TTBXDockablePanel then
+    begin
+      SetLength(Panels, Length(Panels) + 1);
+      Panels[High(Panels)] := TTBXDockablePanel(Components[i]);
+    end;
+
+  DisableAutoSizing;
+  try
+    for i := 0 to High(Panels) do
+    begin
+      DP := Panels[i];
+      Hdr := TPanelHeaderBar.CreateForPanel(DP, DP,
+        TBXMultiDock1, TBXMultiDock4, TBXMultiDock2, TBXMultiDock3,
+        PanelHeaderClosed);
+      SetLength(FPanelHeaders, Length(FPanelHeaders) + 1);
+      FPanelHeaders[High(FPanelHeaders)] := Hdr;
+    end;
+  finally
+    EnableAutoSizing;
+  end;
+  RefreshPanelHeaders;
+end;
+
+procedure TFmp3.RefreshPanelHeaders;
+var
+  i: Integer;
+begin
+  for i := 0 to High(FPanelHeaders) do
+  begin
+    if FPanelHeaders[i] <> nil then
+    begin
+      FPanelHeaders[i].RefreshTitleAndLanguage;
+      FPanelHeaders[i].ApplyThemeColors(FCoverGradStart, FCoverGradEnd);
+    end;
+  end;
+end;
+
+procedure TFmp3.PanelHeaderClosed(Sender: TObject);
+begin
+  DockablePanelMenuErstellen;
+end;
+
+procedure TFmp3.ApplyCurrentLanguage;
+begin
+  ApplyLanguageToForm(Self, CurrentLang);
+  if FMILangDE <> nil then FMILangDE.Checked := (CurrentLang = langDE);
+  if FMILangEN <> nil then FMILangEN.Checked := (CurrentLang = langEN);
+  DockablePanelMenuErstellen;
+  RefreshPanelHeaders;
+  Invalidate;
+end;
+
+procedure TFmp3.TBXI_LangDEClick(Sender: TObject);
+begin
+  SaveLanguageSetting(Speicherpfad + 'Emat.ini', langDE);
+  ApplyCurrentLanguage;
+end;
+
+procedure TFmp3.TBXI_LangENClick(Sender: TObject);
+begin
+  SaveLanguageSetting(Speicherpfad + 'Emat.ini', langEN);
+  ApplyCurrentLanguage;
+end;
 
 
 initialization //uk | Um zu verhindern, dass Emat mehrmals gestartet wird,

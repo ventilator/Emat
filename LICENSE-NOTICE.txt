@@ -14,8 +14,12 @@ BASS - nicht unter GPL (BASS is not GPL)
 Dieses Paket enthaelt unveraenderte Kopien der Audio-Bibliotheken von
 un4seen developments:
 
-  bass.dll      - BASS audio library 2.4
-  basswma.dll   - BASS WMA add-on
+  bass.dll      - BASS audio library 2.4 (x64)
+  basswma.dll   - BASS WMA add-on (x64)
+  bassflac.dll  - BASS FLAC add-on (x64)
+  bass_aac.dll  - BASS AAC/MP4 add-on (x64)
+  bass_ac3.dll  - BASS AC3 add-on (x64)
+  bass_fx.dll   - BASS FX add-on (x64)
 
 Copyright (c) un4seen developments - https://www.un4seen.com/
 
@@ -33,3 +37,20 @@ Emat. See https://www.un4seen.com/ for details.
 Wer die DLLs nicht mitliefern will, kann Emat auch ohne sie betreiben:
 bass.dll wird beim Start aus dem Programmverzeichnis geladen und kann dort
 durch eine eigene, rechtmaessig erworbene Kopie ersetzt werden.
+
+
+libprojectM - LGPL-2.1
+----------------------
+
+Visualisierungen nutzen libprojectM v4 (projectM-4.dll), bereitgestellt aus
+dem offiziellen Windows-x64-Release (projectMSDL-2.0.0-win64):
+  https://github.com/projectM-visualizer/frontend-sdl-cpp/releases
+
+  projectM-4.dll - libprojectM v4 (GNU Lesser General Public License v2.1)
+  https://github.com/projectM-visualizer/projectm
+
+  glew32.dll     - OpenGL Extension Wrangler Library (Modified BSD / MIT)
+  https://glew.sourceforge.net/
+
+projectM-4.dll wird dynamisch zur Laufzeit geladen und kann jederzeit durch
+eine eigene kompatible x64-Version ersetzt werden.

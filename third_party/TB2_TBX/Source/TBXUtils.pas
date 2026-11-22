@@ -932,14 +932,14 @@ end;
 
 { Drawing routines }
 
-(*{$IFDEF WIN64}
+{$IFDEF CPUX64}
 function GetBGR(C: TColorRef): Cardinal;
 begin
   Result := ((C and $00FF0000) shr 16) or
              (C and $0000FF00) or
             ((C and $000000FF) shl 16);
 end;
-{$ELSE}*)
+{$ELSE}
 function GetBGR(C: TColorRef): Cardinal;
 asm
         MOV     ECX,EAX         // this function swaps R and B bytes in ABGR
@@ -949,7 +949,7 @@ asm
         SHL     EAX,16
         MOV     AX,CX
 end;
-{.$ENDIF}
+{$ENDIF}
 
 procedure SetPixelEx(DC: HDC; X, Y: Integer; C: TColorRef; Alpha: Longword = $FF);
 var

@@ -2588,7 +2588,7 @@ begin
 
    hFakeWindow := CreateFakeWindow(ParentHandle);
    if hFakeWindow <> 0 then
-      OrgWndProc := Pointer(GetWindowLong(hFakeWindow, GWL_WNDPROC));
+      OrgWndProc := Pointer(GetWindowLongPtr(hFakeWindow, GWLP_WNDPROC));
 
    hMBWindow := MiniBrowser;
    DataMsgId := DataReadyMsg;
@@ -2617,7 +2617,7 @@ begin
          FreeLibrary(PluginInfo[i].DLLHandle);
       end;
 
-   if (omod <> nil) then
+   if (omod <> nil) and Assigned(omod.Quit) then
       omod.Quit;
 
    if (pBuf <> nil) then
@@ -2637,8 +2637,8 @@ begin
  // Release subclassed window procedure before destroying the Fake Window
    if hFakeWindow <> 0 then
    begin
-      if GetWindowLong(hFakeWindow, GWL_WNDPROC) <> LongInt(OrgWndProc) then
-         SetWindowLong(hFakeWindow, GWL_WNDPROC, LongInt(OrgWndProc));
+      if GetWindowLongPtr(hFakeWindow, GWLP_WNDPROC) <> PtrInt(OrgWndProc) then
+         SetWindowLongPtr(hFakeWindow, GWLP_WNDPROC, PtrInt(OrgWndProc));
       DestroyFakeWindow;
    end;
 

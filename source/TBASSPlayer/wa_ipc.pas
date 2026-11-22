@@ -1676,12 +1676,12 @@ var
   dwProcessId: DWORD;
   phandle: THandle;
   P: Pointer;
-  C: Cardinal;
+  C: PtrUInt;
   PB: Pointer;
   B: Byte;
 begin
   Result := '';
-  GetWindowThreadProcessID(wnd, pointer(dwProcessId));
+  GetWindowThreadProcessID(wnd, @dwProcessId);
   phandle := OpenProcess(PROCESS_VM_READ, False, dwProcessId);
   if phandle = 0 then exit;
   P := Pointer(SendMessage(wnd, uMsg, wParam, lParam));
@@ -1693,7 +1693,7 @@ begin
     if B <> 0 then begin
       Result := Result + Chr(B);
     end;
-    P := Pointer(DWord(P)+1);
+    P := Pointer(PtrUInt(P)+1);
   until (B=0);
 
   CloseHandle(phandle);

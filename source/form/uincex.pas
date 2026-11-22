@@ -24,18 +24,29 @@ uses sysutils;
 
 procedure IncEx(var X: integer; max: integer; min: integer = 0);
 begin
-  if X = max
+  if (X >= max) or (X < min)
     then X := min
     else inc(X);
 end;
 
 function CopyEx(SourceString:string;Start,Stop:integer):string;
-var i:integer;
+var
+  Len: integer;
 begin
-  if stop=-1 then stop:=length(SourceString);
-  Result:='';
-  for i:=Start to Stop do
-  Result:=Result+SourceString[i];
+  Len := Length(SourceString);
+  if (Len = 0) or (Start > Len) then
+  begin
+    Result := '';
+    Exit;
+  end;
+  if Start < 1 then Start := 1;
+  if (Stop = -1) or (Stop > Len) then Stop := Len;
+  if Stop < Start then
+  begin
+    Result := '';
+    Exit;
+  end;
+  Result := Copy(SourceString, Start, Stop - Start + 1);
 end;
 
 function NatCompare(const Item1, Item2: WideString): Integer;
@@ -80,6 +91,24 @@ var
     Inc(Start, Laenge); 
   end; 
 
+  function CompareNumericStr(const A, B: WideString): Integer;
+  var
+    pA, pB, lenA, lenB: Integer;
+  begin
+    pA := 1;
+    while (pA < Length(A)) and (A[pA] = '0') do Inc(pA);
+    pB := 1;
+    while (pB < Length(B)) and (B[pB] = '0') do Inc(pB);
+    lenA := Length(A) - pA + 1;
+    lenB := Length(B) - pB + 1;
+    if lenA <> lenB then
+      Result := lenA - lenB
+    else
+      Result := WideCompareStr(Copy(A, pA, lenA), Copy(B, pB, lenB));
+    if Result = 0 then
+      Result := Length(A) - Length(B);
+  end;
+
 begin
   Result := 0; 
 
@@ -96,8 +125,8 @@ begin
     S2 := GetNext(Item2, Start2, N2); 
 
     // Haben wir zwei Zahlen? 
-    if N1 and N2 then // Ja -> Zahlen Vergleichen 
-      Result := StrToInt(S1) - StrToInt(S2)
+    if N1 and N2 then // Ja -> Zahlen Vergleichen (ohne Int32-Ueberlauf)
+      Result := CompareNumericStr(S1, S2)
     else // Nein -> Normaler Stringvergleich 
       Result := WideCompareStr(S1, S2); 
 
@@ -117,24 +146,28 @@ begin
   { Create the Dialog }
   { Dialog erzeugen }
   aMsgDlg := CreateMessageDialog(Msg, DlgType, Buttons);
-  captionIndex := 0;
-  { Loop through Objects in Dialog }
-  { Über alle Objekte auf dem Dialog iterieren}
-  for i := 0 to aMsgDlg.ComponentCount - 1 do
-  begin
-   { If the object is of type TButton, then }
-   { Wenn es ein Button ist, dann...}
-    if (aMsgDlg.Components[i] is TButton) then
+  try
+    captionIndex := 0;
+    { Loop through Objects in Dialog }
+    { Über alle Objekte auf dem Dialog iterieren}
+    for i := 0 to aMsgDlg.ComponentCount - 1 do
     begin
-      dlgButton := TButton(aMsgDlg.Components[i]);
-      if CaptionIndex > High(Captions) then Break;
-      { Give a new caption from our Captions array}
-      { Schreibe Beschriftung entsprechend Captions array}
-      dlgButton.Caption := Captions[CaptionIndex];
-      Inc(CaptionIndex);
+     { If the object is of type TButton, then }
+     { Wenn es ein Button ist, dann...}
+      if (aMsgDlg.Components[i] is TButton) then
+      begin
+        dlgButton := TButton(aMsgDlg.Components[i]);
+        if CaptionIndex > High(Captions) then Break;
+        { Give a new caption from our Captions array}
+        { Schreibe Beschriftung entsprechend Captions array}
+        dlgButton.Caption := Captions[CaptionIndex];
+        Inc(CaptionIndex);
+      end;
     end;
+    Result := aMsgDlg.ShowModal;
+  finally
+    aMsgDlg.Free;
   end;
-  Result := aMsgDlg.ShowModal;
 end;
 
 

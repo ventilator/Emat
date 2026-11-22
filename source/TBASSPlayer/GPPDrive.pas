@@ -117,7 +117,7 @@ begin
 
    hFakeWindow := GetFakeWinHandle;
    if hFakeWindow <> 0 then
-      OrgWindowProc := pointer(GetWindowLong(hFakeWindow, GWL_WNDPROC));
+      OrgWindowProc := Pointer(GetWindowLongPtr(hFakeWindow, GWLP_WNDPROC));
 
    result := hFakeWindow;
 end;
@@ -129,8 +129,8 @@ begin
    if hFakeWindow = 0 then
       exit;
 
-   if (OrgWindowProc <> pointer(GetWindowLong(hFakeWindow, GWL_WNDPROC))) then
-      SetWindowLong(hFakeWindow, GWL_WNDPROC, LongInt(OrgWindowProc));
+   if (OrgWindowProc <> Pointer(GetWindowLongPtr(hFakeWindow, GWLP_WNDPROC))) then
+      SetWindowLongPtr(hFakeWindow, GWLP_WNDPROC, PtrInt(OrgWindowProc));
 
    hFakeWindow := 0;
 end;

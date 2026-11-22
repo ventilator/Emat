@@ -702,47 +702,16 @@ end;
 
 
 procedure TSpieler.VisConfig;
-{ Port: startet die Winamp-Visualisierung (Milkdrop 2) in einem eigenen
-  Fenster. Der Vis-Treiber in VisDrive2.pas schiebt das Plug-in-Fenster in
-  das Handle von VisPanel; ohne VisDrawer2.dll (die es nicht mehr gibt)
-  laeuft das direkt, also FUseVisDrawer = False. }
-var
-  PluginPfad : string;
+{ Startet die projectM-v4-Visualisierung (OpenGL 3.3 Core) im eigenen Fenster. }
 begin
   if FVisForm = nil then
   begin
     FVisForm := TVisForm.Create(nil);
-    FVisForm.Show;
-    Application.ProcessMessages;              // Handle muss existieren
-    BassPlayer1.VisEMBEDHandle := FVisForm.VisPanel.Handle;
-
-    PluginPfad := GetEnvironmentVariable('EMAT_VIS_DLL');
-    if PluginPfad = '' then
-      PluginPfad := GetProgDir + 'Plugins\vis_milk2.dll';
-    if not FileExists(PluginPfad) then
-      fmp3.Log('Vis: Plug-in fehlt: ' + PluginPfad)
-    else
-    begin
-      if BassPlayer1.RunVisPlugin(PluginPfad, 0) then
-        fmp3.Log('Vis: RunVisPlugin gestartet: ' + PluginPfad)
-      else
-        fmp3.Log('Vis: RunVisPlugin lieferte false (' + PluginPfad + ')');
-
-      { Der Vis-Treiber meldet den erfolgreichen Start (StartVisOut) erst in
-        seinem WM_SHOWWINDOW-Zweig. Weil das Panel beim Start des Plug-ins
-        schon sichtbar ist, kommt dieses Ereignis nie - das Panel aus- und
-        wieder einschalten loest es aus. Das passiert in einem Timer, weil der
-        Treiber sein Fenster erst kurz nach RunVisPlugin anlegt; ein einzelner
-        Schubs direkt danach kam zu frueh (Milkdrop blieb schwarz). }
-      Application.ProcessMessages;
-      ShowWindow(FVisForm.VisPanel.Handle, 0 {SW_HIDE});
-      Application.ProcessMessages;
-      ShowWindow(FVisForm.VisPanel.Handle, 5 {SW_SHOW});
-      Application.ProcessMessages;
-    end;
-  end
-  else
-    FVisForm.Show;
+    FVisForm.OnGetPCM := BassPlayer1.GetPCMFloat;
+    FVisForm.OnLog := fmp3.Log;
+  end;
+  FVisForm.Show;
+  FVisForm.BringToFront;
 end;
 
 

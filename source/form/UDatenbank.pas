@@ -3,6 +3,7 @@ unit UDatenbank;
 interface
                                                
 uses dialogs, sysutils, strutils, classes, controls, windows, shellapi,
+      fpjson, jsonparser,
       oggvorbis, wmafile, Mp3FileUtils,
       ulang, uincex;
 
@@ -176,6 +177,8 @@ type
  //   function GetArrayindex(Index, Liste: integer): integer;
 
     procedure LoadPlaylist(FileName:string; ListenNummer:integer);
+    procedure LoadPlaylistJSON(const FileName: string; ListenNummer: integer);
+    procedure LoadPlaylistM3U8(const FileName: string; ListenNummer: integer);
 
     procedure ListeLeeren(Liste: integer);
 
@@ -184,6 +187,9 @@ type
     procedure RenameItem(ListenNummer,ElementNummer: integer);
 
     procedure SavePlaylist(FileName:string; ListenNummer:integer);
+    procedure SavePlaylistJSON(const FileName: string; ListenNummer: integer);
+    procedure SavePlaylistM3U8(const FileName: string; ListenNummer: integer);
+    procedure SavePlaylistLegacyBinary(FileName:string; ListenNummer:integer);
 
     procedure OrdnerAnListeAnhaengen(Verzeichnis: string; ListenNummer: integer);
 
@@ -475,19 +481,28 @@ end;
 
 function TDatenbank.GetPreviousElementNummer(ListenNummer:integer):integer;
 begin
+  Result := 0;
+  if not ListeExists(ListenNummer) then Exit;
   with Mp3DatenMeta[ListenNummer] do
    begin
-     result:=history[historyposition+1];
-     if historyposition<high(history) then inc(historyposition);
+     if historyposition < high(history) then
+     begin
+       result := history[historyposition + 1];
+       inc(historyposition);
+     end
+     else
+       result := history[high(history)];
    end;
 end;
 
 
 function TDatenbank.GetNextElementNummer(ListenNummer:integer; var ElementNummer:integer):boolean;
 begin
+  Result := False;
+  if not ListeExists(ListenNummer) then Exit;
   with Mp3DatenMeta[ListenNummer] do
   begin
-    if historyposition=0 then
+    if historyposition<=0 then
       Result:=false
     else
       begin
@@ -502,14 +517,15 @@ end;
 procedure TDatenbank.History_QueueItem(ListenNummer,ElementNummer:integer;
                                        Position : integer = 0 );
 var i:integer;
-                      
+
 begin
+  if not ListeExists(ListenNummer) then Exit;
   with Mp3DatenMeta[ListenNummer] do
   begin
-    if (ListeExists(ListenNummer)) and (history[Position]<>ElementNummer)
+    if (Position >= 0) and (Position <= High(history)) and (history[Position]<>ElementNummer)
     then
       begin
-        for i:=high(history) downto 1 do
+        for i:=high(history) downto Position + 1 do
           history[i]:=history[i-1];
         history[Position]:=ElementNummer;
         if historyposition<high(history) then inc(historyposition);
@@ -1402,7 +1418,9 @@ end;
 procedure TDatenbank.LoadPlaylist(FileName:string; ListenNummer:integer);
 
  var Datei : TFileStream;
-     Mp3DatenSaetze,DateiDatenVersion,i : integer;
+     Mp3DatenSaetze,DateiDatenVersion,i,TmpInt : integer;
+     FirstByte: AnsiChar;
+     Ext: string;
 
   function LoadString : string;
   { Port: Playlisten aus der Delphi-Zeit enthalten CP1252-Bytes. Da 'string'
@@ -1413,6 +1431,8 @@ procedure TDatenbank.LoadPlaylist(FileName:string; ListenNummer:integer);
       Raw: RawByteString;
   begin
     Datei.ReadBuffer( Stringlength, SizeOf(Stringlength) );
+    if (Stringlength < 0) or (Stringlength > 65536) then
+      raise Exception.Create('Ungueltige Stringlaenge in Playlist');
     SetLength( Raw, stringlength );
     if (Stringlength > 0) then
       Datei.ReadBuffer( Raw[1], Stringlength * SizeOf(Char) );
@@ -1423,8 +1443,46 @@ procedure TDatenbank.LoadPlaylist(FileName:string; ListenNummer:integer);
   end;
 
 begin
- if fileexists(FileName)
- then
+ if not fileexists(FileName) then
+ begin
+   MessageDlg(Format(PLSNOTFOUND, [FileName]),mtWarning,[mbOk],0);
+   Exit;
+ end;
+
+ Ext := LowerCase(ExtractFileExt(FileName));
+ if (Ext = '.m3u') or (Ext = '.m3u8') then
+ begin
+   LoadPlaylistM3U8(FileName, ListenNummer);
+   Exit;
+ end;
+
+ // Auto-detect UTF-8 JSON v2 format (starts with '{' or UTF-8 BOM + '{')
+ begin
+   Datei := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+   try
+     FirstByte := #0;
+     if Datei.Size > 0 then
+     begin
+       Datei.ReadBuffer(FirstByte, 1);
+       if (Byte(FirstByte) = $EF) and (Datei.Size >= 4) then
+       begin
+         Datei.Seek(3, soFromBeginning);
+         Datei.ReadBuffer(FirstByte, 1);
+       end;
+       while (FirstByte in [' ', #9, #10, #13]) and (Datei.Position < Datei.Size) do
+         Datei.ReadBuffer(FirstByte, 1);
+     end;
+   finally
+     Datei.Free;
+   end;
+   if FirstByte = '{' then
+   begin
+     LoadPlaylistJSON(FileName, ListenNummer);
+     Exit;
+   end;
+ end;
+
+ // Legacy binary .epl reader
   begin
    Datei:=TFileStream.Create(FileName,fmOpenRead or fmShareDenyWrite);
    try
@@ -1441,20 +1499,29 @@ begin
         begin
           Datei.ReadBuffer(offen, SizeOf(offen));
           Datei.ReadBuffer(AnzahlSuchpfade, SizeOf(integer));
+          if (AnzahlSuchpfade < 0) or (AnzahlSuchpfade > 10000) then
+            raise Exception.Create('Ungueltige AnzahlSuchpfade');
           SetLength(Suchpfade,AnzahlSuchPfade);
           for i:=0 to AnzahlSuchpfade-1 do
             SuchPfade[i]:=LoadString;
           Datei.ReadBuffer(maxNummer, SizeOf(integer));
           for i:=0 to 4 do
-            Datei.ReadBuffer(AnzeigeSpalten[i], SizeOf(integer));
+          begin
+            Datei.ReadBuffer(TmpInt, SizeOf(integer));
+            AnzeigeSpalten[i] := Byte(TmpInt);
+          end;
           SuchText:=LoadString;
           for i:=0 to 99 do
             Datei.ReadBuffer(history[i], SizeOf(integer));
           Datei.ReadBuffer(historyPosition, SizeOf(integer));
+          if (historyPosition < 0) or (historyPosition > High(history)) then
+            historyPosition := 0;
           Datei.ReadBuffer(mode, SizeOf(integer));
         end;
 
         Datei.ReadBuffer( Mp3DatenSaetze , SizeOf(integer) );
+        if (Mp3DatenSaetze < 0) or (Mp3DatenSaetze > 500000) then
+          raise Exception.Create('Ungueltige Anzahl Eintraege');
         SetLength(Mp3Daten[ListenNummer],Mp3DatenSaetze);
 
         for i:=0 to Mp3DatenSaetze-1 do
@@ -1497,16 +1564,336 @@ begin
       Datei.Free;
       exit;
    end;
-  end
- else
-  begin
-   MessageDlg(Format(PLSNOTFOUND, [FileName]),mtWarning,[mbOk],0);
-   exit;
   end;
 end;
 
 
 procedure TDatenbank.SavePlaylist(FileName:string; ListenNummer:integer);
+var
+  Ext: string;
+begin
+  if not ListeExists(ListenNummer) then Exit;
+  Ext := LowerCase(ExtractFileExt(FileName));
+  if (Ext = '.m3u') or (Ext = '.m3u8') then
+    SavePlaylistM3U8(FileName, ListenNummer)
+  else
+    SavePlaylistJSON(FileName, ListenNummer);
+end;
+
+procedure TDatenbank.SavePlaylistJSON(const FileName: string; ListenNummer: integer);
+var
+  Root, MetaObj, ItemObj, TagObj: TJSONObject;
+  PathsArr, ColsArr, HistArr, TracksArr: TJSONArray;
+  SL: TStringList;
+  i: Integer;
+begin
+  if not ListeExists(ListenNummer) then Exit;
+  Mp3DatenMeta[ListenNummer].FileName := FileName;
+
+  Root := TJSONObject.Create;
+  try
+    Root.Add('format', 'emat-playlist');
+    Root.Add('version', 2);
+
+    MetaObj := TJSONObject.Create;
+    with Mp3DatenMeta[ListenNummer] do
+    begin
+      MetaObj.Add('offen', offen);
+      MetaObj.Add('maxNummer', maxNummer);
+      MetaObj.Add('suchText', SuchText);
+      MetaObj.Add('historyPosition', historyPosition);
+      MetaObj.Add('mode', mode);
+
+      PathsArr := TJSONArray.Create;
+      for i := 0 to High(SuchPfade) do
+        PathsArr.Add(SuchPfade[i]);
+      MetaObj.Add('suchPfade', PathsArr);
+
+      ColsArr := TJSONArray.Create;
+      for i := 0 to 4 do
+        ColsArr.Add(Integer(AnzeigeSpalten[i]));
+      MetaObj.Add('anzeigeSpalten', ColsArr);
+
+      HistArr := TJSONArray.Create;
+      for i := 0 to High(history) do
+        HistArr.Add(history[i]);
+      MetaObj.Add('history', HistArr);
+    end;
+    Root.Add('meta', MetaObj);
+
+    TracksArr := TJSONArray.Create;
+    for i := 0 to High(Mp3Daten[ListenNummer]) do
+    begin
+      ItemObj := TJSONObject.Create;
+      with Mp3Daten[ListenNummer, i] do
+      begin
+        ItemObj.Add('nummer', Nummer);
+        ItemObj.Add('filename', Filename);
+        ItemObj.Add('path', Path);
+        ItemObj.Add('size', Size);
+        ItemObj.Add('anzeige', Anzeige);
+        ItemObj.Add('dauer', Dauer);
+        ItemObj.Add('spielcounter', Spielcounter);
+        ItemObj.Add('defekt', Defekt);
+
+        TagObj := TJSONObject.Create;
+        TagObj.Add('titel', id3tag.Titel);
+        TagObj.Add('artist', id3tag.Artist);
+        TagObj.Add('album', id3tag.Album);
+        TagObj.Add('year', id3tag.Year);
+        TagObj.Add('comment', id3tag.Comment);
+        TagObj.Add('genre', id3tag.Genre);
+        TagObj.Add('dauer', id3tag.dauer);
+        TagObj.Add('track', id3tag.Track);
+        TagObj.Add('ausgelesen', id3tag.ausgelesen);
+        ItemObj.Add('id3tag', TagObj);
+      end;
+      TracksArr.Add(ItemObj);
+    end;
+    Root.Add('tracks', TracksArr);
+
+    SL := TStringList.Create;
+    try
+      SL.Text := Root.FormatJSON();
+      SL.SaveToFile(FileName);
+    finally
+      SL.Free;
+    end;
+  finally
+    Root.Free;
+  end;
+end;
+
+procedure TDatenbank.LoadPlaylistJSON(const FileName: string; ListenNummer: integer);
+var
+  SL: TStringList;
+  Data: TJSONData;
+  Root, MetaObj, ItemObj, TagObj: TJSONObject;
+  Arr: TJSONArray;
+  i, MaxN: Integer;
+begin
+  if not FileExists(FileName) then Exit;
+  SL := TStringList.Create;
+  Data := nil;
+  try
+    SL.LoadFromFile(FileName);
+    Data := GetJSON(SL.Text);
+    if not (Data is TJSONObject) then Exit;
+    Root := TJSONObject(Data);
+
+    Mp3DatenMeta[ListenNummer].FileName := FileName;
+    Mp3DatenMeta[ListenNummer].offen := True;
+
+    if Root.Find('meta') is TJSONObject then
+    begin
+      MetaObj := TJSONObject(Root.Find('meta'));
+      with Mp3DatenMeta[ListenNummer] do
+      begin
+        offen := MetaObj.Get('offen', True);
+        maxNummer := MetaObj.Get('maxNummer', 0);
+        SuchText := MetaObj.Get('suchText', '');
+        historyPosition := MetaObj.Get('historyPosition', 0);
+        if (historyPosition < 0) or (historyPosition > High(history)) then
+          historyPosition := 0;
+        mode := MetaObj.Get('mode', 0);
+
+        if MetaObj.Find('suchPfade') is TJSONArray then
+        begin
+          Arr := TJSONArray(MetaObj.Find('suchPfade'));
+          AnzahlSuchPfade := Arr.Count;
+          SetLength(SuchPfade, Arr.Count);
+          for i := 0 to Arr.Count - 1 do
+            SuchPfade[i] := Arr.Strings[i];
+        end;
+
+        if MetaObj.Find('anzeigeSpalten') is TJSONArray then
+        begin
+          Arr := TJSONArray(MetaObj.Find('anzeigeSpalten'));
+          for i := 0 to 4 do
+            if i < Arr.Count then
+              AnzeigeSpalten[i] := Byte(Arr.Integers[i]);
+        end;
+
+        if MetaObj.Find('history') is TJSONArray then
+        begin
+          Arr := TJSONArray(MetaObj.Find('history'));
+          for i := 0 to High(history) do
+            if i < Arr.Count then
+              history[i] := Arr.Integers[i]
+            else
+              history[i] := 0;
+        end;
+      end;
+    end;
+
+    MaxN := Mp3DatenMeta[ListenNummer].maxNummer;
+    if Root.Find('tracks') is TJSONArray then
+    begin
+      Arr := TJSONArray(Root.Find('tracks'));
+      SetLength(Mp3Daten[ListenNummer], Arr.Count);
+      for i := 0 to Arr.Count - 1 do
+      begin
+        if not (Arr.Items[i] is TJSONObject) then Continue;
+        ItemObj := TJSONObject(Arr.Items[i]);
+        with Mp3Daten[ListenNummer, i] do
+        begin
+          Nummer := ItemObj.Get('nummer', i + 1);
+          if Nummer > MaxN then MaxN := Nummer;
+          Filename := ItemObj.Get('filename', '');
+          Path := ItemObj.Get('path', '');
+          Size := ItemObj.Get('size', 0);
+          Anzeige := ItemObj.Get('anzeige', True);
+          Dauer := ItemObj.Get('dauer', '');
+          Spielcounter := ItemObj.Get('spielcounter', 0);
+          Defekt := ItemObj.Get('defekt', False);
+          if ItemObj.Find('id3tag') is TJSONObject then
+          begin
+            TagObj := TJSONObject(ItemObj.Find('id3tag'));
+            id3tag.Titel := TagObj.Get('titel', '');
+            id3tag.Artist := TagObj.Get('artist', '');
+            id3tag.Album := TagObj.Get('album', '');
+            id3tag.Year := TagObj.Get('year', '');
+            id3tag.Comment := TagObj.Get('comment', '');
+            id3tag.Genre := TagObj.Get('genre', '');
+            id3tag.dauer := TagObj.Get('dauer', 0);
+            id3tag.Track := TagObj.Get('track', 0);
+            id3tag.ausgelesen := TagObj.Get('ausgelesen', False);
+          end;
+        end;
+      end;
+      Mp3DatenMeta[ListenNummer].maxNummer := MaxN;
+    end;
+  except
+    on E: Exception do
+      MessageDlg(Format(PLSNOTLOAD, [FileName]) + sLineBreak + E.Message, mtWarning, [mbOk], 0);
+  end;
+  Data.Free;
+  SL.Free;
+end;
+
+procedure TDatenbank.SavePlaylistM3U8(const FileName: string; ListenNummer: integer);
+var
+  SL: TStringList;
+  i, Secs: Integer;
+  Disp, FullPath: string;
+begin
+  if not ListeExists(ListenNummer) then Exit;
+  SL := TStringList.Create;
+  try
+    SL.Add('#EXTM3U');
+    for i := 0 to High(Mp3Daten[ListenNummer]) do
+    begin
+      with Mp3Daten[ListenNummer, i] do
+      begin
+        Secs := id3tag.dauer;
+        if Secs <= 0 then Secs := -1;
+        if (id3tag.Artist <> '') and (id3tag.Titel <> '') then
+          Disp := id3tag.Artist + ' - ' + id3tag.Titel
+        else if id3tag.Titel <> '' then
+          Disp := id3tag.Titel
+        else
+          Disp := ChangeFileExt(Filename, '');
+        SL.Add(Format('#EXTINF:%d,%s', [Secs, Disp]));
+        if Path <> '' then
+          FullPath := IncludeTrailingPathDelimiter(Path) + Filename
+        else
+          FullPath := Filename;
+        SL.Add(FullPath);
+      end;
+    end;
+    SL.SaveToFile(FileName);
+  finally
+    SL.Free;
+  end;
+end;
+
+procedure TDatenbank.LoadPlaylistM3U8(const FileName: string; ListenNummer: integer);
+var
+  SL: TStringList;
+  i, CommaPos, DashPos, DurSec, Count: Integer;
+  Line, BaseDir, FullPath, ExtTitle, ArtistPart, TitlePart: string;
+begin
+  if not FileExists(FileName) then Exit;
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    BaseDir := ExtractFilePath(FileName);
+    Mp3DatenMeta[ListenNummer].FileName := FileName;
+    Mp3DatenMeta[ListenNummer].offen := True;
+    SetLength(Mp3Daten[ListenNummer], 0);
+    Count := 0;
+    DurSec := 0;
+    ExtTitle := '';
+
+    for i := 0 to SL.Count - 1 do
+    begin
+      Line := Trim(SL[i]);
+      if (i = 0) and (Length(Line) >= 3) and
+         (Byte(Line[1]) = $EF) and (Byte(Line[2]) = $BB) and (Byte(Line[3]) = $BF) then
+        Delete(Line, 1, 3);
+      if Line = '' then Continue;
+
+      if Pos('#EXTINF:', UpperCase(Line)) = 1 then
+      begin
+        CommaPos := Pos(',', Line);
+        if CommaPos > 0 then
+        begin
+          DurSec := StrToIntDef(Trim(Copy(Line, 9, CommaPos - 9)), 0);
+          ExtTitle := Trim(Copy(Line, CommaPos + 1, MaxInt));
+        end;
+        Continue;
+      end;
+      if Line[1] = '#' then Continue;
+
+      if not LooksLikeUTF8(Line) then
+        Line := WinCPToUTF8(Line);
+
+      if (Length(Line) >= 2) and (Line[2] = ':') or (Copy(Line, 1, 2) = '\\') then
+        FullPath := Line
+      else
+        FullPath := ExpandFileName(BaseDir + Line);
+
+      Inc(Count);
+      SetLength(Mp3Daten[ListenNummer], Count);
+      with Mp3Daten[ListenNummer, Count - 1] do
+      begin
+        Nummer := Count;
+        Filename := ExtractFileName(FullPath);
+        Path := ExtractFilePath(FullPath);
+        Size := 0;
+        Anzeige := True;
+        Spielcounter := 0;
+        Defekt := False;
+        id3tag.dauer := DurSec;
+        if DurSec > 0 then
+          Dauer := Format('%d:%.2d', [DurSec div 60, DurSec mod 60])
+        else
+          Dauer := '';
+        if ExtTitle <> '' then
+        begin
+          DashPos := Pos(' - ', ExtTitle);
+          if DashPos > 0 then
+          begin
+            ArtistPart := Trim(Copy(ExtTitle, 1, DashPos - 1));
+            TitlePart := Trim(Copy(ExtTitle, DashPos + 3, MaxInt));
+            id3tag.Artist := ArtistPart;
+            id3tag.Titel := TitlePart;
+          end
+          else
+            id3tag.Titel := ExtTitle;
+          id3tag.ausgelesen := False;
+        end;
+      end;
+      DurSec := 0;
+      ExtTitle := '';
+    end;
+    Mp3DatenMeta[ListenNummer].maxNummer := Count;
+  finally
+    SL.Free;
+  end;
+end;
+
+procedure TDatenbank.SavePlaylistLegacyBinary(FileName:string; ListenNummer:integer);
 
 var Datei    : TFileStream;
     Mp3DatenSaetze,i : integer;

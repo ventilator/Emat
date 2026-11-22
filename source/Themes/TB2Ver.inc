@@ -1,7 +1,7 @@
 { $jrsoftware: tb2k/Source/TB2Ver.inc,v 1.4 2002/12/24 19:01:12 jr Exp $ }
 
 { Determine Delphi/C++Builder version }
-{$IFNDEF WIN32} Delphi 1 is not supported. {$ENDIF}
+{$IFNDEF MSWINDOWS} Delphi 1 is not supported. {$ENDIF}
 {$IFNDEF VER90}  { if it's not Delphi 2.0 }
   {$IFNDEF VER93}  { and it's not C++Builder 1.0 }
     {$DEFINE JR_D3}  { then it must be at least Delphi 3 or C++Builder 3 }

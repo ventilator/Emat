@@ -1,6 +1,6 @@
 name: release
 
-# Baut Emat unter Windows (Lazarus/FPC, i386-win32) und haengt das Zip an
+# Baut Emat unter Windows (Lazarus/FPC, x86_64-win64) und haengt das Zip an
 # ein GitHub-Release. Ausgeloest von einem Tag-Push (v*), sonst nur Artefakt.
 
 on:
@@ -21,14 +21,10 @@ jobs:
         with:
           fetch-depth: 0        # git describe braucht die Tags
 
-      - name: Lazarus 4.8 mit FPC 3.2.2 installieren
+      - name: Lazarus 4.8 (win64) mit FPC 3.2.2 installieren
         shell: pwsh
         run: |
-          # Das chocolatey-Paket bringt keinen i386-win32-Compiler mit; der
-          # offizielle 32-Bit-Installer legt C:\lazarus und C:\FPC\3.2.2 an.
-          # SourceForge liefert fuer PowerShell-artige User-Agents nur eine
-          # HTML-Zwischenseite (152 KB) - curl mit curl-UA bekommt die Datei.
-          $url = 'https://downloads.sourceforge.net/project/lazarus/Lazarus%20Windows%2032%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win32.exe'
+          $url = 'https://downloads.sourceforge.net/project/lazarus/Lazarus%20Windows%2064%20bits/Lazarus%204.8/lazarus-4.8-fpc-3.2.2-win64.exe'
           $exe = Join-Path $env:RUNNER_TEMP 'lazarus-setup.exe'
           if (Test-Path $exe) { Remove-Item $exe -Force }
 
@@ -45,7 +41,7 @@ jobs:
             throw "Download zu klein ($len Bytes) - vermutlich eine HTML-Seite statt des Installers"
           }
           Start-Process -FilePath $exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-' -Wait
-          Get-ChildItem 'C:\lazarus\lazbuild.exe', 'C:\FPC\3.2.2\bin\i386-win32\ppc386.exe' -ErrorAction SilentlyContinue |
+          Get-ChildItem 'C:\lazarus\lazbuild.exe', 'C:\lazarus\fpc\3.2.2\bin\x86_64-win64\ppcx64.exe' -ErrorAction SilentlyContinue |
             Format-Table FullName, Length
 
       - name: Release bauen
@@ -70,15 +66,15 @@ jobs:
           generate_release_notes: true
           prerelease: true
           body: |
-            Portierung von Emat auf Lazarus/FPC (Windows, 32 Bit).
+            Portierung von Emat auf Lazarus/FPC (Windows 11, 64 Bit) mit projectM-v4-Visualisierung.
 
-            Enthalten: Emat.exe, bass.dll, basswma.dll, Lizenzhinweise.
+            Enthalten: Emat.exe, bass.dll, basswma.dll, projectM-4.dll, glew32.dll, Lizenzhinweise.
             BASS steht nicht unter der GPL - siehe LICENSE-NOTICE.txt im Zip.
 
       - name: Artefakt fuer manuelle Laeufe
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v7
         with:
-          name: Emat-win32
+          name: Emat-win64
           path: release/*
           if-no-files-found: error
